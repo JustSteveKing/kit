@@ -71,9 +71,14 @@ final class RegisterController
      */
     private function issueToken(User $user, string $deviceName): array
     {
-        $expirationMinutes = config('sanctum.expiration');
+        $configuredExpiration = config('sanctum.expiration');
+        $expirationMinutes = filter_var(
+            $configuredExpiration,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]],
+        );
 
-        $expiresAt = is_int($expirationMinutes) && $expirationMinutes > 0
+        $expiresAt = $expirationMinutes !== false
             ? now()->addMinutes($expirationMinutes)
             : null;
 

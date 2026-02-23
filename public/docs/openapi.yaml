@@ -40,7 +40,7 @@ paths:
                     attributes:
                       name: 'Justina Gaylord'
                       email: lafayette.considine@example.com
-                      email_verified_at: '2026-02-23T11:58:59+00:00'
+                      email_verified_at: '2026-02-23T12:07:27+00:00'
                       created_at: null
                       updated_at: null
                   meta:
@@ -68,7 +68,7 @@ paths:
                             example: lafayette.considine@example.com
                           email_verified_at:
                             type: string
-                            example: '2026-02-23T11:58:59+00:00'
+                            example: '2026-02-23T12:07:27+00:00'
                           created_at:
                             type: string
                             example: null
@@ -164,7 +164,7 @@ paths:
                     attributes:
                       name: 'Justina Gaylord'
                       email: cormier.nick@example.com
-                      email_verified_at: '2026-02-23T11:58:59+00:00'
+                      email_verified_at: '2026-02-23T12:07:27+00:00'
                       created_at: null
                       updated_at: null
                   meta:
@@ -192,7 +192,7 @@ paths:
                             example: cormier.nick@example.com
                           email_verified_at:
                             type: string
-                            example: '2026-02-23T11:58:59+00:00'
+                            example: '2026-02-23T12:07:27+00:00'
                           created_at:
                             type: string
                             example: null
@@ -525,7 +525,7 @@ paths:
                     attributes:
                       name: 'Morgan Hirthe'
                       email: dare.emelie@example.com
-                      email_verified_at: '2026-02-23T11:59:00+00:00'
+                      email_verified_at: '2026-02-23T12:07:27+00:00'
                       created_at: null
                       updated_at: null
                 properties:
@@ -549,7 +549,7 @@ paths:
                             example: dare.emelie@example.com
                           email_verified_at:
                             type: string
-                            example: '2026-02-23T11:59:00+00:00'
+                            example: '2026-02-23T12:07:27+00:00'
                           created_at:
                             type: string
                             example: null
