@@ -17,13 +17,13 @@ use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', RegisterController::class)
-    ->middleware('throttle:auth-register')
+    ->middleware(['idempotency', 'throttle:auth-register'])
     ->name('v1.auth.register');
 Route::post('/auth/login', LoginController::class)
     ->middleware('throttle:auth-login')
     ->name('v1.auth.login');
 Route::post('/auth/password/forgot', ForgotPasswordController::class)
-    ->middleware('throttle:auth-password')
+    ->middleware(['idempotency', 'throttle:auth-password'])
     ->name('v1.auth.password.forgot');
 Route::post('/auth/password/reset', ResetPasswordController::class)
     ->middleware('throttle:auth-password')

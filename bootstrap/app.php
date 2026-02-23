@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Middleware\AttachRequestId;
 use App\Http\Middleware\EnsureJsonApiRequest;
+use App\Http\Middleware\IdempotencyKey;
 use App\Http\Middleware\SetRequestLocale;
 use App\Http\Middleware\Sunset;
 use App\Support\SecurityAudit;
@@ -32,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
+            'idempotency' => IdempotencyKey::class,
             'sunset' => Sunset::class,
         ]);
 

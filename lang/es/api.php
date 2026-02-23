@@ -23,6 +23,8 @@ return [
         'too_many_requests' => 'Demasiadas solicitudes. Intentalo de nuevo mas tarde.',
         'validation_failed' => 'Los datos proporcionados no son validos.',
         'unsupported_media_type' => 'Tipo de contenido no compatible. Usa cuerpos de solicitud application/json.',
+        'idempotency_key_invalid' => 'Formato de cabecera Idempotency-Key invalido.',
+        'idempotency_key_conflict' => 'Idempotency-Key ya fue usado con un payload diferente.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'Este endpoint ha sido retirado y ya no esta disponible.',

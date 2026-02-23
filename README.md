@@ -174,6 +174,7 @@ Relevant config/env:
 - API responses include baseline hardening headers (`nosniff`, `DENY`, `no-referrer`)
 - API responses include an `X-Request-Id` header (propagated or generated)
 - Security-sensitive auth/token actions emit structured `security.audit` log events
+- Critical write endpoints support `Idempotency-Key` replay/conflict handling
 
 ## Sunset Middleware (Endpoint Deprecation)
 

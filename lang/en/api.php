@@ -23,6 +23,8 @@ return [
         'too_many_requests' => 'Too many requests. Please try again later.',
         'validation_failed' => 'The given data was invalid.',
         'unsupported_media_type' => 'Unsupported media type. Use application/json request bodies.',
+        'idempotency_key_invalid' => 'Invalid Idempotency-Key header format.',
+        'idempotency_key_conflict' => 'Idempotency-Key was already used with a different request payload.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'This endpoint has been sunset and is no longer available.',
