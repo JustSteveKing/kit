@@ -1,0 +1,453 @@
+{
+    "variable": [
+        {
+            "id": "baseUrl",
+            "key": "baseUrl",
+            "type": "string",
+            "name": "string",
+            "value": "http:\/\/kit.test"
+        }
+    ],
+    "info": {
+        "name": "Laravel API Documentation",
+        "_postman_id": "724f1fdd-1f31-49e2-9fab-847292335b92",
+        "description": "",
+        "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "description": "",
+            "item": [
+                {
+                    "name": "Token Authentication",
+                    "description": "",
+                    "item": [
+                        {
+                            "name": "Register",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/register",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/register"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"name\":\"Jane Doe\",\"email\":\"jane@example.com\",\"password\":\"password123\",\"device_name\":\"ios-app\"}"
+                                },
+                                "description": "Create a new account and issue a Sanctum bearer token.",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 201,
+                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-02-23T11:58:59+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "name": "Registration succeeded."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 422,
+                                    "body": "{\"message\":\"The given data was invalid.\",\"errors\":{\"email\":[\"The email has already been taken.\"]}}",
+                                    "name": "Validation failed."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Login",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/login",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/login"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"email\":\"jane@example.com\",\"password\":\"password123\",\"device_name\":\"ios-app\"}"
+                                },
+                                "description": "Authenticate a user and issue a Sanctum bearer token.",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-02-23T11:58:59+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "name": "Login succeeded."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 422,
+                                    "body": "{\"message\":\"The given data was invalid.\",\"errors\":{\"email\":[\"The provided credentials are incorrect.\"]}}",
+                                    "name": "Credentials were invalid."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Get Current User",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/me",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/me"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "Return the authenticated user for the current bearer token."
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-02-23T11:59:00+00:00\",\"created_at\":null,\"updated_at\":null}}}",
+                                    "name": "Authenticated user profile."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 401,
+                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "name": "Authentication failed."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Logout",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/logout",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/logout"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "Revoke the current Sanctum token."
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 204,
+                                    "body": null,
+                                    "name": "Token revoked."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 401,
+                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "name": "Authentication failed."
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Password Reset",
+                    "description": "",
+                    "item": [
+                        {
+                            "name": "Request Password Reset",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/password\/forgot",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/password\/forgot"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"email\":\"jane@example.com\"}"
+                                },
+                                "description": "Send a password reset link to the provided email if an account exists.",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"message\":\"If the account exists, a password reset link has been sent.\"}",
+                                    "name": "Password reset request accepted."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Reset Password",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/password\/reset",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/password\/reset"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"token\":\"reset-token-value\",\"email\":\"jane@example.com\",\"password\":\"new-password123\",\"password_confirmation\":\"new-password123\"}"
+                                },
+                                "description": "Reset the user password using a valid reset token.",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"message\":\"Your password has been reset.\"}",
+                                    "name": "Password reset succeeded."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 422,
+                                    "body": "{\"message\":\"The given data was invalid.\",\"errors\":{\"email\":[\"This password reset token is invalid.\"]}}",
+                                    "name": "Reset token or payload was invalid."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Read Reset Token Payload",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/password\/reset\/:token",
+                                    "query": [
+                                        {
+                                            "key": "email",
+                                            "value": "jane%40example.com",
+                                            "description": "Account email from the reset link.",
+                                            "disabled": false
+                                        }
+                                    ],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/password\/reset\/:token?email=jane%40example.com",
+                                    "variable": [
+                                        {
+                                            "id": "token",
+                                            "key": "token",
+                                            "value": "reset-token-value",
+                                            "description": "Password reset token from reset link."
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"token\":\"architecto\",\"email\":\"zbailey@example.net\"}"
+                                },
+                                "description": "Return reset token and email payload for API clients handling email reset links.",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"token\":\"reset-token-value\",\"email\":\"jane@example.com\"}",
+                                    "name": "Reset payload data."
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Email Verification",
+                    "description": "",
+                    "item": [
+                        {
+                            "name": "Verify Email",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/email\/verify\/:id\/:hash",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/email\/verify\/:id\/:hash",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "01HZX3W3T4J8Q57XNZD5BPHJ92",
+                                            "description": "User ULID from the signed verification link."
+                                        },
+                                        {
+                                            "id": "hash",
+                                            "key": "hash",
+                                            "value": "8c4f4370e5db9b5be6d0f4c95495f49f998fa32a",
+                                            "description": "SHA-1 hash of the email from the signed verification link."
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"id\":\"architecto\",\"hash\":\"ngzmiyvdljnikhwaykcmyuwpwlvqwrsitcpscqld\"}"
+                                },
+                                "description": "Verify a user email using the signed verification link parameters.",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"message\":\"Email verified successfully.\"}",
+                                    "name": "Email was verified."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 403,
+                                    "body": "{\"message\":\"Invalid verification link.\"}",
+                                    "name": "Signed URL was invalid, expired, or mismatched."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Send Verification Email",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/email\/verification-notification",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/email\/verification-notification"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "Send (or resend) an email verification link to the authenticated user."
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"message\":\"Verification link sent.\"}",
+                                    "name": "Verification email queued\/sent."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"message\":\"Email is already verified.\"}",
+                                    "name": "User already verified."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 401,
+                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "name": "Authentication failed."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "Authorization",
+                "type": "string"
+            }
+        ]
+    }
+}

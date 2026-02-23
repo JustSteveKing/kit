@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\LogoutController;
+use App\Http\Controllers\Api\V1\Auth\MeController;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\V1\Auth\SendEmailVerificationNotificationController;
+use App\Http\Controllers\Api\V1\Auth\ShowResetPasswordTokenController;
+use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
+use Illuminate\Support\Facades\Route;
+
+Route::post('/auth/register', RegisterController::class)
+    ->middleware('throttle:auth-register')
+    ->name('v1.auth.register');
+Route::post('/auth/login', LoginController::class)
+    ->middleware('throttle:auth-login')
+    ->name('v1.auth.login');
+Route::post('/auth/password/forgot', ForgotPasswordController::class)
+    ->middleware('throttle:auth-password')
+    ->name('v1.auth.password.forgot');
+Route::post('/auth/password/reset', ResetPasswordController::class)
+    ->middleware('throttle:auth-password')
+    ->name('v1.auth.password.reset');
+Route::get('/auth/password/reset/{token}', ShowResetPasswordTokenController::class)
+    ->name('password.reset');
+Route::get('/auth/email/verify/{id}/{hash}', VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (): void {
+    Route::get('/auth/me', MeController::class)->name('v1.auth.me');
+    Route::post('/auth/logout', LogoutController::class)->name('v1.auth.logout');
+    Route::post('/auth/email/verification-notification', SendEmailVerificationNotificationController::class)
+        ->middleware('throttle:6,1')
+        ->name('v1.auth.email.verification-notification');
+});

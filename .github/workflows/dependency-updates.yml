@@ -1,0 +1,41 @@
+name: dependency-updates
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          tools: composer:v2
+          coverage: none
+
+      - name: Update Composer dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'bot: dependency updates'
+          title: 'bot: dependency updates'
+          body: |
+            Automated daily dependency refresh.
+
+            - Ran `composer update`
+            - Updated lockfile and related dependency constraints
+          branch: bot/dependency-updates
+          delete-branch: true

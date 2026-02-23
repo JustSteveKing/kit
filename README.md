@@ -1,58 +1,279 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Kit
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Opinionated Laravel API starter kit for token-based authentication with strong defaults around API design, documentation, testing, and security.
 
-## About Laravel
+## Highlights
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP `8.5` + Laravel `12`
+- SQLite-first local development (`DB_CONNECTION=sqlite`)
+- Sanctum personal access token authentication
+- Versioned API routes with no `/api` prefix (`/v1/...`)
+- Invokable controllers only
+- Form Request validation + DTO-style request payload objects
+- JSON:API resources for entity responses
+- API localization via `Accept-Language` + `Content-Language`
+- Scribe (attribute-based) API docs + OpenAPI generation
+- OpenAPI contract tests to keep docs and runtime behavior in sync
+- Sunset middleware to deprecate and retire endpoints safely
+- GitHub Actions for CI tests and daily dependency update PRs
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Laravel Framework: `^12.0`
+- PHP: `^8.5`
+- Auth: `laravel/sanctum`
+- Docs/OpenAPI: `knuckleswtf/scribe` (attributes, not docblocks)
+- Test Runner: Pest + Laravel test tooling
+- Static Analysis / Quality: PHPStan (Larastan), Pint, Rector
 
-## Learning Laravel
+## Quick Start
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1) Install dependencies
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2) Bootstrap environment
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Or run the bundled setup script:
 
-## Code of Conduct
+```bash
+composer run setup
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3) Run the API
 
-## Security Vulnerabilities
+```bash
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+API base path is versioned and has no global `/api` prefix:
+
+- `http://127.0.0.1:8000/v1/...`
+
+## API Routing
+
+Routing is intentionally split:
+
+- `routes/api/routes.php` for top-level API version grouping
+- `routes/api/v1.php` for V1 endpoint declarations
+
+Framework routing is configured with `apiPrefix: ''` in `bootstrap/app.php`, so your URLs stay clean.
+
+## Auth Endpoints (V1)
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| POST | `/v1/auth/register` | No | Register and issue token |
+| POST | `/v1/auth/login` | No | Login and issue token |
+| GET | `/v1/auth/me` | Bearer | Current authenticated user |
+| POST | `/v1/auth/logout` | Bearer | Revoke current token |
+| POST | `/v1/auth/email/verification-notification` | Bearer | Send/resend verification email |
+| GET | `/v1/auth/email/verify/{id}/{hash}` | Signed URL | Verify email |
+| POST | `/v1/auth/password/forgot` | No | Request reset email (anti-enumeration response) |
+| GET | `/v1/auth/password/reset/{token}` | No | Return reset payload for API clients |
+| POST | `/v1/auth/password/reset` | No | Reset password |
+
+## First Requests (cURL)
+
+Register:
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/auth/register \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "password": "Password123!",
+    "device_name": "cli"
+  }'
+```
+
+Login:
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/auth/login \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane@example.com",
+    "password": "Password123!",
+    "device_name": "cli"
+  }'
+```
+
+Use token on protected route:
+
+```bash
+curl http://127.0.0.1:8000/v1/auth/me \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+Localized response (Spanish):
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/auth/password/forgot \
+  -H "Accept: application/json" \
+  -H "Accept-Language: es" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"unknown@example.com"}'
+```
+
+## Response Design
+
+- `UserResource` uses Laravel JSON:API resource format (`application/vnd.api+json`)
+- Message/error JSON responses use `new JsonResponse([...])` for explicitness
+- Validation and auth errors are normalized in global exception renderers
+- API message strings are translated via `lang/en/api.php` and `lang/es/api.php`
+
+## Localization
+
+Locale resolution is API-first:
+
+- Middleware reads `Accept-Language`
+- Locale is resolved against `APP_SUPPORTED_LOCALES`
+- Response includes `Content-Language`
+- Unsupported locales fall back to `APP_FALLBACK_LOCALE`
+
+Relevant config/env:
+
+- `APP_LOCALE`
+- `APP_FALLBACK_LOCALE`
+- `APP_SUPPORTED_LOCALES` (default: `en,es`)
+- `SANCTUM_EXPIRATION` (default: `120` minutes)
+
+## Architecture Conventions
+
+- Controllers are invokable and do not extend a base controller
+- Request validation lives in `app/Http/Requests/Auth`
+- DTO payload objects live in `app/Http/Payloads/V1` (final, readonly)
+- Entity output lives in API resources (`app/Http/Resources`)
+
+## Security Defaults
+
+- ULID primary keys for users
+- Password hashing via model casts
+- Email verification required model contract (`MustVerifyEmail`)
+- Rate limits configured in `AppServiceProvider`:
+  - `auth-register`: 10/minute per IP
+  - `auth-login`: 10/minute per IP + email
+  - `auth-password`: 5/minute per IP + email
+  - `auth-protected`: 60/minute per authenticated user
+- Verification endpoints use signed URLs and throttling
+- Write endpoints enforce JSON payloads (`application/json`)
+- API responses include baseline hardening headers (`nosniff`, `DENY`, `no-referrer`)
+
+## Sunset Middleware (Endpoint Deprecation)
+
+`App\Http\Middleware\Sunset` adds deprecation metadata and can enforce retirement.
+
+Usage:
+
+```php
+Route::middleware('sunset:2030-01-01,https://api.example.com/v2/auth/login,true')
+    ->post('/v1/auth/login', LoginController::class);
+```
+
+Behavior:
+
+- Adds `Deprecation` and `Sunset` headers
+- Adds `Link: <...>; rel="successor-version"` when successor URL is valid
+- Can return `410 Gone` after sunset date when enforcement is enabled
+
+## API Documentation (Scribe + OpenAPI)
+
+Scribe is configured for this no-prefix API shape:
+
+- Route matching uses `v1/*` prefixes (`config/scribe.php`)
+- Endpoints are documented via PHP attributes
+- OpenAPI output is generated to `public/docs/openapi.yaml`
+
+Generate docs/spec:
+
+```bash
+php artisan scribe:generate --no-interaction
+```
+
+Generated artifacts:
+
+- `public/docs/index.html`
+- `public/docs/openapi.yaml`
+- `public/docs/collection.json`
+
+## Testing & Quality
+
+Run test suite:
+
+```bash
+php artisan test
+```
+
+Or use composer script:
+
+```bash
+composer test
+```
+
+Other quality commands:
+
+```bash
+composer lint
+composer stan
+```
+
+Feature tests include:
+
+- Token/auth flows
+- Email verification and password reset workflows
+- Security and unhappy-path scenarios
+- Localization behavior
+- Sunset middleware behavior
+- OpenAPI generation and contract verification
+
+## CI & Dependency Automation
+
+GitHub Actions workflows:
+
+- `.github/workflows/ci-tests.yml`
+  - Runs tests on every push and pull request
+- `.github/workflows/dependency-updates.yml`
+  - Runs daily at `03:00 UTC`
+  - Executes `composer update`
+  - Opens/updates PR titled `bot: dependency updates`
+
+## Project Structure
+
+```text
+app/
+  Http/
+    Controllers/Api/V1/Auth/
+    Middleware/
+    Payloads/V1/
+    Requests/Auth/
+    Resources/
+routes/
+  api/
+    routes.php
+    v1.php
+tests/
+  Feature/
+config/
+  sanctum.php
+  scribe.php
+.github/
+  workflows/
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT

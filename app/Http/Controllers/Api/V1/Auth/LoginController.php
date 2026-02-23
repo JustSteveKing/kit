@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api\V1\Auth;
+
+use App\Http\Payloads\V1\LoginPayload;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Knuckles\Scribe\Attributes\BodyParam;
+use Knuckles\Scribe\Attributes\Endpoint;
+use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\ResponseFromApiResource;
+use Knuckles\Scribe\Attributes\Subgroup;
+use Knuckles\Scribe\Attributes\Unauthenticated;
+
+#[Group(name: 'Authentication')]
+#[Subgroup(name: 'Token Authentication')]
+#[Endpoint(title: 'Login', description: 'Authenticate a user and issue a Sanctum bearer token.')]
+#[Unauthenticated]
+#[BodyParam('email', type: 'string', description: 'User email address.', required: true, example: 'jane@example.com')]
+#[BodyParam('password', type: 'string', description: 'User password.', required: true, example: 'password123')]
+#[BodyParam('device_name', type: 'string', description: 'Client device label for token tracking.', required: true, example: 'ios-app')]
+#[ResponseFromApiResource(
+    name: UserResource::class,
+    model: User::class,
+    status: 200,
+    description: 'Login succeeded.',
+    additional: ['meta' => ['token' => '1|example-token', 'token_type' => 'Bearer', 'expires_at' => null]]
+)]
+#[Response(
+    content: [
+        'message' => 'The given data was invalid.',
+        'errors' => ['email' => ['The provided credentials are incorrect.']],
+    ],
+    status: 422,
+    description: 'Credentials were invalid.'
+)]
+final class LoginController
+{
+    public function __invoke(LoginRequest $request): JsonResponse
+    {
+        $payload = LoginPayload::fromReqest($request);
+
+        $user = User::query()->where('email', $payload->email)->first();
+
+        if (! $user || ! Hash::check($payload->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => [__('api.auth.invalid_credentials')],
+            ]);
+        }
+
+        [$token, $expiresAt] = $this->issueToken($user, $payload->deviceName);
+
+        return UserResource::make($user)->additional([
+            'meta' => [
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'expires_at' => $expiresAt?->toAtomString(),
+            ],
+        ])->response();
+    }
+
+    /**
+     * @return array{0:string,1:\Illuminate\Support\Carbon|null}
+     */
+    private function issueToken(User $user, string $deviceName): array
+    {
+        $expirationMinutes = config('sanctum.expiration');
+
+        $expiresAt = is_int($expirationMinutes) && $expirationMinutes > 0
+            ? now()->addMinutes($expirationMinutes)
+            : null;
+
+        $token = $user->createToken($deviceName, ['*'], $expiresAt);
+
+        return [$token->plainTextToken, $expiresAt];
+    }
+}

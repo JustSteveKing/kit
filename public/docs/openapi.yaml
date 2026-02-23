@@ -1,0 +1,647 @@
+openapi: 3.0.3
+info:
+  title: 'Laravel API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://kit.test'
+tags:
+  -
+    name: Authentication
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'Get a bearer token from the `POST /v1/auth/login` endpoint.'
+security:
+  -
+    default: []
+paths:
+  /v1/auth/register:
+    post:
+      summary: Register
+      operationId: register
+      description: 'Create a new account and issue a Sanctum bearer token.'
+      parameters: []
+      responses:
+        201:
+          description: 'Registration succeeded.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: ''
+                    type: users
+                    attributes:
+                      name: 'Justina Gaylord'
+                      email: lafayette.considine@example.com
+                      email_verified_at: '2026-02-23T11:58:59+00:00'
+                      created_at: null
+                      updated_at: null
+                  meta:
+                    token: 1|example-token
+                    token_type: Bearer
+                    expires_at: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ''
+                      type:
+                        type: string
+                        example: users
+                      attributes:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: 'Justina Gaylord'
+                          email:
+                            type: string
+                            example: lafayette.considine@example.com
+                          email_verified_at:
+                            type: string
+                            example: '2026-02-23T11:58:59+00:00'
+                          created_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          updated_at:
+                            type: string
+                            example: null
+                            nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: 1|example-token
+                      token_type:
+                        type: string
+                        example: Bearer
+                      expires_at:
+                        type: string
+                        example: null
+                        nullable: true
+        422:
+          description: 'Validation failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The given data was invalid.'
+                  errors:
+                    email:
+                      - 'The email has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The given data was invalid.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Display name for the account.'
+                  example: 'Jane Doe'
+                email:
+                  type: string
+                  description: 'Unique email address for login.'
+                  example: jane@example.com
+                password:
+                  type: string
+                  description: 'Account password.'
+                  example: password123
+                device_name:
+                  type: string
+                  description: 'Client device label for token tracking.'
+                  example: ios-app
+              required:
+                - name
+                - email
+                - password
+      security: []
+  /v1/auth/login:
+    post:
+      summary: Login
+      operationId: login
+      description: 'Authenticate a user and issue a Sanctum bearer token.'
+      parameters: []
+      responses:
+        200:
+          description: 'Login succeeded.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: ''
+                    type: users
+                    attributes:
+                      name: 'Justina Gaylord'
+                      email: cormier.nick@example.com
+                      email_verified_at: '2026-02-23T11:58:59+00:00'
+                      created_at: null
+                      updated_at: null
+                  meta:
+                    token: 1|example-token
+                    token_type: Bearer
+                    expires_at: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ''
+                      type:
+                        type: string
+                        example: users
+                      attributes:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: 'Justina Gaylord'
+                          email:
+                            type: string
+                            example: cormier.nick@example.com
+                          email_verified_at:
+                            type: string
+                            example: '2026-02-23T11:58:59+00:00'
+                          created_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          updated_at:
+                            type: string
+                            example: null
+                            nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: 1|example-token
+                      token_type:
+                        type: string
+                        example: Bearer
+                      expires_at:
+                        type: string
+                        example: null
+                        nullable: true
+        422:
+          description: 'Credentials were invalid.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The given data was invalid.'
+                  errors:
+                    email:
+                      - 'The provided credentials are incorrect.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The given data was invalid.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The provided credentials are incorrect.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'User email address.'
+                  example: jane@example.com
+                password:
+                  type: string
+                  description: 'User password.'
+                  example: password123
+                device_name:
+                  type: string
+                  description: 'Client device label for token tracking.'
+                  example: ios-app
+              required:
+                - email
+                - password
+                - device_name
+      security: []
+  /v1/auth/password/forgot:
+    post:
+      summary: 'Request Password Reset'
+      operationId: requestPasswordReset
+      description: 'Send a password reset link to the provided email if an account exists.'
+      parameters: []
+      responses:
+        200:
+          description: 'Password reset request accepted.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'If the account exists, a password reset link has been sent.'
+                properties:
+                  message:
+                    type: string
+                    example: 'If the account exists, a password reset link has been sent.'
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Account email address.'
+                  example: jane@example.com
+              required:
+                - email
+      security: []
+  /v1/auth/password/reset:
+    post:
+      summary: 'Reset Password'
+      operationId: resetPassword
+      description: 'Reset the user password using a valid reset token.'
+      parameters: []
+      responses:
+        200:
+          description: 'Password reset succeeded.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Your password has been reset.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Your password has been reset.'
+        422:
+          description: 'Reset token or payload was invalid.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The given data was invalid.'
+                  errors:
+                    email:
+                      - 'This password reset token is invalid.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The given data was invalid.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'This password reset token is invalid.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: 'Password reset token.'
+                  example: reset-token-value
+                email:
+                  type: string
+                  description: 'Account email associated with token.'
+                  example: jane@example.com
+                password:
+                  type: string
+                  description: 'New account password.'
+                  example: new-password123
+                password_confirmation:
+                  type: string
+                  description: 'Must match password.'
+                  example: new-password123
+              required:
+                - token
+                - email
+                - password
+                - password_confirmation
+      security: []
+  '/v1/auth/password/reset/{token}':
+    get:
+      summary: 'Read Reset Token Payload'
+      operationId: readResetTokenPayload
+      description: 'Return reset token and email payload for API clients handling email reset links.'
+      parameters:
+        -
+          in: query
+          name: email
+          description: 'Account email from the reset link.'
+          example: jane@example.com
+          required: false
+          schema:
+            type: string
+            description: 'Account email from the reset link.'
+            example: jane@example.com
+      responses:
+        200:
+          description: 'Reset payload data.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  token: reset-token-value
+                  email: jane@example.com
+                properties:
+                  token:
+                    type: string
+                    example: reset-token-value
+                  email:
+                    type: string
+                    example: jane@example.com
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: ''
+                  example: architecto
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: zbailey@example.net
+                  nullable: true
+              required:
+                - token
+      security: []
+    parameters:
+      -
+        in: path
+        name: token
+        description: 'Password reset token from reset link.'
+        example: reset-token-value
+        required: true
+        schema:
+          type: string
+  '/v1/auth/email/verify/{id}/{hash}':
+    get:
+      summary: 'Verify Email'
+      operationId: verifyEmail
+      description: 'Verify a user email using the signed verification link parameters.'
+      parameters: []
+      responses:
+        200:
+          description: 'Email was verified.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Email verified successfully.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Email verified successfully.'
+        403:
+          description: 'Signed URL was invalid, expired, or mismatched.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid verification link.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid verification link.'
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the users table.'
+                  example: architecto
+                hash:
+                  type: string
+                  description: 'Must be 40 characters.'
+                  example: ngzmiyvdljnikhwaykcmyuwpwlvqwrsitcpscqld
+              required:
+                - id
+                - hash
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'User ULID from the signed verification link.'
+        example: 01HZX3W3T4J8Q57XNZD5BPHJ92
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: hash
+        description: 'SHA-1 hash of the email from the signed verification link.'
+        example: 8c4f4370e5db9b5be6d0f4c95495f49f998fa32a
+        required: true
+        schema:
+          type: string
+  /v1/auth/me:
+    get:
+      summary: 'Get Current User'
+      operationId: getCurrentUser
+      description: 'Return the authenticated user for the current bearer token.'
+      parameters: []
+      responses:
+        200:
+          description: 'Authenticated user profile.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: ''
+                    type: users
+                    attributes:
+                      name: 'Morgan Hirthe'
+                      email: dare.emelie@example.com
+                      email_verified_at: '2026-02-23T11:59:00+00:00'
+                      created_at: null
+                      updated_at: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ''
+                      type:
+                        type: string
+                        example: users
+                      attributes:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: 'Morgan Hirthe'
+                          email:
+                            type: string
+                            example: dare.emelie@example.com
+                          email_verified_at:
+                            type: string
+                            example: '2026-02-23T11:59:00+00:00'
+                          created_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          updated_at:
+                            type: string
+                            example: null
+                            nullable: true
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Authentication
+  /v1/auth/logout:
+    post:
+      summary: Logout
+      operationId: logout
+      description: 'Revoke the current Sanctum token.'
+      parameters: []
+      responses:
+        204:
+          description: 'Token revoked.'
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Authentication
+  /v1/auth/email/verification-notification:
+    post:
+      summary: 'Send Verification Email'
+      operationId: sendVerificationEmail
+      description: 'Send (or resend) an email verification link to the authenticated user.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'Verification email queued/sent.'
+                    type: object
+                    example:
+                      message: 'Verification link sent.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Verification link sent.'
+                  -
+                    description: 'User already verified.'
+                    type: object
+                    example:
+                      message: 'Email is already verified.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Email is already verified.'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Authentication
