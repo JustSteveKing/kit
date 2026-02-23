@@ -253,6 +253,10 @@ GitHub Actions workflows:
   - Runs daily at `03:00 UTC`
   - Executes `composer update`
   - Opens/updates PR titled `bot: dependency updates`
+- `.github/workflows/security-gate.yml`
+  - Runs Composer security audit
+  - Fails on high/critical advisories
+  - Runs repository secret scan with Gitleaks
 
 ## Project Structure
 

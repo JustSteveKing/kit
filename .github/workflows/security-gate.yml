@@ -1,0 +1,56 @@
+name: security-gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  composer-audit:
+    name: composer-audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: Run Composer audit
+        run: composer audit --format=json > composer-audit.json || true
+
+      - name: Fail on high/critical advisories
+        run: |
+          HIGH_OR_CRITICAL_COUNT=$(jq '[.advisories[]?[]? | select(((.severity // "unknown") | ascii_downcase) == "high" or ((.severity // "unknown") | ascii_downcase) == "critical")] | length' composer-audit.json)
+          echo "High/Critical advisories: ${HIGH_OR_CRITICAL_COUNT}"
+          if [ "${HIGH_OR_CRITICAL_COUNT}" -gt 0 ]; then
+            jq '.advisories' composer-audit.json
+            exit 1
+          fi
+
+  secrets-scan:
+    name: secrets-scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
