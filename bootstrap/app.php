@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\AttachRequestId;
 use App\Http\Middleware\EnsureJsonApiRequest;
 use App\Http\Middleware\SetRequestLocale;
 use App\Http\Middleware\Sunset;
+use App\Support\SecurityAudit;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -35,12 +37,17 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->prependToGroup('api', EnsureJsonApiRequest::class);
         $middleware->prependToGroup('api', SetRequestLocale::class);
+        $middleware->prependToGroup('api', AttachRequestId::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $exception, Request $request): ?JsonResponse {
             if (! $request->expectsJson()) {
                 return null;
             }
+
+            SecurityAudit::log('auth.unauthenticated', [
+                'guard' => 'sanctum',
+            ]);
 
             return new JsonResponse([
                 'message' => __('api.errors.unauthenticated'),
@@ -52,6 +59,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            SecurityAudit::log('auth.forbidden', [
+                'exception' => $exception::class,
+            ]);
+
             return new JsonResponse([
                 'message' => __('api.errors.forbidden'),
             ], 403);
@@ -62,6 +73,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            SecurityAudit::log('auth.forbidden', [
+                'exception' => $exception::class,
+            ]);
+
             return new JsonResponse([
                 'message' => __('api.errors.forbidden'),
             ], 403);
@@ -71,6 +86,8 @@ return Application::configure(basePath: dirname(__DIR__))
             if (! $request->expectsJson()) {
                 return null;
             }
+
+            SecurityAudit::log('api.rate_limited');
 
             $response = new JsonResponse([
                 'message' => __('api.errors.too_many_requests'),
@@ -89,6 +106,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            SecurityAudit::log('api.validation_failed', [
+                'errors' => array_keys($exception->errors()),
+            ]);
+
             return new JsonResponse([
                 'message' => __('api.errors.validation_failed'),
                 'errors' => $exception->errors(),
@@ -99,6 +120,8 @@ return Application::configure(basePath: dirname(__DIR__))
             if (! $request->expectsJson()) {
                 return null;
             }
+
+            SecurityAudit::log('auth.email_verification.invalid_signature');
 
             return new JsonResponse([
                 'message' => __('api.auth.invalid_verification_link'),

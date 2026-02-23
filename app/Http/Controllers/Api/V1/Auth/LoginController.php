@@ -8,6 +8,7 @@ use App\Http\Payloads\V1\LoginPayload;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -50,12 +51,24 @@ final class LoginController
         $user = User::query()->where('email', $payload->email)->first();
 
         if (! $user || ! Hash::check($payload->password, $user->password)) {
+            SecurityAudit::log('auth.login.failed', [
+                'email_hash' => SecurityAudit::hashEmail($payload->email),
+                'device_name' => $payload->deviceName,
+            ]);
+
             throw ValidationException::withMessages([
                 'email' => [__('api.auth.invalid_credentials')],
             ]);
         }
 
         [$token, $expiresAt] = $this->issueToken($user, $payload->deviceName);
+
+        SecurityAudit::log('auth.login.succeeded', [
+            'user_id' => (string) $user->getKey(),
+            'email_hash' => SecurityAudit::hashEmail($payload->email),
+            'device_name' => $payload->deviceName,
+            'token_expires_at' => $expiresAt?->toAtomString(),
+        ]);
 
         return UserResource::make($user)->additional([
             'meta' => [

@@ -8,6 +8,7 @@ use App\Http\Payloads\V1\RegisterPayload;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Knuckles\Scribe\Attributes\BodyParam;
@@ -56,6 +57,13 @@ final class RegisterController
         event(new Registered($user));
 
         [$token, $expiresAt] = $this->issueToken($user, $payload->deviceName);
+
+        SecurityAudit::log('auth.register.succeeded', [
+            'user_id' => (string) $user->getKey(),
+            'email_hash' => SecurityAudit::hashEmail($user->email),
+            'device_name' => $payload->deviceName,
+            'token_expires_at' => $expiresAt?->toAtomString(),
+        ]);
 
         return UserResource::make($user)->additional([
             'meta' => [

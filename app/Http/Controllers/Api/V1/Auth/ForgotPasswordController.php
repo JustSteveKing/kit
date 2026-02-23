@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Payloads\V1\ForgotPasswordPayload;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Support\SecurityAudit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Password;
 use Knuckles\Scribe\Attributes\BodyParam;
@@ -31,8 +32,13 @@ final class ForgotPasswordController
     {
         $payload = ForgotPasswordPayload::fromReqest($request);
 
-        Password::broker()->sendResetLink([
+        $status = Password::broker()->sendResetLink([
             'email' => $payload->email,
+        ]);
+
+        SecurityAudit::log('auth.password_reset.requested', [
+            'email_hash' => SecurityAudit::hashEmail($payload->email),
+            'status' => $status,
         ]);
 
         return new JsonResponse([

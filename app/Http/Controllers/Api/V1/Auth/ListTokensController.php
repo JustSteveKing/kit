@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Resources\PersonalAccessTokenResource;
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,6 +48,11 @@ final class ListTokensController
         $tokens = $user->tokens()
             ->latest('id')
             ->get();
+
+        SecurityAudit::log('auth.tokens.listed', [
+            'user_id' => (string) $user->getKey(),
+            'count' => $tokens->count(),
+        ]);
 
         return PersonalAccessTokenResource::collection($tokens)
             ->additional([

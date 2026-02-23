@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,7 +30,17 @@ final class LogoutController
         $token = $user->currentAccessToken();
 
         if ($token) {
+            SecurityAudit::log('auth.logout.succeeded', [
+                'user_id' => (string) $user->getKey(),
+                'token_id' => (string) $token->getKey(),
+            ]);
+
             $token->delete();
+        } else {
+            SecurityAudit::log('auth.logout.succeeded', [
+                'user_id' => (string) $user->getKey(),
+                'token_id' => null,
+            ]);
         }
 
         return response()->noContent();

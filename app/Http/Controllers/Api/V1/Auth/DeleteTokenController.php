@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\Http\Payloads\V1\DeleteTokenPayload;
 use App\Http\Requests\Auth\DeleteTokenRequest;
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -35,10 +36,21 @@ final class DeleteTokenController
         $token = $user->tokens()->whereKey($payload->tokenId)->first();
 
         if (! $token) {
+            SecurityAudit::log('auth.tokens.revoke_failed', [
+                'user_id' => (string) $user->getKey(),
+                'token_id' => (string) $payload->tokenId,
+                'reason' => 'not_found',
+            ]);
+
             return new JsonResponse([
                 'message' => __('api.auth.token_not_found'),
             ], 404);
         }
+
+        SecurityAudit::log('auth.tokens.revoked', [
+            'user_id' => (string) $user->getKey(),
+            'token_id' => (string) $token->getKey(),
+        ]);
 
         $token->delete();
 

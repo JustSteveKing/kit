@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Response;
 use Knuckles\Scribe\Attributes\Authenticated;
@@ -24,7 +25,13 @@ final class DeleteAllTokensController
 {
     public function __invoke(#[CurrentUser] User $user): Response
     {
+        $deletedCount = $user->tokens()->count();
         $user->tokens()->delete();
+
+        SecurityAudit::log('auth.tokens.revoked_all', [
+            'user_id' => (string) $user->getKey(),
+            'count' => $deletedCount,
+        ]);
 
         return response()->noContent();
     }

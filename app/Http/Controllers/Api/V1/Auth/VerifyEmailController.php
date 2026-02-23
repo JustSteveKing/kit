@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\Http\Payloads\V1\VerifyEmailPayload;
 use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Models\User;
+use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Knuckles\Scribe\Attributes\Endpoint;
@@ -33,12 +34,24 @@ final class VerifyEmailController
         $user = User::query()->findOrFail($payload->id);
 
         if (! hash_equals(sha1($user->getEmailForVerification()), $payload->hash)) {
+            SecurityAudit::log('auth.email_verification.failed', [
+                'user_id' => (string) $user->getKey(),
+                'reason' => 'hash_mismatch',
+            ]);
+
             abort(403, __('api.auth.invalid_verification_link'));
         }
 
-        if (! $user->hasVerifiedEmail() && $user->markEmailAsVerified()) {
+        $wasAlreadyVerified = $user->hasVerifiedEmail();
+
+        if (! $wasAlreadyVerified && $user->markEmailAsVerified()) {
             event(new Verified($user));
         }
+
+        SecurityAudit::log('auth.email_verification.succeeded', [
+            'user_id' => (string) $user->getKey(),
+            'already_verified' => $wasAlreadyVerified,
+        ]);
 
         return new JsonResponse([
             'message' => __('api.auth.email_verified'),

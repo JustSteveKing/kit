@@ -172,6 +172,8 @@ Relevant config/env:
 - Verification endpoints use signed URLs and throttling
 - Write endpoints enforce JSON payloads (`application/json`)
 - API responses include baseline hardening headers (`nosniff`, `DENY`, `no-referrer`)
+- API responses include an `X-Request-Id` header (propagated or generated)
+- Security-sensitive auth/token actions emit structured `security.audit` log events
 
 ## Sunset Middleware (Endpoint Deprecation)
 

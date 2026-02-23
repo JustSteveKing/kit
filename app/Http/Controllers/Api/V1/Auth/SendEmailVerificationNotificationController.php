@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Support\SecurityAudit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Knuckles\Scribe\Attributes\Authenticated;
@@ -26,12 +27,20 @@ final class SendEmailVerificationNotificationController
         $user = $request->user();
 
         if ($user->hasVerifiedEmail()) {
+            SecurityAudit::log('auth.email_verification.already_verified', [
+                'user_id' => (string) $user->getKey(),
+            ]);
+
             return new JsonResponse([
                 'message' => __('api.auth.email_already_verified'),
             ]);
         }
 
         $user->sendEmailVerificationNotification();
+
+        SecurityAudit::log('auth.email_verification.notification_sent', [
+            'user_id' => (string) $user->getKey(),
+        ]);
 
         return new JsonResponse([
             'message' => __('api.auth.verification_link_sent'),
