@@ -78,7 +78,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-02-23T12:07:27+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Registration succeeded.'
       -
@@ -157,7 +157,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-02-23T12:07:27+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Login succeeded.'
       -
@@ -517,7 +517,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-02-23T12:07:27+00:00","created_at":null,"updated_at":null}}}'
+        content: '{"data":{"id":"","type":"users","attributes":{"name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}}}'
         headers: []
         description: 'Authenticated user profile.'
       -
@@ -573,6 +573,195 @@ endpoints:
         content: '{"message":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: v1/auth/tokens
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: 'Token Authentication'
+      subgroupDescription: ''
+      title: 'List Tokens'
+      description: 'List personal access tokens for the authenticated user.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"1","type":"personal-access-tokens","attributes":{"name":"ios-app","abilities":["auth:me","auth:logout"],"last_used_at":null,"expires_at":"2026-02-24T12:00:00+00:00","created_at":"2026-02-23T12:00:00+00:00","updated_at":"2026-02-23T12:00:00+00:00","is_current":true}}]}'
+        headers: []
+        description: 'Token list payload.'
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: 'Authentication failed.'
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Forbidden."}'
+        headers: []
+        description: 'Token is missing required ability.'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: v1/auth/tokens
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: 'Token Authentication'
+      subgroupDescription: ''
+      title: 'Revoke All Tokens'
+      description: 'Revoke all personal access tokens for the authenticated user.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: null
+        headers: []
+        description: 'All tokens revoked.'
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: 'Authentication failed.'
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Forbidden."}'
+        headers: []
+        description: 'Token is missing required ability.'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'v1/auth/tokens/{token_id}'
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: 'Token Authentication'
+      subgroupDescription: ''
+      title: 'Revoke Token'
+      description: 'Revoke one personal access token owned by the authenticated user.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      token_id:
+        custom: []
+        name: token_id
+        description: 'Personal access token id.'
+        required: true
+        example: 42
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      token_id: 42
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      token_id:
+        custom: []
+        name: token_id
+        description: ''
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      token_id: 16
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: null
+        headers: []
+        description: 'Token revoked.'
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: 'Authentication failed.'
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Forbidden."}'
+        headers: []
+        description: 'Token is missing required ability.'
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Token not found."}'
+        headers: []
+        description: 'Token does not belong to current user or no longer exists.'
     responseFields: []
     auth:
       - headers

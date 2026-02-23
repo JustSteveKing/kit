@@ -15,6 +15,7 @@ return [
         'password_reset_invalid_user' => 'No encontramos un usuario con esa direccion de correo electronico.',
         'password_reset_throttled' => 'Espera antes de volver a intentarlo.',
         'password_reset_failed' => 'No se pudo restablecer la contrasena con los datos proporcionados.',
+        'token_not_found' => 'Token no encontrado.',
     ],
     'errors' => [
         'unauthenticated' => 'No autenticado.',

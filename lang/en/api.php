@@ -15,6 +15,7 @@ return [
         'password_reset_invalid_user' => 'We can\'t find a user with that email address.',
         'password_reset_throttled' => 'Please wait before retrying.',
         'password_reset_failed' => 'Unable to reset password with the provided details.',
+        'token_not_found' => 'Token not found.',
     ],
     'errors' => [
         'unauthenticated' => 'Unauthenticated.',

@@ -40,7 +40,7 @@ paths:
                     attributes:
                       name: 'Justina Gaylord'
                       email: lafayette.considine@example.com
-                      email_verified_at: '2026-02-23T12:07:27+00:00'
+                      email_verified_at: '2026-02-23T19:05:13+00:00'
                       created_at: null
                       updated_at: null
                   meta:
@@ -68,7 +68,7 @@ paths:
                             example: lafayette.considine@example.com
                           email_verified_at:
                             type: string
-                            example: '2026-02-23T12:07:27+00:00'
+                            example: '2026-02-23T19:05:13+00:00'
                           created_at:
                             type: string
                             example: null
@@ -164,7 +164,7 @@ paths:
                     attributes:
                       name: 'Justina Gaylord'
                       email: cormier.nick@example.com
-                      email_verified_at: '2026-02-23T12:07:27+00:00'
+                      email_verified_at: '2026-02-23T19:05:13+00:00'
                       created_at: null
                       updated_at: null
                   meta:
@@ -192,7 +192,7 @@ paths:
                             example: cormier.nick@example.com
                           email_verified_at:
                             type: string
-                            example: '2026-02-23T12:07:27+00:00'
+                            example: '2026-02-23T19:05:13+00:00'
                           created_at:
                             type: string
                             example: null
@@ -525,7 +525,7 @@ paths:
                     attributes:
                       name: 'Morgan Hirthe'
                       email: dare.emelie@example.com
-                      email_verified_at: '2026-02-23T12:07:27+00:00'
+                      email_verified_at: '2026-02-23T19:05:13+00:00'
                       created_at: null
                       updated_at: null
                 properties:
@@ -549,7 +549,7 @@ paths:
                             example: dare.emelie@example.com
                           email_verified_at:
                             type: string
-                            example: '2026-02-23T12:07:27+00:00'
+                            example: '2026-02-23T19:05:13+00:00'
                           created_at:
                             type: string
                             example: null
@@ -600,6 +600,228 @@ paths:
                     example: Unauthenticated.
       tags:
         - Authentication
+  /v1/auth/tokens:
+    get:
+      summary: 'List Tokens'
+      operationId: listTokens
+      description: 'List personal access tokens for the authenticated user.'
+      parameters: []
+      responses:
+        200:
+          description: 'Token list payload.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: '1'
+                      type: personal-access-tokens
+                      attributes:
+                        name: ios-app
+                        abilities:
+                          - 'auth:me'
+                          - 'auth:logout'
+                        last_used_at: null
+                        expires_at: '2026-02-24T12:00:00+00:00'
+                        created_at: '2026-02-23T12:00:00+00:00'
+                        updated_at: '2026-02-23T12:00:00+00:00'
+                        is_current: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: '1'
+                        type: personal-access-tokens
+                        attributes:
+                          name: ios-app
+                          abilities:
+                            - 'auth:me'
+                            - 'auth:logout'
+                          last_used_at: null
+                          expires_at: '2026-02-24T12:00:00+00:00'
+                          created_at: '2026-02-23T12:00:00+00:00'
+                          updated_at: '2026-02-23T12:00:00+00:00'
+                          is_current: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          example: personal-access-tokens
+                        attributes:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: ios-app
+                            abilities:
+                              type: array
+                              example:
+                                - 'auth:me'
+                                - 'auth:logout'
+                              items:
+                                type: string
+                            last_used_at:
+                              type: string
+                              example: null
+                              nullable: true
+                            expires_at:
+                              type: string
+                              example: '2026-02-24T12:00:00+00:00'
+                            created_at:
+                              type: string
+                              example: '2026-02-23T12:00:00+00:00'
+                            updated_at:
+                              type: string
+                              example: '2026-02-23T12:00:00+00:00'
+                            is_current:
+                              type: boolean
+                              example: true
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing required ability.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Forbidden.
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden.
+      tags:
+        - Authentication
+    delete:
+      summary: 'Revoke All Tokens'
+      operationId: revokeAllTokens
+      description: 'Revoke all personal access tokens for the authenticated user.'
+      parameters: []
+      responses:
+        204:
+          description: 'All tokens revoked.'
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing required ability.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Forbidden.
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden.
+      tags:
+        - Authentication
+  '/v1/auth/tokens/{token_id}':
+    delete:
+      summary: 'Revoke Token'
+      operationId: revokeToken
+      description: 'Revoke one personal access token owned by the authenticated user.'
+      parameters: []
+      responses:
+        204:
+          description: 'Token revoked.'
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing required ability.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Forbidden.
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'Token does not belong to current user or no longer exists.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Token not found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Token not found.'
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token_id:
+                  type: integer
+                  description: ''
+                  example: 16
+              required:
+                - token_id
+    parameters:
+      -
+        in: path
+        name: token_id
+        description: 'Personal access token id.'
+        example: 42
+        required: true
+        schema:
+          type: integer
   /v1/auth/email/verification-notification:
     post:
       summary: 'Send Verification Email'

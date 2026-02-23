@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Auth\DeleteAllTokensController;
+use App\Http\Controllers\Api\V1\Auth\DeleteTokenController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\V1\Auth\ListTokensController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\MeController;
@@ -38,6 +41,15 @@ Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (
     Route::post('/auth/logout', LogoutController::class)
         ->middleware('abilities:auth:logout')
         ->name('v1.auth.logout');
+    Route::get('/auth/tokens', ListTokensController::class)
+        ->middleware('abilities:auth:tokens:read')
+        ->name('v1.auth.tokens.index');
+    Route::delete('/auth/tokens', DeleteAllTokensController::class)
+        ->middleware('abilities:auth:tokens:delete')
+        ->name('v1.auth.tokens.destroy-all');
+    Route::delete('/auth/tokens/{token_id}', DeleteTokenController::class)
+        ->middleware('abilities:auth:tokens:delete')
+        ->name('v1.auth.tokens.destroy');
     Route::post('/auth/email/verification-notification', SendEmailVerificationNotificationController::class)
         ->middleware(['abilities:auth:verification:send', 'throttle:6,1'])
         ->name('v1.auth.email.verification-notification');

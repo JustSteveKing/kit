@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "2ba57d47-bc68-4f23-ae94-03672f3794a5",
+        "_postman_id": "832787c5-41fd-49c5-a4fd-2328037fd698",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,7 +56,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-02-23T12:07:27+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-02-23T19:05:13+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +100,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-02-23T12:07:27+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-02-23T19:05:13+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -138,7 +138,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-02-23T12:07:27+00:00\",\"created_at\":null,\"updated_at\":null}}}",
+                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-02-23T19:05:13+00:00\",\"created_at\":null,\"updated_at\":null}}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -184,6 +184,155 @@
                                     "code": 401,
                                     "body": "{\"message\":\"Unauthenticated.\"}",
                                     "name": "Authentication failed."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "List Tokens",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/tokens",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/tokens"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "List personal access tokens for the authenticated user."
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 200,
+                                    "body": "{\"data\":[{\"id\":\"1\",\"type\":\"personal-access-tokens\",\"attributes\":{\"name\":\"ios-app\",\"abilities\":[\"auth:me\",\"auth:logout\"],\"last_used_at\":null,\"expires_at\":\"2026-02-24T12:00:00+00:00\",\"created_at\":\"2026-02-23T12:00:00+00:00\",\"updated_at\":\"2026-02-23T12:00:00+00:00\",\"is_current\":true}}]}",
+                                    "name": "Token list payload."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 401,
+                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "name": "Authentication failed."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 403,
+                                    "body": "{\"message\":\"Forbidden.\"}",
+                                    "name": "Token is missing required ability."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Revoke All Tokens",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/tokens",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/tokens"
+                                },
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "Revoke all personal access tokens for the authenticated user."
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 204,
+                                    "body": null,
+                                    "name": "All tokens revoked."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 401,
+                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "name": "Authentication failed."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 403,
+                                    "body": "{\"message\":\"Forbidden.\"}",
+                                    "name": "Token is missing required ability."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Revoke Token",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "v1\/auth\/tokens\/:token_id",
+                                    "query": [],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/tokens\/:token_id",
+                                    "variable": [
+                                        {
+                                            "id": "token_id",
+                                            "key": "token_id",
+                                            "value": "42",
+                                            "description": "Personal access token id."
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application\/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application\/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"token_id\":16}"
+                                },
+                                "description": "Revoke one personal access token owned by the authenticated user."
+                            },
+                            "response": [
+                                {
+                                    "header": [],
+                                    "code": 204,
+                                    "body": null,
+                                    "name": "Token revoked."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 401,
+                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "name": "Authentication failed."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 403,
+                                    "body": "{\"message\":\"Forbidden.\"}",
+                                    "name": "Token is missing required ability."
+                                },
+                                {
+                                    "header": [],
+                                    "code": 404,
+                                    "body": "{\"message\":\"Token not found.\"}",
+                                    "name": "Token does not belong to current user or no longer exists."
                                 }
                             ]
                         }
