@@ -60,6 +60,27 @@ it('logs in and returns a bearer token', function (): void {
     expect(PersonalAccessToken::query()->count())->toBe(1);
 });
 
+it('issues scoped tokens without wildcard ability', function (): void {
+    $response = $this->postJson('/v1/auth/register', [
+        'name' => 'Scoped User',
+        'email' => 'scoped@example.com',
+        'password' => 'password123',
+        'device_name' => 'ios-app',
+    ])->assertCreated();
+
+    $plainToken = (string) $response->json('meta.token');
+    $tokenId = explode('|', $plainToken, 2)[0] ?? null;
+
+    expect($tokenId)->not->toBeNull();
+
+    $token = PersonalAccessToken::query()->findOrFail((int) $tokenId);
+
+    expect($token->abilities)->toContain('auth:me');
+    expect($token->abilities)->toContain('auth:logout');
+    expect($token->abilities)->toContain('auth:verification:send');
+    expect($token->abilities)->not->toContain('*');
+});
+
 it('rejects invalid credentials', function (): void {
     User::factory()->create([
         'email' => 'john@example.com',

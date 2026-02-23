@@ -82,8 +82,25 @@ final class LoginController
             ? now()->addMinutes($expirationMinutes)
             : null;
 
-        $token = $user->createToken($deviceName, ['*'], $expiresAt);
+        $token = $user->createToken($deviceName, $this->defaultAbilities(), $expiresAt);
 
         return [$token->plainTextToken, $expiresAt];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function defaultAbilities(): array
+    {
+        $abilities = config('sanctum.abilities.default', []);
+
+        if (! is_array($abilities)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            array_map(static fn (mixed $ability): string => trim((string) $ability), $abilities),
+            static fn (string $ability): bool => $ability !== '',
+        ));
     }
 }

@@ -53,6 +53,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Token Abilities
+    |--------------------------------------------------------------------------
+    |
+    | Default abilities assigned to newly issued personal access tokens.
+    | Keep this list least-privilege and grant only endpoint-specific needs.
+    |
+    */
+    'abilities' => [
+        'default' => [
+            'auth:me',
+            'auth:logout',
+            'auth:verification:send',
+            'auth:tokens:read',
+            'auth:tokens:delete',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Token Prefix
     |--------------------------------------------------------------------------
     |

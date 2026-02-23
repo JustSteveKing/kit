@@ -18,6 +18,7 @@ return [
     ],
     'errors' => [
         'unauthenticated' => 'No autenticado.',
+        'forbidden' => 'Prohibido.',
         'too_many_requests' => 'Demasiadas solicitudes. Intentalo de nuevo mas tarde.',
         'validation_failed' => 'Los datos proporcionados no son validos.',
         'unsupported_media_type' => 'Tipo de contenido no compatible. Usa cuerpos de solicitud application/json.',

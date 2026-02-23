@@ -32,9 +32,13 @@ Route::get('/auth/email/verify/{id}/{hash}', VerifyEmailController::class)
     ->name('verification.verify');
 
 Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (): void {
-    Route::get('/auth/me', MeController::class)->name('v1.auth.me');
-    Route::post('/auth/logout', LogoutController::class)->name('v1.auth.logout');
+    Route::get('/auth/me', MeController::class)
+        ->middleware('abilities:auth:me')
+        ->name('v1.auth.me');
+    Route::post('/auth/logout', LogoutController::class)
+        ->middleware('abilities:auth:logout')
+        ->name('v1.auth.logout');
     Route::post('/auth/email/verification-notification', SendEmailVerificationNotificationController::class)
-        ->middleware('throttle:6,1')
+        ->middleware(['abilities:auth:verification:send', 'throttle:6,1'])
         ->name('v1.auth.email.verification-notification');
 });

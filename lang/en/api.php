@@ -18,6 +18,7 @@ return [
     ],
     'errors' => [
         'unauthenticated' => 'Unauthenticated.',
+        'forbidden' => 'Forbidden.',
         'too_many_requests' => 'Too many requests. Please try again later.',
         'validation_failed' => 'The given data was invalid.',
         'unsupported_media_type' => 'Unsupported media type. Use application/json request bodies.',

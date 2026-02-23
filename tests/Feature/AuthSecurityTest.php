@@ -149,6 +149,36 @@ it('requires auth for logout', function (): void {
     $this->postJson('/v1/auth/logout')->assertUnauthorized();
 });
 
+it('forbids me endpoint when token lacks required ability', function (): void {
+    $user = User::factory()->create();
+    $token = $user->createToken('limited-me', ['auth:logout'])->plainTextToken;
+
+    $this->withToken($token)
+        ->getJson('/v1/auth/me')
+        ->assertForbidden()
+        ->assertJsonPath('message', __('api.errors.forbidden'));
+});
+
+it('forbids logout when token lacks required ability', function (): void {
+    $user = User::factory()->create();
+    $token = $user->createToken('limited-logout', ['auth:me'])->plainTextToken;
+
+    $this->withToken($token)
+        ->postJson('/v1/auth/logout')
+        ->assertForbidden()
+        ->assertJsonPath('message', __('api.errors.forbidden'));
+});
+
+it('forbids resend verification when token lacks required ability', function (): void {
+    $user = User::factory()->unverified()->create();
+    $token = $user->createToken('limited-verification', ['auth:me'])->plainTextToken;
+
+    $this->withToken($token)
+        ->postJson('/v1/auth/email/verification-notification')
+        ->assertForbidden()
+        ->assertJsonPath('message', __('api.errors.forbidden'));
+});
+
 it('throttles repeated failed login attempts', function (): void {
     User::factory()->create([
         'email' => 'throttle-login@example.com',
