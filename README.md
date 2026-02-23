@@ -175,6 +175,7 @@ Relevant config/env:
 - API responses include an `X-Request-Id` header (propagated or generated)
 - Security-sensitive auth/token actions emit structured `security.audit` log events
 - Critical write endpoints support `Idempotency-Key` replay/conflict handling
+- Configurable transport hardening for HTTPS enforcement, HSTS, trusted proxies/hosts, and strict CORS origins
 
 ## Sunset Middleware (Endpoint Deprecation)
 

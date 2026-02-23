@@ -22,6 +22,7 @@ return [
         'forbidden' => 'Prohibido.',
         'too_many_requests' => 'Demasiadas solicitudes. Intentalo de nuevo mas tarde.',
         'validation_failed' => 'Los datos proporcionados no son validos.',
+        'https_required' => 'HTTPS es obligatorio para este endpoint.',
         'unsupported_media_type' => 'Tipo de contenido no compatible. Usa cuerpos de solicitud application/json.',
         'idempotency_key_invalid' => 'Formato de cabecera Idempotency-Key invalido.',
         'idempotency_key_conflict' => 'Idempotency-Key ya fue usado con un payload diferente.',

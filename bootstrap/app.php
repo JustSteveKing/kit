@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Middleware\AttachRequestId;
 use App\Http\Middleware\EnsureJsonApiRequest;
+use App\Http\Middleware\EnforceTransportSecurity;
 use App\Http\Middleware\IdempotencyKey;
 use App\Http\Middleware\SetRequestLocale;
 use App\Http\Middleware\Sunset;
@@ -37,7 +38,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'sunset' => Sunset::class,
         ]);
 
+        $trustedProxies = (string) env('TRUSTED_PROXIES', '*');
+        $middleware->trustProxies($trustedProxies !== '' ? $trustedProxies : null);
+
+        $trustedHosts = array_values(array_filter(array_map(
+            static fn (string $host): string => trim($host),
+            explode(',', (string) env('TRUSTED_HOSTS', '')),
+        )));
+        if ($trustedHosts !== []) {
+            $middleware->trustHosts(at: $trustedHosts, subdomains: false);
+        }
+
         $middleware->prependToGroup('api', EnsureJsonApiRequest::class);
+        $middleware->prependToGroup('api', EnforceTransportSecurity::class);
         $middleware->prependToGroup('api', SetRequestLocale::class);
         $middleware->prependToGroup('api', AttachRequestId::class);
     })
