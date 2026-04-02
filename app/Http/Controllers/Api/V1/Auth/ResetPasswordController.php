@@ -44,6 +44,7 @@ final class ResetPasswordController
         $payload = ResetPasswordPayload::fromReqest($request);
         $resetUserId = null;
 
+        /** @var string $status */
         $status = Password::broker()->reset(
             [
                 'email' => $payload->email,
@@ -57,7 +58,9 @@ final class ResetPasswordController
                     'remember_token' => Str::random(60),
                 ])->save();
 
-                $resetUserId = (string) $user->getKey();
+                $userId = $user->getKey();
+                assert(is_string($userId));
+                $resetUserId = $userId;
 
                 event(new PasswordReset($user));
             }

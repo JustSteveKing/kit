@@ -18,9 +18,12 @@ final readonly class ShowResetPasswordTokenPayload
     {
         $data = self::validatedData($request);
 
+        $token = $data['token'] ?? '';
+        $email = $data['email'] ?? null;
+
         return new self(
-            token: (string) $data['token'],
-            email: isset($data['email']) ? (string) $data['email'] : null,
+            token: is_string($token) ? $token : '',
+            email: is_string($email) ? $email : null,
         );
     }
 
@@ -29,10 +32,9 @@ final readonly class ShowResetPasswordTokenPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

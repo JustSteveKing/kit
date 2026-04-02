@@ -10,15 +10,16 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 final class UserResource extends JsonApiResource
 {
-    public function toId(Request $request): ?string
+    public function toId(Request $request): string
     {
-        /** @var User $user */
+        assert($this->resource instanceof User);
         $user = $this->resource;
+        $id = $user->getKey();
 
-        return (string) $user->getKey();
+        return is_string($id) || is_int($id) ? (string) $id : '';
     }
 
-    public function toType(Request $request): ?string
+    public function toType(Request $request): string
     {
         return 'users';
     }
@@ -28,7 +29,7 @@ final class UserResource extends JsonApiResource
      */
     public function toAttributes(Request $request): array
     {
-        /** @var User $user */
+        assert($this->resource instanceof User);
         $user = $this->resource;
 
         return [

@@ -26,22 +26,20 @@ final class LogoutController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user): Response
     {
-        /** @var PersonalAccessToken $token */
         $token = $user->currentAccessToken();
 
-        if ($token) {
-            SecurityAudit::log('auth.logout.succeeded', [
-                'user_id' => (string) $user->getKey(),
-                'token_id' => (string) $token->getKey(),
-            ]);
+        $userId = $user->getKey();
+        assert(is_string($userId));
 
-            $token->delete();
-        } else {
-            SecurityAudit::log('auth.logout.succeeded', [
-                'user_id' => (string) $user->getKey(),
-                'token_id' => null,
-            ]);
-        }
+        $tokenId = $token->getKey();
+        assert(is_int($tokenId) || is_string($tokenId));
+
+        SecurityAudit::log('auth.logout.succeeded', [
+            'user_id' => $userId,
+            'token_id' => (string) $tokenId,
+        ]);
+
+        $token->delete();
 
         return response()->noContent();
     }

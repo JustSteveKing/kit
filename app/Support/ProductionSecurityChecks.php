@@ -22,7 +22,8 @@ final class ProductionSecurityChecks
             throw new RuntimeException('In production, SECURITY_FORCE_HTTPS must be enabled.');
         }
 
-        $appUrl = mb_strtolower((string) config('app.url', ''));
+        $appUrlConfig = config('app.url', '');
+        $appUrl = mb_strtolower(is_scalar($appUrlConfig) ? (string) $appUrlConfig : '');
         if (! str_starts_with($appUrl, 'https://')) {
             throw new RuntimeException('In production, APP_URL must use https://.');
         }

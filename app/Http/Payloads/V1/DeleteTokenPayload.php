@@ -16,9 +16,10 @@ final readonly class DeleteTokenPayload
     public static function fromReqest(Request $request): self
     {
         $data = self::validatedData($request);
+        $tokenId = $data['token_id'] ?? 0;
 
         return new self(
-            tokenId: (int) $data['token_id'],
+            tokenId: is_numeric($tokenId) ? (int) $tokenId : 0,
         );
     }
 
@@ -27,10 +28,9 @@ final readonly class DeleteTokenPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

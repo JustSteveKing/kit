@@ -18,9 +18,12 @@ final readonly class VerifyEmailPayload
     {
         $data = self::validatedData($request);
 
+        $id = $data['id'] ?? '';
+        $hash = $data['hash'] ?? '';
+
         return new self(
-            id: (string) $data['id'],
-            hash: (string) $data['hash'],
+            id: is_string($id) ? $id : '',
+            hash: is_string($hash) ? $hash : '',
         );
     }
 
@@ -29,10 +32,9 @@ final readonly class VerifyEmailPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

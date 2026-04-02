@@ -10,15 +10,16 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 final class PersonalAccessTokenResource extends JsonApiResource
 {
-    public function toId(Request $request): ?string
+    public function toId(Request $request): string
     {
-        /** @var PersonalAccessToken $token */
+        assert($this->resource instanceof PersonalAccessToken);
         $token = $this->resource;
+        $id = $token->getKey();
 
-        return (string) $token->getKey();
+        return is_string($id) || is_int($id) ? (string) $id : '';
     }
 
-    public function toType(Request $request): ?string
+    public function toType(Request $request): string
     {
         return 'personal-access-tokens';
     }
@@ -28,10 +29,14 @@ final class PersonalAccessTokenResource extends JsonApiResource
      */
     public function toAttributes(Request $request): array
     {
-        /** @var PersonalAccessToken $token */
+        assert($this->resource instanceof PersonalAccessToken);
         $token = $this->resource;
 
         $currentTokenId = $request->user()?->currentAccessToken()?->getKey();
+        $tokenId = $token->getKey();
+
+        $currentTokenIdStr = is_string($currentTokenId) || is_int($currentTokenId) ? (string) $currentTokenId : '';
+        $tokenIdStr = is_string($tokenId) || is_int($tokenId) ? (string) $tokenId : '';
 
         return [
             'name' => $token->name,
@@ -40,7 +45,7 @@ final class PersonalAccessTokenResource extends JsonApiResource
             'expires_at' => $token->expires_at?->toAtomString(),
             'created_at' => $token->created_at?->toAtomString(),
             'updated_at' => $token->updated_at?->toAtomString(),
-            'is_current' => $currentTokenId !== null && (string) $currentTokenId === (string) $token->getKey(),
+            'is_current' => $currentTokenId !== null && $currentTokenIdStr === $tokenIdStr,
         ];
     }
 }

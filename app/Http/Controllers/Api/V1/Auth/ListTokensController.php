@@ -50,7 +50,7 @@ final class ListTokensController
             ->get();
 
         SecurityAudit::log('auth.tokens.listed', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => (string) (is_string($user->getKey()) || is_int($user->getKey()) ? $user->getKey() : ''),
             'count' => $tokens->count(),
         ]);
 

@@ -26,9 +26,15 @@ final class SendEmailVerificationNotificationController
     {
         $user = $request->user();
 
+        if (! $user instanceof \App\Models\User) {
+            return new JsonResponse([
+                'message' => __('api.errors.unauthenticated'),
+            ], 401);
+        }
+
         if ($user->hasVerifiedEmail()) {
             SecurityAudit::log('auth.email_verification.already_verified', [
-                'user_id' => (string) $user->getKey(),
+                'user_id' => is_scalar($user->getKey()) ? (string) $user->getKey() : '',
             ]);
 
             return new JsonResponse([
@@ -39,7 +45,7 @@ final class SendEmailVerificationNotificationController
         $user->sendEmailVerificationNotification();
 
         SecurityAudit::log('auth.email_verification.notification_sent', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => is_scalar($user->getKey()) ? (string) $user->getKey() : '',
         ]);
 
         return new JsonResponse([

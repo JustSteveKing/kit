@@ -64,7 +64,7 @@ final class LoginController
         [$token, $expiresAt] = $this->issueToken($user, $payload->deviceName);
 
         SecurityAudit::log('auth.login.succeeded', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => (string) (is_string($user->getKey()) || is_int($user->getKey()) ? $user->getKey() : ''),
             'email_hash' => SecurityAudit::hashEmail($payload->email),
             'device_name' => $payload->deviceName,
             'token_expires_at' => $expiresAt?->toAtomString(),
@@ -112,7 +112,7 @@ final class LoginController
         }
 
         return array_values(array_filter(
-            array_map(static fn (mixed $ability): string => trim((string) $ability), $abilities),
+            array_map(static fn (mixed $ability): string => trim(is_string($ability) || is_int($ability) ? (string) $ability : ''), $abilities),
             static fn (string $ability): bool => $ability !== '',
         ));
     }

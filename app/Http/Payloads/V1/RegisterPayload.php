@@ -20,13 +20,16 @@ final readonly class RegisterPayload
     {
         $data = self::validatedData($request);
 
+        $name = $data['name'] ?? '';
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+        $deviceName = $data['device_name'] ?? 'api-client';
+
         return new self(
-            name: (string) $data['name'],
-            email: (string) $data['email'],
-            password: (string) $data['password'],
-            deviceName: isset($data['device_name']) && $data['device_name'] !== ''
-                ? (string) $data['device_name']
-                : 'api-client',
+            name: is_string($name) ? $name : '',
+            email: is_string($email) ? $email : '',
+            password: is_string($password) ? $password : '',
+            deviceName: is_string($deviceName) && $deviceName !== '' ? $deviceName : 'api-client',
         );
     }
 
@@ -35,10 +38,9 @@ final readonly class RegisterPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

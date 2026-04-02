@@ -29,7 +29,7 @@ final class DeleteAllTokensController
         $user->tokens()->delete();
 
         SecurityAudit::log('auth.tokens.revoked_all', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => (string) (is_string($user->getKey()) || is_int($user->getKey()) ? $user->getKey() : ''),
             'count' => $deletedCount,
         ]);
 
