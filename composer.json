@@ -20,6 +20,7 @@
         "fakerphp/faker": "^1.23",
         "knuckleswtf/scribe": "^5.7",
         "larastan/larastan": "3.x-dev",
+        "laravel/boost": "^2.4",
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",
         "mockery/mockery": "^1.6",

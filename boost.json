@@ -1,0 +1,14 @@
+{
+    "agents": [
+        "claude_code",
+        "gemini"
+    ],
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch_mcp": false,
+    "sail": false,
+    "skills": [
+        "laravel-best-practices",
+        "pest-testing"
+    ]
+}
