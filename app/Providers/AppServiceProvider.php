@@ -28,18 +28,31 @@ final class AppServiceProvider extends ServiceProvider
             Limit::perMinute(10)->by($request->ip()),
         ]);
 
-        RateLimiter::for('auth-login', fn (Request $request) => [
-            Limit::perMinute(10)->by(sprintf('%s|%s', $request->ip(), (string) $request->input('email'))),
-        ]);
+        RateLimiter::for('auth-login', function (Request $request) {
+            $email = $request->input('email');
+            $emailStr = is_scalar($email) ? (string) $email : '';
 
-        RateLimiter::for('auth-password', fn (Request $request) => [
-            Limit::perMinute(5)->by(sprintf('%s|%s', $request->ip(), (string) $request->input('email'))),
-        ]);
+            return [
+                Limit::perMinute(10)->by(sprintf('%s|%s', $request->ip(), $emailStr)),
+            ];
+        });
 
-        RateLimiter::for('auth-protected', fn (Request $request) => [
-            Limit::perMinute(60)->by(
-                (string) ($request->user()?->getAuthIdentifier() ?? $request->ip())
-            ),
-        ]);
+        RateLimiter::for('auth-password', function (Request $request) {
+            $email = $request->input('email');
+            $emailStr = is_scalar($email) ? (string) $email : '';
+
+            return [
+                Limit::perMinute(5)->by(sprintf('%s|%s', $request->ip(), $emailStr)),
+            ];
+        });
+
+        RateLimiter::for('auth-protected', function (Request $request) {
+            $idValue = $request->user()?->getAuthIdentifier() ?? $request->ip();
+            $identifier = is_scalar($idValue) ? (string) $idValue : '';
+
+            return [
+                Limit::perMinute(60)->by($identifier),
+            ];
+        });
     }
 }

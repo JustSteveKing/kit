@@ -17,8 +17,10 @@ final readonly class ForgotPasswordPayload
     {
         $data = self::validatedData($request);
 
+        $email = $data['email'] ?? '';
+
         return new self(
-            email: (string) $data['email'],
+            email: is_string($email) ? $email : '',
         );
     }
 
@@ -27,10 +29,9 @@ final readonly class ForgotPasswordPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

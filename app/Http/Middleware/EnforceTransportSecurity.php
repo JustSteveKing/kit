@@ -25,7 +25,8 @@ final class EnforceTransportSecurity
         $response = $next($request);
 
         if ((bool) config('security.hsts.enabled', true) && $request->isSecure()) {
-            $maxAge = max((int) config('security.hsts.max_age', 31536000), 0);
+            $configMaxAge = config('security.hsts.max_age', 31536000);
+            $maxAge = max(is_scalar($configMaxAge) ? (int) $configMaxAge : 31536000, 0);
             $directives = ["max-age={$maxAge}"];
 
             if ((bool) config('security.hsts.include_subdomains', true)) {

@@ -26,13 +26,13 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "http://kit.test";
+        var tryItOutBaseUrl = "http://localhost";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
-    <script src="../docs/js/tryitout-5.7.0.js"></script>
+    <script src="../docs/js/tryitout-5.9.0.js"></script>
 
-    <script src="../docs/js/theme-default-5.7.0.js"></script>
+    <script src="../docs/js/theme-default-5.9.0.js"></script>
 
 </head>
 
@@ -133,7 +133,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: February 23, 2026</li>
+        <li>Last updated: April 2, 2026</li>
     </ul>
 </div>
 
@@ -142,7 +142,7 @@
     <div class="content">
         <h1 id="introduction">Introduction</h1>
 <aside>
-    <strong>Base URL</strong>: <code>http://kit.test</code>
+    <strong>Base URL</strong>: <code>http://localhost</code>
 </aside>
 <pre><code>This documentation aims to provide all the information you need to work with our API.
 
@@ -172,7 +172,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://kit.test/v1/auth/register" \
+    "http://localhost/v1/auth/register" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -186,7 +186,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/register"
+    "http://localhost/v1/auth/register"
 );
 
 const headers = {
@@ -222,7 +222,7 @@ fetch(url, {
         &quot;attributes&quot;: {
             &quot;name&quot;: &quot;Justina Gaylord&quot;,
             &quot;email&quot;: &quot;lafayette.considine@example.com&quot;,
-            &quot;email_verified_at&quot;: &quot;2026-02-23T19:05:13+00:00&quot;,
+            &quot;email_verified_at&quot;: &quot;2026-04-02T10:56:09+00:00&quot;,
             &quot;created_at&quot;: null,
             &quot;updated_at&quot;: null
         }
@@ -384,7 +384,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://kit.test/v1/auth/login" \
+    "http://localhost/v1/auth/login" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -397,7 +397,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/login"
+    "http://localhost/v1/auth/login"
 );
 
 const headers = {
@@ -432,7 +432,7 @@ fetch(url, {
         &quot;attributes&quot;: {
             &quot;name&quot;: &quot;Justina Gaylord&quot;,
             &quot;email&quot;: &quot;cormier.nick@example.com&quot;,
-            &quot;email_verified_at&quot;: &quot;2026-02-23T19:05:13+00:00&quot;,
+            &quot;email_verified_at&quot;: &quot;2026-04-02T10:56:09+00:00&quot;,
             &quot;created_at&quot;: null,
             &quot;updated_at&quot;: null
         }
@@ -583,7 +583,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://kit.test/v1/auth/me" \
+    --get "http://localhost/v1/auth/me" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -591,7 +591,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/me"
+    "http://localhost/v1/auth/me"
 );
 
 const headers = {
@@ -620,7 +620,7 @@ fetch(url, {
         &quot;attributes&quot;: {
             &quot;name&quot;: &quot;Morgan Hirthe&quot;,
             &quot;email&quot;: &quot;dare.emelie@example.com&quot;,
-            &quot;email_verified_at&quot;: &quot;2026-02-23T19:05:13+00:00&quot;,
+            &quot;email_verified_at&quot;: &quot;2026-04-02T10:56:09+00:00&quot;,
             &quot;created_at&quot;: null,
             &quot;updated_at&quot;: null
         }
@@ -736,7 +736,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://kit.test/v1/auth/logout" \
+    "http://localhost/v1/auth/logout" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -744,7 +744,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/logout"
+    "http://localhost/v1/auth/logout"
 );
 
 const headers = {
@@ -876,7 +876,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://kit.test/v1/auth/tokens" \
+    --get "http://localhost/v1/auth/tokens" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -884,7 +884,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/tokens"
+    "http://localhost/v1/auth/tokens"
 );
 
 const headers = {
@@ -1045,7 +1045,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://kit.test/v1/auth/tokens" \
+    "http://localhost/v1/auth/tokens" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1053,7 +1053,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/tokens"
+    "http://localhost/v1/auth/tokens"
 );
 
 const headers = {
@@ -1194,7 +1194,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://kit.test/v1/auth/tokens/42" \
+    "http://localhost/v1/auth/tokens/42" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -1206,7 +1206,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/tokens/42"
+    "http://localhost/v1/auth/tokens/42"
 );
 
 const headers = {
@@ -1387,7 +1387,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://kit.test/v1/auth/password/forgot" \
+    "http://localhost/v1/auth/password/forgot" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1398,7 +1398,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/password/forgot"
+    "http://localhost/v1/auth/password/forgot"
 );
 
 const headers = {
@@ -1528,7 +1528,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://kit.test/v1/auth/password/reset" \
+    "http://localhost/v1/auth/password/reset" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1542,7 +1542,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/password/reset"
+    "http://localhost/v1/auth/password/reset"
 );
 
 const headers = {
@@ -1725,7 +1725,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://kit.test/v1/auth/password/reset/reset-token-value?email=jane%40example.com" \
+    --get "http://localhost/v1/auth/password/reset/reset-token-value?email=jane%40example.com" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1737,7 +1737,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/password/reset/reset-token-value"
+    "http://localhost/v1/auth/password/reset/reset-token-value"
 );
 
 const params = {
@@ -1914,7 +1914,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://kit.test/v1/auth/email/verify/01HZX3W3T4J8Q57XNZD5BPHJ92/8c4f4370e5db9b5be6d0f4c95495f49f998fa32a" \
+    --get "http://localhost/v1/auth/email/verify/01HZX3W3T4J8Q57XNZD5BPHJ92/8c4f4370e5db9b5be6d0f4c95495f49f998fa32a" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1926,7 +1926,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/email/verify/01HZX3W3T4J8Q57XNZD5BPHJ92/8c4f4370e5db9b5be6d0f4c95495f49f998fa32a"
+    "http://localhost/v1/auth/email/verify/01HZX3W3T4J8Q57XNZD5BPHJ92/8c4f4370e5db9b5be6d0f4c95495f49f998fa32a"
 );
 
 const headers = {
@@ -2104,7 +2104,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://kit.test/v1/auth/email/verification-notification" \
+    "http://localhost/v1/auth/email/verification-notification" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2112,7 +2112,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://kit.test/v1/auth/email/verification-notification"
+    "http://localhost/v1/auth/email/verification-notification"
 );
 
 const headers = {

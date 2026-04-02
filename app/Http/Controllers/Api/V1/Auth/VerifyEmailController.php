@@ -35,7 +35,7 @@ final class VerifyEmailController
 
         if (! hash_equals(sha1($user->getEmailForVerification()), $payload->hash)) {
             SecurityAudit::log('auth.email_verification.failed', [
-                'user_id' => (string) $user->getKey(),
+                'user_id' => is_scalar($user->getKey()) ? (string) $user->getKey() : '',
                 'reason' => 'hash_mismatch',
             ]);
 
@@ -49,7 +49,7 @@ final class VerifyEmailController
         }
 
         SecurityAudit::log('auth.email_verification.succeeded', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => is_scalar($user->getKey()) ? (string) $user->getKey() : '',
             'already_verified' => $wasAlreadyVerified,
         ]);
 

@@ -40,9 +40,12 @@ final class IdempotencyKey
                 ], 409);
             }
 
+            $body = $cached['body'] ?? '';
+            $status = $cached['status'] ?? 200;
+
             $response = new Response(
-                (string) ($cached['body'] ?? ''),
-                (int) ($cached['status'] ?? 200),
+                is_scalar($body) ? (string) $body : '',
+                is_scalar($status) ? (int) $status : 200,
             );
 
             $contentType = $cached['content_type'] ?? null;
@@ -59,7 +62,8 @@ final class IdempotencyKey
         $response = $next($request);
 
         if ($this->shouldCacheResponse($response)) {
-            $ttl = max((int) config('idempotency.ttl_minutes', 10), 1);
+            $ttlConfig = config('idempotency.ttl_minutes', 10);
+            $ttl = max(is_scalar($ttlConfig) ? (int) $ttlConfig : 10, 1);
 
             Cache::put($cacheKey, [
                 'request_hash' => $requestHash,
@@ -76,7 +80,9 @@ final class IdempotencyKey
 
     private function cacheKey(Request $request, string $idempotencyKey): string
     {
-        $scope = (string) ($request->user()?->getAuthIdentifier() ?? $request->ip());
+        $scopeValue = $request->user()?->getAuthIdentifier() ?? $request->ip();
+        $scope = is_scalar($scopeValue) ? (string) $scopeValue : '';
+
         $routeName = (string) ($request->route()?->getName() ?? $request->path());
 
         return 'idempotency:'.sha1(sprintf('%s|%s|%s', $scope, $routeName, $idempotencyKey));

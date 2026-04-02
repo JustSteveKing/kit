@@ -20,11 +20,16 @@ final readonly class ResetPasswordPayload
     {
         $data = self::validatedData($request);
 
+        $token = $data['token'] ?? '';
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+        $passwordConfirmation = $data['password_confirmation'] ?? '';
+
         return new self(
-            token: (string) $data['token'],
-            email: (string) $data['email'],
-            password: (string) $data['password'],
-            passwordConfirmation: (string) $data['password_confirmation'],
+            token: is_string($token) ? $token : '',
+            email: is_string($email) ? $email : '',
+            password: is_string($password) ? $password : '',
+            passwordConfirmation: is_string($passwordConfirmation) ? $passwordConfirmation : '',
         );
     }
 
@@ -33,10 +38,9 @@ final readonly class ResetPasswordPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }
