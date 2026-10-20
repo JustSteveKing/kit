@@ -16,6 +16,7 @@ return [
         'password_reset_throttled' => 'Espera antes de volver a intentarlo.',
         'password_reset_failed' => 'No se pudo restablecer la contrasena con los datos proporcionados.',
         'token_not_found' => 'Token no encontrado.',
+        'ability_not_grantable' => 'Solo puedes conceder habilidades que tiene tu token actual.',
     ],
     'errors' => [
         'unauthenticated' => 'No autenticado.',

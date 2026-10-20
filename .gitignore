@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Octane: a locally downloaded FrankenPHP binary and its Caddy state
+/frankenphp
+/public/frankenphp-worker.php
+**/caddy
+/.legible

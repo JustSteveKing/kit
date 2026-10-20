@@ -22,7 +22,10 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Password Reset')]
-#[Endpoint(title: 'Reset Password', description: 'Reset the user password using a valid reset token.')]
+#[Endpoint(
+    title: 'Reset Password',
+    description: 'Set a new password using the token from a password reset email. Use it to finish the forgot-password flow. Returns a confirmation message; an invalid or expired token is a 422 on the email field.',
+)]
 #[Unauthenticated]
 #[BodyParam('token', type: 'string', description: 'Password reset token.', required: true, example: 'reset-token-value')]
 #[BodyParam('email', type: 'string', description: 'Account email associated with token.', required: true, example: 'jane@example.com')]

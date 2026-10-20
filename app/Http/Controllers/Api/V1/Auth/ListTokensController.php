@@ -20,7 +20,10 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
-#[Endpoint(title: 'List Tokens', description: 'List personal access tokens for the authenticated user.')]
+#[Endpoint(
+    title: 'List Tokens',
+    description: 'List the authenticated user\'s personal access tokens, newest first, 25 to a page. Use it to show signed-in devices or to find a token ID to revoke. Returns an array of tokens, with is_current marking the one making the request; follow the Link header\'s rel="next" for the next page.',
+)]
 #[Authenticated]
 #[QueryParam('cursor', type: 'string', description: 'Opaque cursor from a Link header. Omit it for the first page.', required: false, example: null)]
 #[Response(

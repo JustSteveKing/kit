@@ -12,15 +12,32 @@ this file is how to change it.
 composer lint     # Pint, the PER preset plus the rules in pint.json
 composer stan     # PHPStan with Larastan at level 10
 php artisan test  # Pest, including the OpenAPI contract tests
+legible check public/docs/openapi.yaml   # agent readiness, against .legible.yaml
 ```
 
-CI runs all three. A change that fails any of them is not finished. Fix style with
+CI runs all four, and builds and boots the production image. A change that fails any of them is
+not finished. [legible](https://github.com/JustSteveKing/legible) is a single binary from its
+releases; CI pins the version in `.github/workflows/ci-tests.yml`. Fix style with
 `vendor/bin/pint --dirty`, never by loosening `pint.json` or `phpstan.neon`.
 
 ## Adding an endpoint
 
-Every endpoint is the same six pieces. Copy the nearest existing one in
-`app/Http/Controllers/Api/V1/Auth/` rather than starting from a blank file.
+Start with the generator, never a blank file:
+
+```bash
+php artisan make:endpoint Projects/CreateProject --method=POST --uri=/projects
+php artisan make:endpoint Projects/ShowProject --method=GET --uri=/projects/{project}
+```
+
+It writes the six pieces below, appends the route, formats them with Pint and prints the steps it
+leaves to you. `--ability=` overrides the default (`projects:write`, or `projects:read` for a GET),
+`--guest` leaves the route public, and `--force` overwrites. The templates are in
+`stubs/endpoint/`.
+
+What it cannot know stays visible until you write it: the controller answers `501`, path
+parameters carry a TODO to constrain them, and the description is three TODO sentences. CI fails
+while any of that documentation remains, through `OpenApiContractTest` and legible, so finish every
+TODO before calling the endpoint done. The pieces, and what to put in each:
 
 1. **Route** in `routes/api/v1.php`. URLs have no `/api` prefix: `routes/api/routes.php` adds `v1`.
    Name it `v1.{domain}.{action}`. Protected routes sit behind `auth:sanctum`, a named rate limiter
@@ -38,11 +55,18 @@ Every endpoint is the same six pieces. Copy the nearest existing one in
    goes into `sanctum.abilities.default` in `config/sanctum.php`, or no token issued at login can
    call the route.
 
-2. **Form Request** in `app/Http/Requests/{Domain}/`: final, `authorize()` and `rules()` only.
+   Path parameters are validated here, by route constraints (`whereNumber`, `whereUlid`,
+   `where('slug', '[a-z0-9-]+')`), never by the Form Request. A Form Request that validates a path
+   parameter documents it as a body field too, which legible reports as an argument collision.
+
+2. **Form Request** in `app/Http/Requests/{Domain}/`: final, `authorize()` and `rules()` for body or
+   query input only. A GET's Form Request also has a `queryParameters()` method, or Scribe documents
+   its rules as a request body. A DELETE usually needs none.
 
 3. **Payload** in `app/Http/Payloads/V1/`: a `final readonly` class with `fromRequest()` that reads
-   the validated data with typed accessors (`Arr::string()`, `Arr::integer()`), never casts from
-   `mixed`. Controllers work with the payload, not with `$request->input()`.
+   the validated data with typed accessors (`Arr::string()`, `Arr::integer()`) and path parameters
+   with `App\Http\Payloads\RouteParameter`, never casting from `mixed`. Controllers work with the
+   payload, not with `$request->input()`.
 
 4. **Controller** in `app/Http/Controllers/Api/V1/{Domain}/`: final, invokable, no base class.
    Document it with Scribe attributes, not docblocks: `#[Group]`, `#[Endpoint]`, a `#[BodyParam]` or
@@ -66,7 +90,11 @@ php artisan scribe:generate --no-interaction
 
 `OpenApiContractTest` compares every `v1/` route with the generated spec, so a route Scribe cannot
 see fails the build. Scribe documents a route even without attributes, though, so the attributes
-are what make its documentation worth reading.
+are what make its documentation worth reading: legible fails a one-sentence description, an error
+status with no documented response, and a description shared by two operations.
+
+An endpoint whose validation problems carry `errors` joins the `error-shape` ignore in
+`.legible.yaml`, which says why.
 
 ## Errors
 
@@ -127,8 +155,14 @@ client can read goes through `__()`:
 - Call `SecurityAudit::log('domain.action.outcome', [...])` for anything security-relevant: sign-in,
   tokens, permission changes, destructive actions. Log IDs and `SecurityAudit::hashEmail()`, never
   raw emails, passwords or tokens.
-- Grant each token the least it needs: one ability per endpoint group, added to the defaults only if
-  every client needs it.
+- Grant each token the least it needs. Every ability a route checks is listed in
+  `sanctum.abilities.available`; session tokens from register and login get
+  `sanctum.abilities.default`. Add a new ability to the first, and to the second only if every
+  signed-in client needs it.
+- Machines get API keys, not passwords: `POST /v1/auth/tokens` creates a key holding a subset of the
+  calling token's abilities, expiring within `API_KEY_MAX_DAYS`. Issue tokens through
+  `App\Support\AccessTokens`, which sets every token's own `expires_at`; `sanctum.expiration` is
+  off on purpose, or no key could outlive a session.
 - `ProductionSecurityChecks` refuses to boot in production without HTTPS enforcement, a `https://`
   `APP_URL`, `APP_DEBUG=false`, explicit CORS origins and trusted hosts. Configure them; do not
   remove the check.
@@ -143,6 +177,19 @@ client can read goes through `__()`:
   matching it by hand.
 - User IDs are ULIDs, so treat them as strings.
 
+## Running in production
+
+The `Dockerfile` runs Octane on FrankenPHP: the application stays in memory between requests.
+
+- Keep request state out of singletons and static properties. Use `scoped()` bindings, which Octane
+  resets per request, as api-toolbox does for its request ID and trace.
+- Resolve request state when the request is served, not in a closure that captured the
+  application at boot: Octane serves each request from a sandboxed copy of it.
+- Emails are queued, so production needs a worker as well as the server: the same image runs one
+  with `php artisan queue:work`. Locally, run `php artisan queue:work` beside `php artisan serve`.
+- Dev packages are not installed in the image. Config that references one, as `config/scribe.php`
+  does, must return early without it; the image build in CI fails otherwise.
+
 ## Dependencies
 
 [Laravel Vet](https://github.com/laravel/vet) guards `composer install`: `vet.json` records every
@@ -151,6 +198,9 @@ package someone has read, and releases younger than 7 days are held back.
 - Do not add or upgrade a package without being asked to.
 - After `composer require` or `composer update`, run `./vendor/bin/vet` in a terminal, review each
   change (or have it handed to you to read), and commit `vet.json` with `composer.lock`.
+- `laravel/*` packages are trusted by policy: they skip the release-age hold, and when they are the
+  only packages that changed, record them with `./vendor/bin/vet --fresh` rather than reviewing
+  them. The weekly bot does exactly that. Anything else that changed alongside them is reviewed.
 - Never edit `vet.json` by hand, and never use `--no-plugins` to get past Vet. The one exception is
   the documented review of a bot PR, which installs the new lock without the plugin precisely so
   that Vet can audit it.

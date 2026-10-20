@@ -56,9 +56,17 @@
             "version": "v0.3.0",
             "hash": "tree-v2:170dbefcc470a823490926a602216b6f1c5ba5f258a4ba16528a199269bd610c"
         },
+        "laminas/laminas-diactoros": {
+            "version": "3.9.0",
+            "hash": "tree-v2:a96235360b43645eb30bed80af9e8b1e4f60b80fefd1eb980e1e33f1549a7c6e"
+        },
         "laravel/framework": {
             "version": "v13.35.0",
             "hash": "tree-v2:862428a89369e09b33dee255707d3c5d05dfffdc5bf880ce97418d0e7853d24b"
+        },
+        "laravel/octane": {
+            "version": "v2.22.0",
+            "hash": "tree-v2:67290079ce12d4269b4cdf8fc872859fad8443f71c80f889298b53e8ed9e208a"
         },
         "laravel/prompts": {
             "version": "v0.3.26",
@@ -276,6 +284,10 @@
             "version": "v8.1.9",
             "hash": "tree-v2:0088281cac46a3378736e4db93df87bd462c17b193ffa95622e72670427bd3e1"
         },
+        "symfony/psr-http-message-bridge": {
+            "version": "v8.1.9",
+            "hash": "tree-v2:a29d81f0b30177b80606a6e88dcb64fc8dab6b536afc1c620fe9ce024be56641"
+        },
         "symfony/routing": {
             "version": "v8.1.9",
             "hash": "tree-v2:dc0d70dd175594a8a2468f2b694b8ce0780dbd4369e7020777aac056a66c25ca"
@@ -337,10 +349,6 @@
         "doctrine/deprecations": {
             "version": "1.1.6",
             "hash": "tree-v2:8abdb22c79e82b9ea4884ab18dbaa595bb5315736231fa9e310b9d70a3ab0815"
-        },
-        "driftingly/rector-laravel": {
-            "version": "2.6.2",
-            "hash": "tree-v2:7ad85f8d2c4fc8ae611466f654d894413f9d066999bbede4abdccda6f230be4e"
         },
         "entropy/entropy": {
             "version": "0.4.30",
@@ -506,10 +514,6 @@
             "version": "12.5.33",
             "hash": "tree-v2:fe7d4ec3e4840290cee07c39535422b61bb31ebd2afde15a39a78373a0cd2c64"
         },
-        "rector/rector": {
-            "version": "2.7.0",
-            "hash": "tree-v2:e8f59d6c70f4d83c2a49a512000935fdc04f7ef278c685ae7da3cac6b36f0d91"
-        },
         "sebastian/cli-parser": {
             "version": "4.2.1",
             "hash": "tree-v2:fc44fc3e0a4b1fd529963948acebc3a3370f7b55aa8e9969c96953477b41886e"
@@ -582,10 +586,6 @@
             "version": "v8.1.9",
             "hash": "tree-v2:ac2ebd08460160092a00a9af5531fd33f054e17c16a88425464505af0d2044d1"
         },
-        "symplify/rule-doc-generator-contracts": {
-            "version": "11.2.0",
-            "hash": "tree-v2:143fc89ce64308c660e6f52de2df92429720106e1e43e1484dd93193772ed011"
-        },
         "ta-tikoma/phpunit-architecture-test": {
             "version": "0.8.7",
             "hash": "tree-v2:068328d7bed81666d79d94c08e5b634b6c2f1499e8ebadf1068b4d7f19545243"
@@ -606,6 +606,7 @@
     "minimum-release-age": 7,
     "minimum-release-age-exclude": [
         "juststeveking/*",
+        "laravel/*",
         "roave/security-advisories"
     ]
 }

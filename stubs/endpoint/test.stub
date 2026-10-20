@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+it('{{ successDescription }}', function (): void {
+    // Call {{ method }} {{ uri }} with a token holding {{ abilityOrNone }}, then assert the response, e.g.
+    // ->assertCreated()->assertJsonPath('data.id', ...).
+})->todo();
+{{ guardTests }}

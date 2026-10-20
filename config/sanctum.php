@@ -43,29 +43,57 @@ return [
     | Expiration Minutes
     |--------------------------------------------------------------------------
     |
-    | This value controls the number of minutes until an issued token will be
-    | considered expired. This will override any values set in the token's
-    | "expires_at" attribute, but first-party sessions are not affected.
+    | Off: every token Kit issues carries its own expires_at instead, from
+    | "lifetimes" below. A global expiration would cap every token, so an API
+    | key could never outlive a sign-in session.
     |
     */
 
-    'expiration' => env('SANCTUM_EXPIRATION', 120),
+    'expiration' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Lifetimes
+    |--------------------------------------------------------------------------
+    |
+    | Session tokens are issued by register and login. API keys are created by
+    | POST /v1/auth/tokens, for scripts, integrations and agents; a client picks
+    | an expiry up to the maximum, or gets the default.
+    |
+    */
+
+    'lifetimes' => [
+        'session_minutes' => (int) env('SANCTUM_EXPIRATION', 120),
+        'api_key_default_days' => (int) env('API_KEY_DEFAULT_DAYS', 90),
+        'api_key_max_days' => (int) env('API_KEY_MAX_DAYS', 365),
+    ],
 
     /*
     |--------------------------------------------------------------------------
     | Token Abilities
     |--------------------------------------------------------------------------
     |
-    | Default abilities assigned to newly issued personal access tokens.
-    | Keep this list least-privilege and grant only endpoint-specific needs.
+    | "available" is every ability a route checks. "default" is what a session
+    | token from register or login gets. An API key gets the abilities its
+    | creator asks for, limited to ones the creating token holds itself.
     |
     */
+
     'abilities' => [
+        'available' => [
+            'auth:me',
+            'auth:logout',
+            'auth:verification:send',
+            'auth:tokens:read',
+            'auth:tokens:create',
+            'auth:tokens:delete',
+        ],
         'default' => [
             'auth:me',
             'auth:logout',
             'auth:verification:send',
             'auth:tokens:read',
+            'auth:tokens:create',
             'auth:tokens:delete',
         ],
     ],

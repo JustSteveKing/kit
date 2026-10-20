@@ -14,6 +14,12 @@ use Knuckles\Scribe\Extracting\Strategies;
 
 // Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
 
+// Scribe is a dev dependency. Production installs it without, and Laravel loads every config
+// file, so without this every artisan command there fails on the classes below.
+if ( ! class_exists(Defaults::class)) {
+    return [];
+}
+
 return [
     // The HTML <title> for the generated documentation.
     'title' => config('app.name') . ' API Documentation',
@@ -175,6 +181,7 @@ return [
         // Should extend `Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator`.
         'generators' => [
             App\Support\ProblemDetailsOpenApiGenerator::class,
+            App\Support\NoContentOpenApiGenerator::class,
         ],
     ],
 

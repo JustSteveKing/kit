@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+{{ imports }}
+
+#[Group(name: '{{ group }}')]
+#[Endpoint(
+    title: '{{ title }}',
+    description: 'TODO: Say what this endpoint does. TODO: Say when a client should call it. TODO: Say what it returns.',
+)]
+{{ attributes }}
+final class {{ class }}
+{
+    public function __invoke({{ parameters }}): JsonResponse
+    {
+{{ body }}
+        abort(501, 'TODO: Implement {{ title }}.');
+    }
+}

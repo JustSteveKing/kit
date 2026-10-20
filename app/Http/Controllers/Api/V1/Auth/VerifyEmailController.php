@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Payloads\V1\VerifyEmailPayload;
-use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Models\User;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\Response;
@@ -19,7 +19,10 @@ use Knuckles\Scribe\Attributes\UrlParam;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Email Verification')]
-#[Endpoint(title: 'Verify Email', description: 'Verify a user email using the signed verification link parameters.')]
+#[Endpoint(
+    title: 'Verify Email',
+    description: 'Mark the user\'s email as verified using the signed link from the verification email. Clients do not build this URL; they follow the one in the email, which expires. Returns a confirmation message; a link that is invalid, expired or altered is a 403.',
+)]
 #[Unauthenticated]
 #[UrlParam('id', type: 'string', description: 'User ULID from the signed verification link.', required: true, example: '01HZX3W3T4J8Q57XNZD5BPHJ92')]
 #[UrlParam('hash', type: 'string', description: 'SHA-1 hash of the email from the signed verification link.', required: true, example: '8c4f4370e5db9b5be6d0f4c95495f49f998fa32a')]
@@ -36,7 +39,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
 )]
 final class VerifyEmailController
 {
-    public function __invoke(VerifyEmailRequest $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $payload = VerifyEmailPayload::fromRequest($request);
 

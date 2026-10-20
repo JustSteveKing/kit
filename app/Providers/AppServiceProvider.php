@@ -10,6 +10,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Knuckles\Scribe\Scribe;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,13 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         ProductionSecurityChecks::assertForEnvironment((string) app()->environment());
+
+        // Document path parameters as the routes name them. Scribe otherwise renames {project}
+        // to {id} when it guesses at route model binding, and the spec stops matching the routes.
+        // Scribe is a dev dependency, so production skips this.
+        if (class_exists(Scribe::class)) {
+            Scribe::normalizeEndpointUrlUsing(static fn(string $uri): string => $uri);
+        }
 
         RateLimiter::for('auth-register', fn(Request $request) => [
             Limit::perMinute(10)->by($request->ip()),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Payloads\V1;
 
+use App\Http\Payloads\RouteParameter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -20,7 +21,7 @@ final readonly class ShowResetPasswordTokenPayload
         $data = self::validatedData($request);
 
         return new self(
-            token: Arr::string($data, 'token'),
+            token: RouteParameter::string($request, 'token'),
             email: isset($data['email']) ? Arr::string($data, 'email') : null,
         );
     }

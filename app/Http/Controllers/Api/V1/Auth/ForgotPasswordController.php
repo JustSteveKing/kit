@@ -18,13 +18,37 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Password Reset')]
-#[Endpoint(title: 'Request Password Reset', description: 'Send a password reset link to the provided email if an account exists.')]
+#[Endpoint(
+    title: 'Request Password Reset',
+    description: 'Email a password reset link to an address, if an account uses it. Use it from a forgot-password form. The response is the same whether or not the account exists, so it cannot be used to discover accounts; send an Idempotency-Key so a retry does not send a second email.',
+)]
 #[Unauthenticated]
 #[BodyParam('email', type: 'string', description: 'Account email address.', required: true, example: 'jane@example.com')]
 #[Response(
     content: ['message' => 'If the account exists, a password reset link has been sent.'],
     status: 200,
     description: 'Password reset request accepted.',
+)]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/validation-failed',
+        'title' => 'Validation Failed',
+        'status' => 422,
+        'detail' => 'The email field must be a valid email address.',
+        'errors' => ['email' => ['The email field must be a valid email address.']],
+    ],
+    status: 422,
+    description: 'The email was missing or not an email address.',
+)]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/rate-limit-exceeded',
+        'title' => 'Rate Limit Exceeded',
+        'status' => 429,
+        'detail' => 'Too many requests. Please try again later.',
+    ],
+    status: 429,
+    description: 'Too many reset requests for this address; retry after the Retry-After header.',
 )]
 final class ForgotPasswordController
 {

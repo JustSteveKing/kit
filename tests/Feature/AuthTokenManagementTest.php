@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\ListTokensController;
 use App\Models\User;
+use App\Support\AccessTokens;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -78,14 +79,13 @@ it('returns not found when revoking a token not owned by the authenticated user'
         ->assertJsonPath('detail', __('api.auth.token_not_found'));
 });
 
-it('validates token id route parameter when revoking a single token', function (): void {
+it('answers 404 for a token id that is not a number', function (): void {
     $user = User::factory()->create();
     $requestToken = $user->createToken('request-token', ['auth:tokens:delete']);
 
     $this->withToken($requestToken->plainTextToken)
         ->deleteJson('/v1/auth/tokens/not-an-integer')
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['token_id']);
+        ->assertProblemType('https://apiguide.dev/errors/resource-not-found', 404);
 });
 
 it('forbids single token revocation when token lacks required ability', function (): void {
@@ -158,4 +158,134 @@ it('rejects token list cursors that cannot be decoded', function (): void {
     $this->withToken($token)
         ->getJson('/v1/auth/tokens?cursor=not-a-cursor')
         ->assertProblemType('https://apiguide.dev/errors/invalid-pagination-cursor', 400);
+});
+
+it('creates an api key holding a subset of the current token abilities', function (): void {
+    $user = User::factory()->create();
+    $session = $user->createToken('session', ['auth:me', 'auth:tokens:read', 'auth:tokens:create']);
+
+    $response = $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', [
+            'name' => 'deploy-bot',
+            'abilities' => ['auth:me'],
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.name', 'deploy-bot')
+        ->assertJsonPath('data.abilities', ['auth:me'])
+        ->assertJsonPath('data.is_current', false)
+        ->assertJsonPath('meta.token_type', 'Bearer');
+
+    $key = PersonalAccessToken::findToken((string) $response->json('meta.token'));
+
+    expect($key)->not->toBeNull();
+    expect($key?->expires_at?->isSameDay(now()->addDays(90)))->toBeTrue();
+
+    app('auth')->forgetGuards();
+
+    $this->withToken((string) $response->json('meta.token'))->getJson('/v1/auth/me')->assertOk();
+
+    app('auth')->forgetGuards();
+
+    $this->withToken((string) $response->json('meta.token'))->getJson('/v1/auth/tokens')->assertProblem(403);
+});
+
+it('refuses to grant an ability the current token does not hold', function (): void {
+    $user = User::factory()->create();
+    $session = $user->createToken('session', ['auth:me', 'auth:tokens:create']);
+
+    $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', [
+            'name' => 'too-broad',
+            'abilities' => ['auth:me', 'auth:tokens:delete'],
+        ])
+        ->assertProblemType('https://apiguide.dev/errors/validation-failed', 422)
+        ->assertJsonPath('errors', ['abilities.1' => [__('api.auth.ability_not_grantable')]]);
+
+    expect($user->tokens()->count())->toBe(1);
+});
+
+it('refuses abilities no route checks, even from a token holding every ability', function (): void {
+    $user = User::factory()->create();
+    $session = $user->createToken('session', ['*']);
+
+    $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', [
+            'name' => 'made-up',
+            'abilities' => ['billing:refund'],
+        ])
+        ->assertProblem(422);
+});
+
+it('lets an api key outlive a session token, up to the configured maximum', function (): void {
+    $user = User::factory()->create();
+    $session = $user->createToken('session', ['auth:tokens:create', 'auth:me']);
+
+    $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', [
+            'name' => 'year-long',
+            'abilities' => ['auth:me'],
+            'expires_at' => now()->addDays(365)->toAtomString(),
+        ])
+        ->assertCreated();
+
+    $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', [
+            'name' => 'too-long',
+            'abilities' => ['auth:me'],
+            'expires_at' => now()->addDays(366)->toAtomString(),
+        ])
+        ->assertProblem(422)
+        ->assertJsonValidationErrors(['expires_at']);
+
+    $this->travel(3)->hours();
+    app('auth')->forgetGuards();
+
+    $key = $user->tokens()->where('name', 'year-long')->firstOrFail();
+
+    expect($key->expires_at?->isSameDay(now()->addDays(365)->subHours(3)))->toBeTrue();
+});
+
+it('keeps an api key working after session tokens have expired', function (): void {
+    $user = User::factory()->create();
+    $session = app(AccessTokens::class)->issueSession($user, 'laptop');
+
+    $key = $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', ['name' => 'nightly-job', 'abilities' => ['auth:me']])
+        ->assertCreated()
+        ->json('meta.token');
+
+    $this->travel(config()->integer('sanctum.lifetimes.session_minutes') + 1)->minutes();
+    app('auth')->forgetGuards();
+
+    $this->withToken($session->plainTextToken)->getJson('/v1/auth/me')->assertUnauthorized();
+
+    app('auth')->forgetGuards();
+
+    $this->withToken((string) $key)->getJson('/v1/auth/me')->assertOk();
+});
+
+it('requires the tokens create ability to make an api key', function (): void {
+    $user = User::factory()->create();
+    $session = $user->createToken('session', ['auth:me']);
+
+    $this->withToken($session->plainTextToken)
+        ->postJson('/v1/auth/tokens', ['name' => 'nope', 'abilities' => ['auth:me']])
+        ->assertProblem(403);
+});
+
+it('does not create a second key when a create request is retried', function (): void {
+    $user = User::factory()->create();
+    $session = $user->createToken('session', ['auth:me', 'auth:tokens:create']);
+    $headers = ['Idempotency-Key' => 'create-key-12345'];
+    $body = ['name' => 'retried', 'abilities' => ['auth:me']];
+
+    $first = $this->withToken($session->plainTextToken)->withHeaders($headers)
+        ->postJson('/v1/auth/tokens', $body)
+        ->assertCreated();
+
+    $this->withToken($session->plainTextToken)->withHeaders($headers)
+        ->postJson('/v1/auth/tokens', $body)
+        ->assertIdempotentReplay($first);
+
+    expect($user->tokens()->where('name', 'retried')->count())->toBe(1);
 });

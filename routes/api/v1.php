@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Auth\CreateTokenController;
 use App\Http\Controllers\Api\V1\Auth\DeleteAllTokensController;
 use App\Http\Controllers\Api\V1\Auth\DeleteTokenController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
@@ -31,6 +32,8 @@ Route::post('/auth/password/reset', ResetPasswordController::class)
 Route::get('/auth/password/reset/{token}', ShowResetPasswordTokenController::class)
     ->name('password.reset');
 Route::get('/auth/email/verify/{id}/{hash}', VerifyEmailController::class)
+    ->whereUlid('id')
+    ->where('hash', '[0-9a-f]{40}')
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 
@@ -44,10 +47,14 @@ Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (
     Route::get('/auth/tokens', ListTokensController::class)
         ->middleware('abilities:auth:tokens:read')
         ->name('v1.auth.tokens.index');
+    Route::post('/auth/tokens', CreateTokenController::class)
+        ->middleware(['abilities:auth:tokens:create', 'idempotent'])
+        ->name('v1.auth.tokens.store');
     Route::delete('/auth/tokens', DeleteAllTokensController::class)
         ->middleware('abilities:auth:tokens:delete')
         ->name('v1.auth.tokens.destroy-all');
     Route::delete('/auth/tokens/{token_id}', DeleteTokenController::class)
+        ->whereNumber('token_id')
         ->middleware('abilities:auth:tokens:delete')
         ->name('v1.auth.tokens.destroy');
     Route::post('/auth/email/verification-notification', SendEmailVerificationNotificationController::class)
