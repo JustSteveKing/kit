@@ -28,7 +28,14 @@ paths:
       summary: Register
       operationId: register
       description: 'Create an account and issue its first bearer token. Use it once per new user; send an Idempotency-Key so a retried request cannot create a second account. Returns the user with the token, its type and expiry in meta, and sends a verification email.'
-      parameters: []
+      parameters:
+        -
+          in: header
+          name: Idempotency-Key
+          description: 'A key unique to this request, such as a UUID. Send the same key when retrying: a retry with the same key and body gets the original response instead of running again, for a day. The same key with a different body is a 422.'
+          example: '"register-retry-1"'
+          schema:
+            type: string
       responses:
         201:
           description: 'Registration succeeded.'
@@ -38,10 +45,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cjb70r9fgm3p1vsa3t5kbd
+                    id: 01m5dh89fbyy10h69b2psgbfh1
                     name: 'Justina Gaylord'
                     email: lafayette.considine@example.com
-                    email_verified_at: '2026-10-20T11:49:59+00:00'
+                    email_verified_at: '2026-10-20T20:50:09+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -54,7 +61,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cjb70r9fgm3p1vsa3t5kbd
+                        example: 01m5dh89fbyy10h69b2psgbfh1
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -63,7 +70,7 @@ paths:
                         example: lafayette.considine@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:49:59+00:00'
+                        example: '2026-10-20T20:50:09+00:00'
                       created_at:
                         type: string
                         example: null
@@ -166,10 +173,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cjb75mxp8226rd0k5yd7gz
+                    id: 01m5dh89m4dznwkyje0vd5w1sv
                     name: 'Justina Gaylord'
                     email: cormier.nick@example.com
-                    email_verified_at: '2026-10-20T11:49:59+00:00'
+                    email_verified_at: '2026-10-20T20:50:09+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -182,7 +189,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cjb75mxp8226rd0k5yd7gz
+                        example: 01m5dh89m4dznwkyje0vd5w1sv
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -191,7 +198,7 @@ paths:
                         example: cormier.nick@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:49:59+00:00'
+                        example: '2026-10-20T20:50:09+00:00'
                       created_at:
                         type: string
                         example: null
@@ -280,7 +287,14 @@ paths:
       summary: 'Request Password Reset'
       operationId: requestPasswordReset
       description: 'Email a password reset link to an address, if an account uses it. Use it from a forgot-password form. The response is the same whether or not the account exists, so it cannot be used to discover accounts; send an Idempotency-Key so a retry does not send a second email.'
-      parameters: []
+      parameters:
+        -
+          in: header
+          name: Idempotency-Key
+          description: 'A key unique to this request, such as a UUID. Send the same key when retrying: a retry with the same key and body gets the original response instead of running again, for a day. The same key with a different body is a 422.'
+          example: '"forgot-retry-1"'
+          schema:
+            type: string
       responses:
         200:
           description: 'Password reset request accepted.'
@@ -605,7 +619,14 @@ paths:
       summary: 'Get Current User'
       operationId: getCurrentUser
       description: "Return the user the bearer token belongs to. Use it to check a token still works and to read the account's profile and verification state. The response carries an ETag: send it back in If-None-Match and an unchanged user returns 304 with no body."
-      parameters: []
+      parameters:
+        -
+          in: header
+          name: If-None-Match
+          description: 'An ETag from an earlier response. While it still matches, the answer is 304 Not Modified with no body, so you can re-fetch cheaply.'
+          example: '"a1b2c3d4e5f6"'
+          schema:
+            type: string
       responses:
         200:
           description: 'Authenticated user profile.'
@@ -615,10 +636,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cjb7b0xwcwsjy7am2c6xm2
+                    id: 01m5dh89sek7p1cahxjv2z4a10
                     name: 'Morgan Hirthe'
                     email: dare.emelie@example.com
-                    email_verified_at: '2026-10-20T11:49:59+00:00'
+                    email_verified_at: '2026-10-20T20:50:09+00:00'
                     created_at: null
                     updated_at: null
                 properties:
@@ -627,7 +648,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cjb7b0xwcwsjy7am2c6xm2
+                        example: 01m5dh89sek7p1cahxjv2z4a10
                       name:
                         type: string
                         example: 'Morgan Hirthe'
@@ -636,7 +657,7 @@ paths:
                         example: dare.emelie@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:49:59+00:00'
+                        example: '2026-10-20T20:50:09+00:00'
                       created_at:
                         type: string
                         example: null
@@ -827,7 +848,14 @@ paths:
       summary: 'Create API Key'
       operationId: createAPIKey
       description: 'Create a long-lived personal access token with chosen abilities, for a script, integration or agent that should not sign in with a password. It can only hold abilities the token making this request holds, and expires on expires_at, or after the configured default when that is left out. Returns the token with its plain-text value in meta.token, which is shown once and cannot be read again.'
-      parameters: []
+      parameters:
+        -
+          in: header
+          name: Idempotency-Key
+          description: 'A key unique to this request, such as a UUID. Send the same key when retrying: a retry with the same key and body gets the original response instead of running again, for a day. The same key with a different body is a 422.'
+          example: '"token-retry-1"'
+          schema:
+            type: string
       responses:
         201:
           description: 'API key created. meta.token is the only time its value is returned.'
@@ -1622,7 +1650,14 @@ paths:
       summary: 'Create Webhook'
       operationId: createWebhook
       description: 'Subscribe an https endpoint to events. Use it once per receiving endpoint; send an Idempotency-Key so a retry does not create a second subscription. Returns the subscription with its signing secret in meta.secret, shown only this once: deliveries are signed with it using RFC 9421 HTTP Message Signatures.'
-      parameters: []
+      parameters:
+        -
+          in: header
+          name: Idempotency-Key
+          description: 'A key unique to this request, such as a UUID. Send the same key when retrying: a retry with the same key and body gets the original response instead of running again, for a day. The same key with a different body is a 422.'
+          example: '"webhook-retry-1"'
+          schema:
+            type: string
       responses:
         201:
           description: 'Subscription created. meta.secret is the only time the secret is returned.'

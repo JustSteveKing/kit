@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Knuckles\Scribe\Attributes\BodyParam;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Header;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\ResponseFromApiResource;
 use Knuckles\Scribe\Attributes\Subgroup;
@@ -27,6 +28,7 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
     description: 'Create an account and issue its first bearer token. Use it once per new user; send an Idempotency-Key so a retried request cannot create a second account. Returns the user with the token, its type and expiry in meta, and sends a verification email.',
 )]
 #[Unauthenticated]
+#[Header('Idempotency-Key', '"register-retry-1"')]
 #[BodyParam('name', type: 'string', description: 'Display name for the account.', required: true, example: 'Jane Doe')]
 #[BodyParam('email', type: 'string', description: 'Unique email address for login.', required: true, example: 'jane@example.com')]
 #[BodyParam('password', type: 'string', description: 'Account password.', required: true, example: 'password123')]

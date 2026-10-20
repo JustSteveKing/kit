@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 use Knuckles\Scribe\Attributes\BodyParam;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Header;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\Subgroup;
 use Knuckles\Scribe\Attributes\Unauthenticated;
@@ -23,6 +24,7 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
     description: 'Email a password reset link to an address, if an account uses it. Use it from a forgot-password form. The response is the same whether or not the account exists, so it cannot be used to discover accounts; send an Idempotency-Key so a retry does not send a second email.',
 )]
 #[Unauthenticated]
+#[Header('Idempotency-Key', '"forgot-retry-1"')]
 #[BodyParam('email', type: 'string', description: 'Account email address.', required: true, example: 'jane@example.com')]
 #[Response(
     content: ['message' => 'If the account exists, a password reset link has been sent.'],

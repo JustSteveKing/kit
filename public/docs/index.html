@@ -219,6 +219,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/v1/auth/register" \
+    --header "Idempotency-Key: \&amp;quot;register-retry-1\&amp;quot;" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -236,6 +237,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 );
 
 const headers = {
+    "Idempotency-Key": "&amp;quot;register-retry-1&amp;quot;",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -263,10 +265,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5cjb70r9fgm3p1vsa3t5kbd&quot;,
+        &quot;id&quot;: &quot;01m5dh89fbyy10h69b2psgbfh1&quot;,
         &quot;name&quot;: &quot;Justina Gaylord&quot;,
         &quot;email&quot;: &quot;lafayette.considine@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:49:59+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T20:50:09+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     },
@@ -342,6 +344,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>v1/auth/register</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Idempotency-Key</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Idempotency-Key"                data-endpoint="POSTv1-auth-register"
+               value=""register-retry-1""
+               data-component="header">
+    <br>
+<p>Example: <code>"register-retry-1"</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -473,10 +487,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5cjb75mxp8226rd0k5yd7gz&quot;,
+        &quot;id&quot;: &quot;01m5dh89m4dznwkyje0vd5w1sv&quot;,
         &quot;name&quot;: &quot;Justina Gaylord&quot;,
         &quot;email&quot;: &quot;cormier.nick@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:49:59+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T20:50:09+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     },
@@ -631,6 +645,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost/v1/auth/me" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
+    --header "If-None-Match: \&amp;quot;a1b2c3d4e5f6\&amp;quot;" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -642,6 +657,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 const headers = {
     "Authorization": "Bearer {YOUR_BEARER_TOKEN}",
+    "If-None-Match": "&amp;quot;a1b2c3d4e5f6&amp;quot;",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -661,10 +677,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5cjb7b0xwcwsjy7am2c6xm2&quot;,
+        &quot;id&quot;: &quot;01m5dh89sek7p1cahxjv2z4a10&quot;,
         &quot;name&quot;: &quot;Morgan Hirthe&quot;,
         &quot;email&quot;: &quot;dare.emelie@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:49:59+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T20:50:09+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     }
@@ -741,6 +757,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="header">
     <br>
 <p>Example: <code>Bearer {YOUR_BEARER_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>If-None-Match</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="If-None-Match"                data-endpoint="GETv1-auth-me"
+               value=""a1b2c3d4e5f6""
+               data-component="header">
+    <br>
+<p>Example: <code>"a1b2c3d4e5f6"</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
@@ -1116,6 +1144,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/v1/auth/tokens" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
+    --header "Idempotency-Key: \&amp;quot;token-retry-1\&amp;quot;" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1136,6 +1165,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 const headers = {
     "Authorization": "Bearer {YOUR_BEARER_TOKEN}",
+    "Idempotency-Key": "&amp;quot;token-retry-1&amp;quot;",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1283,6 +1313,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="header">
     <br>
 <p>Example: <code>Bearer {YOUR_BEARER_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Idempotency-Key</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Idempotency-Key"                data-endpoint="POSTv1-auth-tokens"
+               value=""token-retry-1""
+               data-component="header">
+    <br>
+<p>Example: <code>"token-retry-1"</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
@@ -1699,6 +1741,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/v1/auth/password/forgot" \
+    --header "Idempotency-Key: \&amp;quot;forgot-retry-1\&amp;quot;" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1713,6 +1756,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Idempotency-Key": "&amp;quot;forgot-retry-1&amp;quot;",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1816,6 +1860,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>v1/auth/password/forgot</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Idempotency-Key</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Idempotency-Key"                data-endpoint="POSTv1-auth-password-forgot"
+               value=""forgot-retry-1""
+               data-component="header">
+    <br>
+<p>Example: <code>"forgot-retry-1"</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -3243,6 +3299,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-bash">curl --request POST \
     "http://localhost/v1/webhooks" \
     --header "Authorization: Bearer {YOUR_BEARER_TOKEN}" \
+    --header "Idempotency-Key: \&amp;quot;webhook-retry-1\&amp;quot;" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -3262,6 +3319,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 const headers = {
     "Authorization": "Bearer {YOUR_BEARER_TOKEN}",
+    "Idempotency-Key": "&amp;quot;webhook-retry-1&amp;quot;",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -3409,6 +3467,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="header">
     <br>
 <p>Example: <code>Bearer {YOUR_BEARER_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Idempotency-Key</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Idempotency-Key"                data-endpoint="POSTv1-webhooks"
+               value=""webhook-retry-1""
+               data-component="header">
+    <br>
+<p>Example: <code>"webhook-retry-1"</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;

@@ -370,6 +370,7 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Idempotency-Key: '"webhook-retry-1"'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []

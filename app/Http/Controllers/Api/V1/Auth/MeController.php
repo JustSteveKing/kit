@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Header;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\ResponseFromApiResource;
 use Knuckles\Scribe\Attributes\Subgroup;
@@ -23,6 +24,7 @@ use Knuckles\Scribe\Attributes\Subgroup;
     description: 'Return the user the bearer token belongs to. Use it to check a token still works and to read the account\'s profile and verification state. The response carries an ETag: send it back in If-None-Match and an unchanged user returns 304 with no body.',
 )]
 #[Authenticated]
+#[Header('If-None-Match', '"a1b2c3d4e5f6"')]
 #[ResponseFromApiResource(name: UserResource::class, model: User::class, status: 200, description: 'Authenticated user profile.')]
 #[Response(
     content: [

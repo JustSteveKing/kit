@@ -53,6 +53,8 @@ it('scaffolds the six pieces of an authenticated endpoint', function (): void {
         ->toContain("'status' => 401")
         ->toContain("'status' => 403")
         ->toContain("'status' => 422")
+        ->toContain("#[Header('Idempotency-Key',")
+        ->toContain('use Knuckles\Scribe\Attributes\Header;')
         ->toContain('CreateProjectPayload::fromRequest($request)')
         ->toContain("abort(501, 'TODO: Implement Create Project.')");
 

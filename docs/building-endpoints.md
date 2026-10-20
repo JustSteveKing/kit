@@ -150,6 +150,11 @@ The Scribe attributes on the class are the endpoint's documentation, and CI chec
 what it returns. Then add a `#[BodyParam]` or `#[QueryParam]` for each input, and a
 `#[ResponseFromApiResource]` for the success response once the resource exists.
 
+Document the standard headers the route reads with `#[Header]`: `Idempotency-Key` on an
+idempotent `POST`, which the generator adds for you, `If-Match` on a write that requires it, and
+`If-None-Match` on a `GET` behind `conditional`. Their descriptions come from
+`HeaderDescriptionsOpenApiGenerator`, so the attribute only needs the name and an example.
+
 Each error status the endpoint can return needs a `#[Response]` written as a problem. The generator
 has already written the `401` and `403`, plus a `422` with a TODO example when there is a Form
 Request. `LoginController` is a finished example of the whole set.

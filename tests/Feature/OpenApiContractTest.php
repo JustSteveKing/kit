@@ -452,3 +452,20 @@ it('keeps authenticated webhook responses aligned with their documented schemas,
         assertMatchesOpenApiSchema($spec, (array) $schema, $response->json(), '$');
     }
 });
+
+it('describes every request header it documents', function (): void {
+    $spec = generateOpenApiSpec(forceGenerate: true);
+    $undescribed = [];
+
+    foreach ((array) ($spec['paths'] ?? []) as $path => $operations) {
+        foreach ((array) $operations as $method => $operation) {
+            foreach ((array) (is_array($operation) ? ($operation['parameters'] ?? []) : []) as $parameter) {
+                if (is_array($parameter) && 'header' === ($parameter['in'] ?? null) && '' === ($parameter['description'] ?? '')) {
+                    $undescribed[] = mb_strtoupper((string) $method) . " {$path} " . ($parameter['name'] ?? '');
+                }
+            }
+        }
+    }
+
+    expect($undescribed)->toBe([]);
+});

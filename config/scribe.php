@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Support\HeaderDescriptionsOpenApiGenerator;
 use App\Support\NoContentOpenApiGenerator;
 use App\Support\ProblemDetailsOpenApiGenerator;
 use App\Support\ResponseFieldsOpenApiGenerator;
@@ -184,6 +185,7 @@ return [
             ProblemDetailsOpenApiGenerator::class,
             NoContentOpenApiGenerator::class,
             ResponseFieldsOpenApiGenerator::class,
+            HeaderDescriptionsOpenApiGenerator::class,
         ],
     ],
 

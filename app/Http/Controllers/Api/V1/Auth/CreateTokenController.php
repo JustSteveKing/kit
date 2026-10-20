@@ -16,6 +16,7 @@ use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\BodyParam;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Header;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\Subgroup;
 
@@ -26,6 +27,7 @@ use Knuckles\Scribe\Attributes\Subgroup;
     description: 'Create a long-lived personal access token with chosen abilities, for a script, integration or agent that should not sign in with a password. It can only hold abilities the token making this request holds, and expires on expires_at, or after the configured default when that is left out. Returns the token with its plain-text value in meta.token, which is shown once and cannot be read again.',
 )]
 #[Authenticated]
+#[Header('Idempotency-Key', '"token-retry-1"')]
 #[BodyParam('name', type: 'string', description: 'A label for the key, shown when listing tokens.', required: true, example: 'deploy-bot')]
 #[BodyParam('abilities', type: 'string[]', description: 'Abilities to grant, each one held by the token making this request.', required: true, example: ['auth:me', 'auth:tokens:read'])]
 #[BodyParam('expires_at', type: 'string', description: 'ISO 8601 expiry, in the future and no later than the configured maximum (365 days by default). Leave it out for the default (90 days).', required: false, example: '2027-01-01T00:00:00+00:00')]
