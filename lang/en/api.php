@@ -16,6 +16,7 @@ return [
         'password_reset_throttled' => 'Please wait before retrying.',
         'password_reset_failed' => 'Unable to reset password with the provided details.',
         'token_not_found' => 'Token not found.',
+        'ability_not_grantable' => 'You can only grant abilities your current token holds.',
     ],
     'errors' => [
         'unauthenticated' => 'Unauthenticated.',

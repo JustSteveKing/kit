@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Auth\CreateTokenController;
 use App\Http\Controllers\Api\V1\Auth\DeleteAllTokensController;
 use App\Http\Controllers\Api\V1\Auth\DeleteTokenController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
@@ -46,6 +47,9 @@ Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (
     Route::get('/auth/tokens', ListTokensController::class)
         ->middleware('abilities:auth:tokens:read')
         ->name('v1.auth.tokens.index');
+    Route::post('/auth/tokens', CreateTokenController::class)
+        ->middleware(['abilities:auth:tokens:create', 'idempotent'])
+        ->name('v1.auth.tokens.store');
     Route::delete('/auth/tokens', DeleteAllTokensController::class)
         ->middleware('abilities:auth:tokens:delete')
         ->name('v1.auth.tokens.destroy-all');

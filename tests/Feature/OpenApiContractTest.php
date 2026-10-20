@@ -319,6 +319,14 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
         ],
         [
             'method' => 'POST',
+            'path' => '/v1/auth/tokens',
+            'response' => $this->postJson('/v1/auth/tokens', [
+                'name' => 'contract-key',
+                'abilities' => ['auth:me'],
+            ]),
+        ],
+        [
+            'method' => 'POST',
             'path' => '/v1/auth/password/forgot',
             'response' => $this->postJson('/v1/auth/password/forgot', [
                 'email' => $loginUser->email,

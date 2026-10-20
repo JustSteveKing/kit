@@ -8,6 +8,7 @@ use App\Http\Payloads\V1\RegisterPayload;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\AccessTokens;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
@@ -50,7 +51,7 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 )]
 final class RegisterController
 {
-    public function __invoke(RegisterRequest $request): JsonResponse
+    public function __invoke(RegisterRequest $request, AccessTokens $tokens): JsonResponse
     {
         $payload = RegisterPayload::fromRequest($request);
 
@@ -62,7 +63,8 @@ final class RegisterController
 
         event(new Registered($user));
 
-        [$token, $expiresAt] = $this->issueToken($user, $payload->deviceName);
+        $token = $tokens->issueSession($user, $payload->deviceName);
+        $expiresAt = $token->accessToken->expires_at;
 
         SecurityAudit::log('auth.register.succeeded', [
             'user_id' => $user->id,
@@ -73,48 +75,10 @@ final class RegisterController
 
         return UserResource::make($user)->additional([
             'meta' => [
-                'token' => $token,
+                'token' => $token->plainTextToken,
                 'token_type' => 'Bearer',
                 'expires_at' => $expiresAt?->toAtomString(),
             ],
         ])->response()->setStatusCode(201);
-    }
-
-    /**
-     * @return array{0:string,1:\Illuminate\Support\Carbon|null}
-     */
-    private function issueToken(User $user, string $deviceName): array
-    {
-        $configuredExpiration = config('sanctum.expiration');
-        $expirationMinutes = filter_var(
-            $configuredExpiration,
-            FILTER_VALIDATE_INT,
-            ['options' => ['min_range' => 1]],
-        );
-
-        $expiresAt = false !== $expirationMinutes
-            ? now()->addMinutes($expirationMinutes)
-            : null;
-
-        $token = $user->createToken($deviceName, $this->defaultAbilities(), $expiresAt);
-
-        return [$token->plainTextToken, $expiresAt];
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function defaultAbilities(): array
-    {
-        $abilities = config('sanctum.abilities.default', []);
-
-        if ( ! is_array($abilities)) {
-            return [];
-        }
-
-        return array_values(array_filter(
-            array_map(static fn(mixed $ability): string => is_string($ability) ? mb_trim($ability) : '', $abilities),
-            static fn(string $ability): bool => '' !== $ability,
-        ));
     }
 }

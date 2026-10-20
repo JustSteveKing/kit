@@ -80,7 +80,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"01m5cd9s04d0vrecpnz9vnq86a","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T10:21:49+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5cdfjnp16kbfqq3s4xsnvb5","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T10:24:59+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Registration succeeded.'
       -
@@ -159,7 +159,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01m5cd9s0csvf155wbah7yn3s0","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T10:21:49+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5cdfjp0cmx0zgvvy8a4z5zj","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T10:24:59+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Login succeeded.'
       -
@@ -489,7 +489,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01m5cd9s12mhvc0tqhs163ps8h","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T10:21:49+00:00","created_at":null,"updated_at":null}}'
+        content: '{"data":{"id":"01m5cdfjpm8vqdmrdwtq6fqe98","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T10:24:59+00:00","created_at":null,"updated_at":null}}'
         headers: []
         description: 'Authenticated user profile.'
       -
@@ -610,6 +610,105 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
         headers: []
         description: 'Token is missing required ability.'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: v1/auth/tokens
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: 'Token Authentication'
+      subgroupDescription: ''
+      title: 'Create API Key'
+      description: 'Create a long-lived personal access token with chosen abilities, for a script, integration or agent that should not sign in with a password. It can only hold abilities the token making this request holds, and expires on expires_at, or after the configured default when that is left out. Returns the token with its plain-text value in meta.token, which is shown once and cannot be read again.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'A label for the key, shown when listing tokens.'
+        required: true
+        example: deploy-bot
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      abilities:
+        custom: []
+        name: abilities
+        description: 'Abilities to grant, each one held by the token making this request.'
+        required: true
+        example:
+          - 'auth:me'
+          - 'auth:tokens:read'
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      expires_at:
+        custom: []
+        name: expires_at
+        description: 'ISO 8601 expiry, in the future and no later than the configured maximum (365 days by default). Leave it out for the default (90 days).'
+        required: false
+        example: '2027-01-01T00:00:00+00:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: deploy-bot
+      abilities:
+        - 'auth:me'
+        - 'auth:tokens:read'
+      expires_at: '2027-01-01T00:00:00+00:00'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"data":{"id":"7","name":"deploy-bot","abilities":["auth:me","auth:tokens:read"],"last_used_at":null,"expires_at":"2027-01-01T00:00:00+00:00","created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00","is_current":false},"meta":{"token":"7|example-token","token_type":"Bearer"}}'
+        headers: []
+        description: 'API key created. meta.token is the only time its value is returned.'
+      -
+        custom: []
+        status: 401
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
+        headers: []
+        description: 'Authentication failed.'
+      -
+        custom: []
+        status: 403
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
+        headers: []
+        description: 'Token is missing the auth:tokens:create ability.'
+      -
+        custom: []
+        status: 422
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"You can only grant abilities your current token holds.","errors":{"abilities.0":["You can only grant abilities your current token holds."]}}'
+        headers: []
+        description: 'A requested ability is not held by this token, or the expiry is invalid.'
     responseFields: []
     auth:
       - headers

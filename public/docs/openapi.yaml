@@ -35,10 +35,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cd9s04d0vrecpnz9vnq86a
+                    id: 01m5cdfjnp16kbfqq3s4xsnvb5
                     name: 'Justina Gaylord'
                     email: lafayette.considine@example.com
-                    email_verified_at: '2026-10-20T10:21:49+00:00'
+                    email_verified_at: '2026-10-20T10:24:59+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -51,7 +51,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cd9s04d0vrecpnz9vnq86a
+                        example: 01m5cdfjnp16kbfqq3s4xsnvb5
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -60,7 +60,7 @@ paths:
                         example: lafayette.considine@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T10:21:49+00:00'
+                        example: '2026-10-20T10:24:59+00:00'
                       created_at:
                         type: string
                         example: null
@@ -163,10 +163,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cd9s0csvf155wbah7yn3s0
+                    id: 01m5cdfjp0cmx0zgvvy8a4z5zj
                     name: 'Justina Gaylord'
                     email: cormier.nick@example.com
-                    email_verified_at: '2026-10-20T10:21:49+00:00'
+                    email_verified_at: '2026-10-20T10:24:59+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -179,7 +179,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cd9s0csvf155wbah7yn3s0
+                        example: 01m5cdfjp0cmx0zgvvy8a4z5zj
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -188,7 +188,7 @@ paths:
                         example: cormier.nick@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T10:21:49+00:00'
+                        example: '2026-10-20T10:24:59+00:00'
                       created_at:
                         type: string
                         example: null
@@ -612,10 +612,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cd9s12mhvc0tqhs163ps8h
+                    id: 01m5cdfjpm8vqdmrdwtq6fqe98
                     name: 'Morgan Hirthe'
                     email: dare.emelie@example.com
-                    email_verified_at: '2026-10-20T10:21:49+00:00'
+                    email_verified_at: '2026-10-20T10:24:59+00:00'
                     created_at: null
                     updated_at: null
                 properties:
@@ -624,7 +624,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cd9s12mhvc0tqhs163ps8h
+                        example: 01m5cdfjpm8vqdmrdwtq6fqe98
                       name:
                         type: string
                         example: 'Morgan Hirthe'
@@ -633,7 +633,7 @@ paths:
                         example: dare.emelie@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T10:21:49+00:00'
+                        example: '2026-10-20T10:24:59+00:00'
                       created_at:
                         type: string
                         example: null
@@ -820,6 +820,187 @@ paths:
                     example: Forbidden.
       tags:
         - Authentication
+    post:
+      summary: 'Create API Key'
+      operationId: createAPIKey
+      description: 'Create a long-lived personal access token with chosen abilities, for a script, integration or agent that should not sign in with a password. It can only hold abilities the token making this request holds, and expires on expires_at, or after the configured default when that is left out. Returns the token with its plain-text value in meta.token, which is shown once and cannot be read again.'
+      parameters: []
+      responses:
+        201:
+          description: 'API key created. meta.token is the only time its value is returned.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: '7'
+                    name: deploy-bot
+                    abilities:
+                      - 'auth:me'
+                      - 'auth:tokens:read'
+                    last_used_at: null
+                    expires_at: '2027-01-01T00:00:00+00:00'
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+                    is_current: false
+                  meta:
+                    token: 7|example-token
+                    token_type: Bearer
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: '7'
+                      name:
+                        type: string
+                        example: deploy-bot
+                      abilities:
+                        type: array
+                        example:
+                          - 'auth:me'
+                          - 'auth:tokens:read'
+                        items:
+                          type: string
+                      last_used_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      expires_at:
+                        type: string
+                        example: '2027-01-01T00:00:00+00:00'
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      is_current:
+                        type: boolean
+                        example: false
+                  meta:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: 7|example-token
+                      token_type:
+                        type: string
+                        example: Bearer
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the auth:tokens:create ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        422:
+          description: 'A requested ability is not held by this token, or the expiry is invalid.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/validation-failed'
+                  title: 'Validation Failed'
+                  status: 422
+                  detail: 'You can only grant abilities your current token holds.'
+                  errors:
+                    abilities.0:
+                      - 'You can only grant abilities your current token holds.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/validation-failed'
+                  title:
+                    type: string
+                    example: 'Validation Failed'
+                  status:
+                    type: integer
+                    example: 422
+                  detail:
+                    type: string
+                    example: 'You can only grant abilities your current token holds.'
+                  errors:
+                    type: object
+                    properties:
+                      abilities.0:
+                        type: array
+                        example:
+                          - 'You can only grant abilities your current token holds.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'A label for the key, shown when listing tokens.'
+                  example: deploy-bot
+                abilities:
+                  type: array
+                  description: 'Abilities to grant, each one held by the token making this request.'
+                  example:
+                    - 'auth:me'
+                    - 'auth:tokens:read'
+                  items:
+                    type: string
+                expires_at:
+                  type: string
+                  description: 'ISO 8601 expiry, in the future and no later than the configured maximum (365 days by default). Leave it out for the default (90 days).'
+                  example: '2027-01-01T00:00:00+00:00'
+              required:
+                - name
+                - abilities
     delete:
       summary: 'Revoke All Tokens'
       operationId: revokeAllTokens
