@@ -59,6 +59,7 @@ Route::patch('leads/{lead}', UpdateLead::class)->middleware('consumes:applicatio
 - `produces` returns 406 when `Accept` rules out every listed type. A missing `Accept` accepts anything.
 - `consumes` returns 415 when the request has content of another type, or content with no `Content-Type`. A request with no content always passes.
 - `consumes:application/json` does not accept `application/merge-patch+json`. List each type a route takes.
+- The last `consumes` declaration wins: a route's overrides its group's, and a controller's overrides the route's. A PATCH route in a group that consumes `application/json` declares `consumes:application/merge-patch+json` itself; do not lift the group's declaration with `withoutMiddleware()`.
 
 ## Request IDs and tracing
 

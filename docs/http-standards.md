@@ -43,7 +43,14 @@ curl -X POST http://127.0.0.1:8000/v1/auth/register \
 | Malformed key | `400` |
 
 Keys belong to the user, or to the client's address before sign-in, and last for
-`IDEMPOTENCY_TTL` seconds, a day by default. Register, forgot password, creating an API key and
+`IDEMPOTENCY_TTL` seconds, a day by default.
+
+A replay returns the original response, secrets included: retrying the request that created an API
+key gives back the same key, which is the point when the first response was lost. So each stored
+response is encrypted with a key derived from `APP_KEY` and the client's `Idempotency-Key`, and
+nothing in the cache can be read without the key the client sent. When you rotate `APP_KEY`, keep
+the old one in `APP_PREVIOUS_KEYS` for at least `IDEMPOTENCY_TTL`, or stored responses are forgotten
+and retries run again. Register, forgot password, creating an API key and
 creating a webhook subscription all honour them, and `make:endpoint` adds `idempotent` to every POST
 it generates.
 
@@ -123,6 +130,9 @@ Route::bind('project', static fn (string $id): Project => Project::query()
     ->findOrFail($id));
 ```
 
+On a nested route, such as `/projects/{project}/tasks/{task}`, the ETag comes from the last bound
+parameter, the task, and `If-Match` is checked against the task and never the project.
+
 `HasModelValidators` builds the ETag from `updated_at`. MySQL's default timestamp columns store
 whole seconds, so two writes in the same second share an ETag. For a resource people edit at the
 same time, add an integer column that every write increments and return it from
@@ -134,13 +144,11 @@ For a `PATCH` that takes a partial document, use JSON Merge Patch, with the `mer
 middleware and the `application/merge-patch+json` media type. Validate the merged document instead
 of the patch, so a field set to `null` goes through the same rules as one sent in full.
 
-The `v1` group's `consumes:application/json` refuses `application/merge-patch+json` with a `415`
-before the route's own middleware runs. A merge patch route lifts the group's declaration and adds
-its own, as an upload does:
+The `v1` group consumes `application/json`, so a merge patch route declares the type it takes
+itself. A route's own `consumes:` replaces its group's, so the group's does not need lifting:
 
 ```php
 Route::patch('/projects/{project}', UpdateProjectController::class)
-    ->withoutMiddleware('consumes:application/json')
     ->middleware(['abilities:projects:write', 'consumes:application/merge-patch+json', 'merge-patch', 'conditional', 'preconditions.required']);
 ```
 

@@ -53,8 +53,8 @@
             "hash": "tree-v2:c5f332afdb641a8e51865f5fe4448a3c4c2d9ec959e76360003b5489525deaf6"
         },
         "juststeveking/api-toolbox": {
-            "version": "v0.3.1",
-            "hash": "tree-v2:f3be18b12bd2db610ae5e5abcbecd60ab41391b5d475d54403d9cc5167a021b0"
+            "version": "v0.3.2",
+            "hash": "tree-v2:922ab467587f40da7d9c80cc6e528ca53351d190c2388857cbf9569476231a97"
         },
         "laminas/laminas-diactoros": {
             "version": "3.9.0",

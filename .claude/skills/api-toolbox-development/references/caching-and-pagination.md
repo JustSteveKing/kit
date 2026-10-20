@@ -27,7 +27,7 @@ protected function entityTagVersion(): ?string
 }
 ```
 
-The model is found through route model binding, so the route parameter must be bound to it.
+The model is found through route model binding, so the route parameter must be bound to it. On a nested route such as `folders/{folder}/documents/{document}`, the last bound parameter that implements `HasValidators` is used, which is the document. Every parameter before it is treated as a parent.
 
 ### 2. Add the middleware
 
