@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $disabled_at
  * @property string|null $disabled_reason
  * @property Carbon|null $validated_at
+ * @property int|null $allowed_rate
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
@@ -104,6 +105,7 @@ final class WebhookSubscription extends Model
             'secret' => 'encrypted',
             'disabled_at' => 'datetime',
             'validated_at' => 'datetime',
+            'allowed_rate' => 'integer',
         ];
     }
 }

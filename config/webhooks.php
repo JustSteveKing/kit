@@ -48,6 +48,10 @@ return [
 
     'validate_endpoints' => (bool) env('WEBHOOKS_VALIDATE_ENDPOINTS', false),
 
+    // Deliveries a minute to ask each endpoint for, as WebHook-Request-Rate. Null asks for none,
+    // and an endpoint that grants no rate is then not limited. A granted rate is always obeyed.
+    'request_rate' => env('WEBHOOKS_REQUEST_RATE'),
+
     // Hours the WebHook-Request-Callback consent URL sent with each validation request stays valid.
     'callback_hours' => (int) env('WEBHOOKS_CALLBACK_HOURS', 72),
 

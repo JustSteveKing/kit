@@ -13,6 +13,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
 /**
@@ -48,6 +49,13 @@ final class DeliverWebhook implements ShouldQueue
 
         if ( ! $subscription->receivesDeliveries()) {
             $this->finish($delivery, DeliveryState::Failed);
+
+            return;
+        }
+
+        // The rate the endpoint granted. Waiting for it is not an attempt, so it costs no retry.
+        if ($this->overRate($subscription)) {
+            self::dispatch($delivery->id)->delay(RateLimiter::availableIn($this->rateKey($subscription)));
 
             return;
         }
@@ -127,6 +135,30 @@ final class DeliverWebhook implements ShouldQueue
             ->acceptJson()
             ->withBody((string) json_encode($delivery->event->payload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), WebhookEventModel::CONTENT_TYPE)
             ->post($url);
+    }
+
+    private function overRate(WebhookSubscription $subscription): bool
+    {
+        // The sync queue runs a delayed job at once, so waiting there would loop; a rate needs a
+        // queue that can delay.
+        if (null === $subscription->allowed_rate || 'sync' === $this->job?->getConnectionName()) {
+            return false;
+        }
+
+        $key = $this->rateKey($subscription);
+
+        if (RateLimiter::tooManyAttempts($key, $subscription->allowed_rate)) {
+            return true;
+        }
+
+        RateLimiter::hit($key, 60);
+
+        return false;
+    }
+
+    private function rateKey(WebhookSubscription $subscription): string
+    {
+        return "webhooks:rate:{$subscription->id}";
     }
 
     private function finish(WebhookDelivery $delivery, DeliveryState $state): void

@@ -408,6 +408,11 @@ https only, redirects never followed, and every request carries `WebHook-Request
   through the `WebHook-Request-Callback` URL sent with it: a signed link, valid for
   `WEBHOOKS_CALLBACK_HOURS` (72), opened with GET or POSTed to, and refused if the subscription's URL
   has changed since.
+- **Rate-limited as the endpoint asks**: an endpoint grants a rate with `WebHook-Allowed-Rate`
+  (deliveries a minute, or `*` for none), in its handshake response or its consent callback, and
+  kit stays within it; a delivery over the rate waits, without spending a retry. Set
+  `WEBHOOKS_REQUEST_RATE` to ask for a rate with `WebHook-Request-Rate`; that rate applies when an
+  endpoint consents without granting one. Limiting needs a queue that can delay, not `sync`.
 - **Recorded**: each attempt keeps its status, a response excerpt, its duration and any error. A
   `null` status means no response arrived, as distinct from an error status.
 - **Safe to point at**: URLs must be https and must not resolve to a private, loopback or reserved

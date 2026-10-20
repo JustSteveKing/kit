@@ -31,7 +31,10 @@ final class GrantConsent
         }
 
         if (null === $subscription->validated_at) {
-            $subscription->forceFill(['validated_at' => now()])->save();
+            $subscription->forceFill([
+                'validated_at' => now(),
+                'allowed_rate' => AllowedRate::from($request->header('WebHook-Allowed-Rate')),
+            ])->save();
 
             SecurityAudit::log('webhooks.consented', [
                 'user_id' => $subscription->user_id,

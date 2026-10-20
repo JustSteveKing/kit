@@ -40,22 +40,25 @@ final class ValidateWebhookEndpoint implements ShouldQueue
             $port = parse_url($url, PHP_URL_PORT) ?? ('https' === parse_url($url, PHP_URL_SCHEME) ? 443 : 80);
 
             // The callback lets the target consent later instead, by GET or POST (section 4.1.3).
-            $allowed = Http::withHeaders([
+            $response = Http::withHeaders(array_filter([
                 'WebHook-Request-Origin' => $origin,
                 'WebHook-Request-Callback' => ConsentCallback::url($subscription),
-            ])
+                'WebHook-Request-Rate' => null === AllowedRate::requested() ? null : (string) AllowedRate::requested(),
+            ]))
                 ->withOptions(['curl' => [CURLOPT_RESOLVE => ["{$host}:{$port}:{$address}"]]])
                 ->withoutRedirecting()
                 ->timeout(config()->integer('webhooks.timeout', 10))
-                ->send('OPTIONS', $url)
-                ->header('WebHook-Allowed-Origin');
+                ->send('OPTIONS', $url);
         } catch (RefusedTarget|ConnectionException) {
             return;
         }
 
         // The URL may have changed while this was queued; consent was given to the URL asked.
-        if ($subscription->refresh()->url === $url && in_array(mb_trim($allowed), [$origin, '*'], true)) {
-            $subscription->forceFill(['validated_at' => now()])->save();
+        if ($subscription->refresh()->url === $url && in_array(mb_trim($response->header('WebHook-Allowed-Origin')), [$origin, '*'], true)) {
+            $subscription->forceFill([
+                'validated_at' => now(),
+                'allowed_rate' => AllowedRate::from($response->header('WebHook-Allowed-Rate')),
+            ])->save();
         }
     }
 }

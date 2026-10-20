@@ -249,7 +249,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '[{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}]'
+        content: '[{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}]'
         headers: []
         description: 'One page of subscriptions.'
       -
@@ -340,7 +340,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_8f3c..."}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_8f3c..."}}'
         headers: []
         description: 'Subscription created. meta.secret is the only time the secret is returned.'
       -
@@ -411,7 +411,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
         headers: []
         description: 'The subscription.'
       -
@@ -532,7 +532,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
         headers: []
         description: 'The updated subscription.'
       -
@@ -680,7 +680,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_2b9e..."}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_2b9e..."}}'
         headers: []
         description: 'Secret rotated. meta.secret is the only time the new secret is returned.'
       -
@@ -751,7 +751,7 @@ endpoints:
       -
         custom: []
         status: 202
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":null,"allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
         headers: []
         description: 'Validation queued.'
       -

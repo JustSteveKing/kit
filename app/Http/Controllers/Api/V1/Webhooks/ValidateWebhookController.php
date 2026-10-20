@@ -33,6 +33,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
             'events' => ['*'],
             'enabled' => true,
             'validated_at' => null,
+            'allowed_rate' => null,
             'disabled_at' => null,
             'disabled_reason' => null,
             'created_at' => '2026-10-20T12:00:00+00:00',

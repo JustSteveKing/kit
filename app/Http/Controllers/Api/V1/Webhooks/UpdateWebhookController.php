@@ -38,6 +38,8 @@ use Knuckles\Scribe\Attributes\UrlParam;
     'description' => 'Production receiver',
     'events' => ['*'],
     'enabled' => true,
+    'validated_at' => '2026-10-20T12:00:05+00:00',
+    'allowed_rate' => null,
     'disabled_at' => null,
     'disabled_reason' => null,
     'created_at' => '2026-10-20T12:00:00+00:00',
@@ -101,7 +103,7 @@ final class UpdateWebhookController
 
         // Consent was given to the old URL, not the new one.
         if ($subscription->isDirty('url')) {
-            $subscription->forceFill(['validated_at' => null]);
+            $subscription->forceFill(['validated_at' => null, 'allowed_rate' => null]);
         }
 
         $subscription->save();

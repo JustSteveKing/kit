@@ -34,6 +34,8 @@ use Knuckles\Scribe\Attributes\Response;
     'description' => 'Production receiver',
     'events' => ['*'],
     'enabled' => true,
+    'validated_at' => '2026-10-20T12:00:05+00:00',
+    'allowed_rate' => null,
     'disabled_at' => null,
     'disabled_reason' => null,
     'created_at' => '2026-10-20T12:00:00+00:00',
