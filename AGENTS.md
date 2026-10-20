@@ -3,8 +3,8 @@
 How to build on Kit without undoing what it sets up. Written for coding agents and for the people
 working with them. Kit is a Laravel 13 API starter kit: Sanctum tokens, versioned routes, RFC 9457
 errors and the other HTTP standards through [api-toolbox](https://github.com/JustSteveKing/api-toolbox),
-Scribe docs checked by contract tests, and a dependency gate. The README describes what Kit does;
-this file is how to change it.
+Scribe docs checked by contract tests, and a dependency gate. The guides in [`docs/`](docs/README.md)
+explain how each part works; this file is how to change it.
 
 ## Before you call anything done
 
