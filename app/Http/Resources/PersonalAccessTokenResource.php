@@ -5,42 +5,30 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Laravel\Sanctum\PersonalAccessToken;
 
-final class PersonalAccessTokenResource extends JsonApiResource
+/**
+ * @mixin PersonalAccessToken
+ */
+final class PersonalAccessTokenResource extends JsonResource
 {
-    public function toId(Request $request): ?string
-    {
-        /** @var PersonalAccessToken $token */
-        $token = $this->resource;
-
-        return (string) $token->getKey();
-    }
-
-    public function toType(Request $request): ?string
-    {
-        return 'personal-access-tokens';
-    }
-
     /**
      * @return array<string, mixed>
      */
-    public function toAttributes(Request $request): array
+    public function toArray(Request $request): array
     {
-        /** @var PersonalAccessToken $token */
-        $token = $this->resource;
-
         $currentTokenId = $request->user()?->currentAccessToken()?->getKey();
 
         return [
-            'name' => $token->name,
-            'abilities' => $token->abilities,
-            'last_used_at' => $token->last_used_at?->toAtomString(),
-            'expires_at' => $token->expires_at?->toAtomString(),
-            'created_at' => $token->created_at?->toAtomString(),
-            'updated_at' => $token->updated_at?->toAtomString(),
-            'is_current' => $currentTokenId !== null && (string) $currentTokenId === (string) $token->getKey(),
+            'id' => (string) $this->getKey(),
+            'name' => $this->name,
+            'abilities' => $this->abilities,
+            'last_used_at' => $this->last_used_at?->toAtomString(),
+            'expires_at' => $this->expires_at?->toAtomString(),
+            'created_at' => $this->created_at?->toAtomString(),
+            'updated_at' => $this->updated_at?->toAtomString(),
+            'is_current' => null !== $currentTokenId && (string) $currentTokenId === (string) $this->getKey(),
         ];
     }
 }

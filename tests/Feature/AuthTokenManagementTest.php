@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Auth\ListTokensController;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -25,15 +26,15 @@ it('lists only the authenticated user tokens', function (): void {
     $response = $this->withToken($current->plainTextToken)
         ->getJson('/v1/auth/tokens')
         ->assertOk()
-        ->assertHeader('Content-Type', 'application/vnd.api+json')
-        ->assertJsonPath('meta.count', 2)
-        ->assertJsonCount(2, 'data')
-        ->assertJsonPath('data.0.type', 'personal-access-tokens');
+        ->assertHeader('Content-Type', 'application/json')
+        ->assertJsonCount(2)
+        ->assertLinkHeader('first')
+        ->assertNoLinkHeader('next');
 
     /** @var array<int, array<string, mixed>> $data */
-    $data = $response->json('data');
+    $data = $response->json();
     $isCurrentValues = array_map(
-        static fn(array $item): bool => (bool) data_get($item, 'attributes.is_current', false),
+        static fn(array $item): bool => (bool) ($item['is_current'] ?? false),
         $data,
     );
 
@@ -122,4 +123,39 @@ it('forbids bulk token revocation when token lacks required ability', function (
         ->deleteJson('/v1/auth/tokens')
         ->assertProblem(403)
         ->assertJsonPath('detail', __('api.errors.forbidden'));
+});
+
+it('pages token lists with link headers', function (): void {
+    $user = User::factory()->create();
+    $current = $user->createToken('current-device', ['auth:tokens:read']);
+
+    foreach (range(1, ListTokensController::PER_PAGE) as $device) {
+        $user->createToken('device-' . $device);
+    }
+
+    $first = $this->withToken($current->plainTextToken)
+        ->getJson('/v1/auth/tokens')
+        ->assertOk()
+        ->assertJsonCount(ListTokensController::PER_PAGE)
+        ->assertLinkHeader('first');
+
+    preg_match('/<([^>]+)>;\\s*rel="next"/', (string) $first->headers->get('Link'), $next);
+
+    expect($next)->toHaveKey(1);
+
+    $this->withToken($current->plainTextToken)
+        ->getJson($next[1])
+        ->assertOk()
+        ->assertJsonCount(1)
+        ->assertJsonPath('0.name', 'current-device')
+        ->assertLinkHeader('prev');
+});
+
+it('rejects token list cursors that cannot be decoded', function (): void {
+    $user = User::factory()->create();
+    $token = $user->createToken('cursor-device', ['auth:tokens:read'])->plainTextToken;
+
+    $this->withToken($token)
+        ->getJson('/v1/auth/tokens?cursor=not-a-cursor')
+        ->assertProblemType('https://apiguide.dev/errors/invalid-pagination-cursor', 400);
 });

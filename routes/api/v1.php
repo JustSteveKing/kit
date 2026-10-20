@@ -36,7 +36,7 @@ Route::get('/auth/email/verify/{id}/{hash}', VerifyEmailController::class)
 
 Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (): void {
     Route::get('/auth/me', MeController::class)
-        ->middleware('abilities:auth:me')
+        ->middleware(['abilities:auth:me', 'conditional'])
         ->name('v1.auth.me');
     Route::post('/auth/logout', LogoutController::class)
         ->middleware('abilities:auth:logout')

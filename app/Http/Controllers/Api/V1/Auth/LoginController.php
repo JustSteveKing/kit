@@ -32,15 +32,18 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
     model: User::class,
     status: 200,
     description: 'Login succeeded.',
-    additional: ['meta' => ['token' => '1|example-token', 'token_type' => 'Bearer', 'expires_at' => null]]
+    additional: ['meta' => ['token' => '1|example-token', 'token_type' => 'Bearer', 'expires_at' => null]],
 )]
 #[Response(
     content: [
-        'message' => 'The given data was invalid.',
+        'type' => 'https://apiguide.dev/errors/validation-failed',
+        'title' => 'Validation Failed',
+        'status' => 422,
+        'detail' => 'The provided credentials are incorrect.',
         'errors' => ['email' => ['The provided credentials are incorrect.']],
     ],
     status: 422,
-    description: 'Credentials were invalid.'
+    description: 'Credentials were invalid.',
 )]
 final class LoginController
 {
@@ -50,7 +53,7 @@ final class LoginController
 
         $user = User::query()->where('email', $payload->email)->first();
 
-        if (! $user || ! Hash::check($payload->password, $user->password)) {
+        if ( ! $user || ! Hash::check($payload->password, $user->password)) {
             SecurityAudit::log('auth.login.failed', [
                 'email_hash' => SecurityAudit::hashEmail($payload->email),
                 'device_name' => $payload->deviceName,
@@ -91,7 +94,7 @@ final class LoginController
             ['options' => ['min_range' => 1]],
         );
 
-        $expiresAt = $expirationMinutes !== false
+        $expiresAt = false !== $expirationMinutes
             ? now()->addMinutes($expirationMinutes)
             : null;
 
@@ -107,13 +110,13 @@ final class LoginController
     {
         $abilities = config('sanctum.abilities.default', []);
 
-        if (! is_array($abilities)) {
+        if ( ! is_array($abilities)) {
             return [];
         }
 
         return array_values(array_filter(
-            array_map(static fn (mixed $ability): string => trim((string) $ability), $abilities),
-            static fn (string $ability): bool => $ability !== '',
+            array_map(static fn(mixed $ability): string => mb_trim((string) $ability), $abilities),
+            static fn(string $ability): bool => '' !== $ability,
         ));
     }
 }

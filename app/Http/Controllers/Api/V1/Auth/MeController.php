@@ -21,7 +21,16 @@ use Knuckles\Scribe\Attributes\Subgroup;
 #[Endpoint(title: 'Get Current User', description: 'Return the authenticated user for the current bearer token.')]
 #[Authenticated]
 #[ResponseFromApiResource(name: UserResource::class, model: User::class, status: 200, description: 'Authenticated user profile.')]
-#[Response(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/unauthorized',
+        'title' => 'Unauthorized',
+        'status' => 401,
+        'detail' => 'Unauthenticated.',
+    ],
+    status: 401,
+    description: 'Authentication failed.',
+)]
 final class MeController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user): JsonResponse

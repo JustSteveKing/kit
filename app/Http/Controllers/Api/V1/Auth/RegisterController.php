@@ -32,15 +32,18 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
     model: User::class,
     status: 201,
     description: 'Registration succeeded.',
-    additional: ['meta' => ['token' => '1|example-token', 'token_type' => 'Bearer', 'expires_at' => null]]
+    additional: ['meta' => ['token' => '1|example-token', 'token_type' => 'Bearer', 'expires_at' => null]],
 )]
 #[Response(
     content: [
-        'message' => 'The given data was invalid.',
+        'type' => 'https://apiguide.dev/errors/validation-failed',
+        'title' => 'Validation Failed',
+        'status' => 422,
+        'detail' => 'The email has already been taken.',
         'errors' => ['email' => ['The email has already been taken.']],
     ],
     status: 422,
-    description: 'Validation failed.'
+    description: 'Validation failed.',
 )]
 final class RegisterController
 {
@@ -86,7 +89,7 @@ final class RegisterController
             ['options' => ['min_range' => 1]],
         );
 
-        $expiresAt = $expirationMinutes !== false
+        $expiresAt = false !== $expirationMinutes
             ? now()->addMinutes($expirationMinutes)
             : null;
 
@@ -102,13 +105,13 @@ final class RegisterController
     {
         $abilities = config('sanctum.abilities.default', []);
 
-        if (! is_array($abilities)) {
+        if ( ! is_array($abilities)) {
             return [];
         }
 
         return array_values(array_filter(
-            array_map(static fn (mixed $ability): string => trim((string) $ability), $abilities),
-            static fn (string $ability): bool => $ability !== '',
+            array_map(static fn(mixed $ability): string => mb_trim((string) $ability), $abilities),
+            static fn(string $ability): bool => '' !== $ability,
         ));
     }
 }

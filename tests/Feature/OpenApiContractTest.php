@@ -20,7 +20,7 @@ function generateOpenApiSpec(bool $forceGenerate = false): array
 {
     $specPath = base_path('public/docs/openapi.yaml');
 
-    if ($forceGenerate || !File::exists($specPath)) {
+    if ($forceGenerate || ! File::exists($specPath)) {
         $exitCode = Artisan::call('scribe:generate', [
             '--no-interaction' => true,
         ]);
@@ -42,23 +42,23 @@ function generateOpenApiSpec(bool $forceGenerate = false): array
  */
 function documentedResponseSchema(array $spec, string $path, string $method, int $status): ?array
 {
-    $operation = $spec['paths'][$path][strtolower($method)] ?? null;
-    if (! is_array($operation)) {
+    $operation = $spec['paths'][$path][mb_strtolower($method)] ?? null;
+    if ( ! is_array($operation)) {
         return null;
     }
 
     $response = $operation['responses'][(string) $status] ?? null;
-    if (! is_array($response)) {
+    if ( ! is_array($response)) {
         return null;
     }
 
     $content = $response['content'] ?? null;
-    if (! is_array($content) || $content === []) {
+    if ( ! is_array($content) || [] === $content) {
         return null;
     }
 
     $mediaType = $content['application/json'] ?? reset($content);
-    if (! is_array($mediaType)) {
+    if ( ! is_array($mediaType)) {
         return null;
     }
 
@@ -75,15 +75,15 @@ function documentedResponseSchema(array $spec, string $path, string $method, int
 function resolveOpenApiSchema(array $spec, array $schema): array
 {
     $ref = $schema['$ref'] ?? null;
-    if (! is_string($ref) || ! str_starts_with($ref, '#/')) {
+    if ( ! is_string($ref) || ! str_starts_with($ref, '#/')) {
         return $schema;
     }
 
-    $segments = explode('/', ltrim($ref, '#/'));
+    $segments = explode('/', mb_ltrim($ref, '#/'));
     $resolved = $spec;
 
     foreach ($segments as $segment) {
-        if (! is_array($resolved) || ! array_key_exists($segment, $resolved)) {
+        if ( ! is_array($resolved) || ! array_key_exists($segment, $resolved)) {
             return $schema;
         }
 
@@ -102,13 +102,13 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
 {
     $resolvedSchema = resolveOpenApiSchema($spec, $schema);
 
-    if (($resolvedSchema['nullable'] ?? false) === true && $value === null) {
+    if (($resolvedSchema['nullable'] ?? false) === true && null === $value) {
         return;
     }
 
     if (isset($resolvedSchema['oneOf']) && is_array($resolvedSchema['oneOf'])) {
         foreach ($resolvedSchema['oneOf'] as $candidate) {
-            if (! is_array($candidate)) {
+            if ( ! is_array($candidate)) {
                 continue;
             }
 
@@ -116,7 +116,7 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
                 assertMatchesOpenApiSchema($spec, $candidate, $value, $path);
 
                 return;
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 continue;
             }
         }
@@ -126,7 +126,7 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
 
     if (isset($resolvedSchema['anyOf']) && is_array($resolvedSchema['anyOf'])) {
         foreach ($resolvedSchema['anyOf'] as $candidate) {
-            if (! is_array($candidate)) {
+            if ( ! is_array($candidate)) {
                 continue;
             }
 
@@ -134,7 +134,7 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
                 assertMatchesOpenApiSchema($spec, $candidate, $value, $path);
 
                 return;
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 continue;
             }
         }
@@ -143,7 +143,7 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
     }
 
     $type = $resolvedSchema['type'] ?? null;
-    if (! is_string($type)) {
+    if ( ! is_string($type)) {
         return;
     }
 
@@ -178,17 +178,17 @@ function assertOpenApiObject(array $spec, array $schema, mixed $value, string $p
     }
 
     $properties = $schema['properties'] ?? [];
-    if (! is_array($properties)) {
+    if ( ! is_array($properties)) {
         return;
     }
 
     foreach ($properties as $propertyName => $propertySchema) {
-        if (! is_string($propertyName) || ! is_array($propertySchema) || ! array_key_exists($propertyName, $value)) {
+        if ( ! is_string($propertyName) || ! is_array($propertySchema) || ! array_key_exists($propertyName, $value)) {
             continue;
         }
 
         $isRequired = is_array($required) && in_array($propertyName, $required, true);
-        if ($value[$propertyName] === null && ! $isRequired && ($propertySchema['nullable'] ?? false) !== true) {
+        if (null === $value[$propertyName] && ! $isRequired && ($propertySchema['nullable'] ?? false) !== true) {
             continue;
         }
 
@@ -207,7 +207,7 @@ function assertOpenApiArray(array $spec, array $schema, mixed $value, string $pa
     test()->assertTrue(array_is_list($value), sprintf('Expected list array at %s.', $path));
 
     $itemSchema = $schema['items'] ?? null;
-    if (! is_array($itemSchema)) {
+    if ( ! is_array($itemSchema)) {
         return;
     }
 
@@ -225,23 +225,23 @@ it('generates openapi and documents all v1 auth routes', function (): void {
 
     $documentedOperations = collect($paths)
         ->flatMap(
-            fn (array $operations, string $path) => collect($operations)
+            fn(array $operations, string $path) => collect($operations)
                 ->keys()
-                ->filter(fn (string $method) => in_array(strtoupper($method), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'], true))
-                ->reject(fn (string $method) => strtoupper($method) === 'HEAD')
-                ->map(fn (string $method) => strtoupper($method).' '.$path)
+                ->filter(fn(string $method) => in_array(mb_strtoupper($method), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'], true))
+                ->reject(fn(string $method) => 'HEAD' === mb_strtoupper($method))
+                ->map(fn(string $method) => mb_strtoupper($method) . ' ' . $path),
         )
         ->sort()
         ->values();
 
     $routeOperations = collect(Route::getRoutes()->getRoutes())
-        ->filter(fn (\Illuminate\Routing\Route $route) => str_starts_with($route->uri(), 'v1/auth'))
-        ->flatMap(function (\Illuminate\Routing\Route $route) {
-            $uri = '/'.$route->uri();
+        ->filter(fn(Illuminate\Routing\Route $route) => str_starts_with($route->uri(), 'v1/auth'))
+        ->flatMap(function (Illuminate\Routing\Route $route) {
+            $uri = '/' . $route->uri();
 
             return collect($route->methods())
-                ->reject(fn (string $method) => $method === 'HEAD')
-                ->map(fn (string $method) => strtoupper($method).' '.$uri);
+                ->reject(fn(string $method) => 'HEAD' === $method)
+                ->map(fn(string $method) => mb_strtoupper($method) . ' ' . $uri);
         })
         ->unique()
         ->sort()
@@ -342,7 +342,7 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
     ];
 
     foreach ($checks as $check) {
-        $method = strtolower($check['method']);
+        $method = mb_strtolower($check['method']);
         $path = $check['path'];
         $response = $check['response'];
         $actualStatus = $response->status();
@@ -351,21 +351,32 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
         $this->assertContains(
             $actualStatus,
             $documentedResponses,
-            sprintf('%s %s returned %d but OpenAPI does not declare it.', strtoupper($method), $path, $actualStatus),
+            sprintf('%s %s returned %d but OpenAPI does not declare it.', mb_strtoupper($method), $path, $actualStatus),
         );
 
-        $schema = documentedResponseSchema($spec, $path, strtoupper($method), $actualStatus);
-        if ($schema === null) {
+        $documentedMediaTypes = array_keys($paths[$path][$method]['responses'][(string) $actualStatus]['content'] ?? []);
+        $actualMediaType = mb_strtolower(mb_trim(explode(';', (string) $response->headers->get('Content-Type'))[0]));
+
+        if ([] !== $documentedMediaTypes) {
+            $this->assertContains(
+                $actualMediaType,
+                $documentedMediaTypes,
+                sprintf('%s %s returned %s but OpenAPI documents %s.', mb_strtoupper($method), $path, $actualMediaType, implode(', ', $documentedMediaTypes)),
+            );
+        }
+
+        $schema = documentedResponseSchema($spec, $path, mb_strtoupper($method), $actualStatus);
+        if (null === $schema) {
             continue;
         }
 
         $rawContent = $response->getContent();
-        if ($rawContent === false || $rawContent === '') {
+        if (false === $rawContent || '' === $rawContent) {
             continue;
         }
 
         $payload = json_decode($rawContent, true);
-        $this->assertNotNull($payload, sprintf('Expected JSON response body for %s %s status %d.', strtoupper($method), $path, $actualStatus));
+        $this->assertNotNull($payload, sprintf('Expected JSON response body for %s %s status %d.', mb_strtoupper($method), $path, $actualStatus));
         assertMatchesOpenApiSchema($spec, $schema, $payload, '$');
     }
 });

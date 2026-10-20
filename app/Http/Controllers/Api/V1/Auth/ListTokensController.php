@@ -8,11 +8,12 @@ use App\Http\Resources\PersonalAccessTokenResource;
 use App\Models\User;
 use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use JustSteveKing\Toolbox\Pagination\CursorPage;
 use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\QueryParam;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\Subgroup;
 
@@ -20,46 +21,56 @@ use Knuckles\Scribe\Attributes\Subgroup;
 #[Subgroup(name: 'Token Authentication')]
 #[Endpoint(title: 'List Tokens', description: 'List personal access tokens for the authenticated user.')]
 #[Authenticated]
+#[QueryParam('cursor', type: 'string', description: 'Opaque cursor from a Link header. Omit it for the first page.', required: false, example: null)]
+#[Response(
+    content: [[
+        'id' => '1',
+        'name' => 'ios-app',
+        'abilities' => ['auth:me', 'auth:logout'],
+        'last_used_at' => null,
+        'expires_at' => '2026-02-24T12:00:00+00:00',
+        'created_at' => '2026-02-23T12:00:00+00:00',
+        'updated_at' => '2026-02-23T12:00:00+00:00',
+        'is_current' => true,
+    ]],
+    status: 200,
+    description: 'One page of tokens, newest first. Navigation is in RFC 8288 Link headers: rel="next" and rel="prev" when there is a page that way, and rel="first".',
+)]
 #[Response(
     content: [
-        'data' => [[
-            'id' => '1',
-            'type' => 'personal-access-tokens',
-            'attributes' => [
-                'name' => 'ios-app',
-                'abilities' => ['auth:me', 'auth:logout'],
-                'last_used_at' => null,
-                'expires_at' => '2026-02-24T12:00:00+00:00',
-                'created_at' => '2026-02-23T12:00:00+00:00',
-                'updated_at' => '2026-02-23T12:00:00+00:00',
-                'is_current' => true,
-            ],
-        ]],
+        'type' => 'https://apiguide.dev/errors/forbidden',
+        'title' => 'Forbidden',
+        'status' => 403,
+        'detail' => 'Forbidden.',
     ],
-    status: 200,
-    description: 'Token list payload.'
+    status: 403,
+    description: 'Token is missing required ability.',
 )]
-#[Response(content: ['message' => 'Forbidden.'], status: 403, description: 'Token is missing required ability.')]
-#[Response(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/unauthorized',
+        'title' => 'Unauthorized',
+        'status' => 401,
+        'detail' => 'Unauthenticated.',
+    ],
+    status: 401,
+    description: 'Authentication failed.',
+)]
 final class ListTokensController
 {
-    public function __invoke(Request $request, #[CurrentUser] User $user): JsonResponse
+    public const int PER_PAGE = 25;
+
+    public function __invoke(Request $request, #[CurrentUser] User $user): CursorPage
     {
         $tokens = $user->tokens()
-            ->latest('id')
-            ->get();
+            ->orderByDesc('id')
+            ->cursorPaginate(self::PER_PAGE);
 
         SecurityAudit::log('auth.tokens.listed', [
             'user_id' => (string) $user->getKey(),
-            'count' => $tokens->count(),
+            'count' => count($tokens->items()),
         ]);
 
-        return PersonalAccessTokenResource::collection($tokens)
-            ->additional([
-                'meta' => [
-                    'count' => $tokens->count(),
-                ],
-            ])
-            ->response();
+        return CursorPage::of($tokens, PersonalAccessTokenResource::class);
     }
 }

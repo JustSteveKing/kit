@@ -24,7 +24,16 @@ use Knuckles\Scribe\Attributes\UrlParam;
 #[UrlParam('id', type: 'string', description: 'User ULID from the signed verification link.', required: true, example: '01HZX3W3T4J8Q57XNZD5BPHJ92')]
 #[UrlParam('hash', type: 'string', description: 'SHA-1 hash of the email from the signed verification link.', required: true, example: '8c4f4370e5db9b5be6d0f4c95495f49f998fa32a')]
 #[Response(content: ['message' => 'Email verified successfully.'], status: 200, description: 'Email was verified.')]
-#[Response(content: ['message' => 'Invalid verification link.'], status: 403, description: 'Signed URL was invalid, expired, or mismatched.')]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/forbidden',
+        'title' => 'Forbidden',
+        'status' => 403,
+        'detail' => 'Invalid verification link.',
+    ],
+    status: 403,
+    description: 'Signed URL was invalid, expired, or mismatched.',
+)]
 final class VerifyEmailController
 {
     public function __invoke(VerifyEmailRequest $request): JsonResponse
@@ -33,7 +42,7 @@ final class VerifyEmailController
 
         $user = User::query()->findOrFail($payload->id);
 
-        if (! hash_equals(sha1($user->getEmailForVerification()), $payload->hash)) {
+        if ( ! hash_equals(sha1($user->getEmailForVerification()), $payload->hash)) {
             SecurityAudit::log('auth.email_verification.failed', [
                 'user_id' => (string) $user->getKey(),
                 'reason' => 'hash_mismatch',
@@ -44,7 +53,7 @@ final class VerifyEmailController
 
         $wasAlreadyVerified = $user->hasVerifiedEmail();
 
-        if (! $wasAlreadyVerified && $user->markEmailAsVerified()) {
+        if ( ! $wasAlreadyVerified && $user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 

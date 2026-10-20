@@ -19,7 +19,16 @@ use Knuckles\Scribe\Attributes\Subgroup;
 #[Authenticated]
 #[Response(content: ['message' => 'Verification link sent.'], status: 200, description: 'Verification email queued/sent.')]
 #[Response(content: ['message' => 'Email is already verified.'], status: 200, description: 'User already verified.')]
-#[Response(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/unauthorized',
+        'title' => 'Unauthorized',
+        'status' => 401,
+        'detail' => 'Unauthenticated.',
+    ],
+    status: 401,
+    description: 'Authentication failed.',
+)]
 final class SendEmailVerificationNotificationController
 {
     public function __invoke(Request $request): JsonResponse

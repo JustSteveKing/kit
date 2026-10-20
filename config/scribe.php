@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 use Knuckles\Scribe\Config\AuthIn;
-use Knuckles\Scribe\Config\Defaults;
-use Knuckles\Scribe\Extracting\Strategies;
 
 use function Knuckles\Scribe\Config\configureStrategy;
+
+use Knuckles\Scribe\Config\Defaults;
+
 use function Knuckles\Scribe\Config\removeStrategies;
+
+use Knuckles\Scribe\Extracting\Strategies;
 
 // Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
 
 return [
     // The HTML <title> for the generated documentation.
-    'title' => config('app.name').' API Documentation',
+    'title' => config('app.name') . ' API Documentation',
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
     'description' => '',
@@ -168,7 +173,9 @@ return [
 
         // Additional generators to use when generating the OpenAPI spec.
         // Should extend `Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator`.
-        'generators' => [],
+        'generators' => [
+            App\Support\ProblemDetailsOpenApiGenerator::class,
+        ],
     ],
 
     'groups' => [
