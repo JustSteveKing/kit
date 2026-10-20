@@ -26,9 +26,9 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         api: __DIR__ . '/../routes/api/routes.php',
-        apiPrefix: '',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
+        apiPrefix: '',
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
@@ -43,7 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies('' !== $trustedProxies ? $trustedProxies : null);
 
         $trustedHosts = array_values(array_filter(array_map(
-            static fn(string $host): string => mb_trim($host),
+            mb_trim(...),
             explode(',', (string) env('TRUSTED_HOSTS', '')),
         )));
         if ([] !== $trustedHosts) {

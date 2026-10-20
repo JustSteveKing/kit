@@ -16,6 +16,7 @@ use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Knuckles\Scribe\Attributes\UrlParam;
 
 #[Group(name: 'Webhooks')]
@@ -31,6 +32,8 @@ use Knuckles\Scribe\Attributes\UrlParam;
     'description' => 'Production receiver',
     'events' => ['*'],
     'enabled' => true,
+    'validated_at' => '2026-10-20T12:00:05+00:00',
+    'allowed_rate' => null,
     'disabled_at' => null,
     'disabled_reason' => null,
     'created_at' => '2026-10-20T12:00:00+00:00',
@@ -66,6 +69,11 @@ use Knuckles\Scribe\Attributes\UrlParam;
     status: 403,
     description: 'Token is missing the webhooks:write ability.',
 )]
+#[ResponseField('data.description', 'string', 'The label given to the subscription.', nullable: true)]
+#[ResponseField('data.validated_at', 'string', 'When the endpoint consented to deliveries, or null if it has not.', nullable: true)]
+#[ResponseField('data.allowed_rate', 'integer', 'Deliveries a minute the endpoint granted, or null for no limit.', nullable: true)]
+#[ResponseField('data.disabled_at', 'string', 'When the subscription was disabled, or null while it is enabled.', nullable: true)]
+#[ResponseField('data.disabled_reason', 'string', 'Why it was disabled, or null.', nullable: true)]
 final class RotateWebhookSecretController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user): JsonResponse

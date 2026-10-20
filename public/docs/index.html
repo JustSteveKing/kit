@@ -263,10 +263,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5ch3jt5tj2t77hs3f321nbt&quot;,
+        &quot;id&quot;: &quot;01m5cjb70r9fgm3p1vsa3t5kbd&quot;,
         &quot;name&quot;: &quot;Justina Gaylord&quot;,
         &quot;email&quot;: &quot;lafayette.considine@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:28:20+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T11:49:59+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     },
@@ -473,10 +473,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5ch3jtc6tvn4etrg4aczmpe&quot;,
+        &quot;id&quot;: &quot;01m5cjb75mxp8226rd0k5yd7gz&quot;,
         &quot;name&quot;: &quot;Justina Gaylord&quot;,
         &quot;email&quot;: &quot;cormier.nick@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:28:20+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T11:49:59+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     },
@@ -661,10 +661,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5ch3jv63p5b5s19wrecwsk5&quot;,
+        &quot;id&quot;: &quot;01m5cjb7b0xwcwsjy7am2c6xm2&quot;,
         &quot;name&quot;: &quot;Morgan Hirthe&quot;,
         &quot;email&quot;: &quot;dare.emelie@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:28:20+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T11:49:59+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     }
@@ -2553,7 +2553,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&amp;expires=1761220800&amp;signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f" \
+    --get "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&amp;request=9f86d081884c7d659a2feaa0c55ad015&amp;expires=1761220800&amp;signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2565,6 +2565,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 const params = {
     "url_hash": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+    "request": "9f86d081884c7d659a2feaa0c55ad015",
     "expires": "1761220800",
     "signature": "0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
 };
@@ -2618,7 +2619,7 @@ fetch(url, {
 }</code>
  </pre>
             <blockquote>
-            <p>Example response (409, Consent was asked for a URL the subscription no longer uses.):</p>
+            <p>Example response (409, Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.):</p>
         </blockquote>
                 <pre>
 
@@ -2728,6 +2729,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>SHA-256 of the URL consent was asked for, from the callback URL. Example: <code>3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b</code></p>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>request</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="request"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="9f86d081884c7d659a2feaa0c55ad015"
+               data-component="query">
+    <br>
+<p>The validation request this consent answers, from the callback URL. Example: <code>9f86d081884c7d659a2feaa0c55ad015</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>expires</code></b>&nbsp;&nbsp;
 <small>integer</small>&nbsp;
  &nbsp;
@@ -2766,7 +2779,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&amp;expires=1761220800&amp;signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f" \
+    "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&amp;request=9f86d081884c7d659a2feaa0c55ad015&amp;expires=1761220800&amp;signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2778,6 +2791,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 const params = {
     "url_hash": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+    "request": "9f86d081884c7d659a2feaa0c55ad015",
     "expires": "1761220800",
     "signature": "0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
 };
@@ -2831,7 +2845,7 @@ fetch(url, {
 }</code>
  </pre>
             <blockquote>
-            <p>Example response (409, Consent was asked for a URL the subscription no longer uses.):</p>
+            <p>Example response (409, Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.):</p>
         </blockquote>
                 <pre>
 
@@ -2941,6 +2955,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>SHA-256 of the URL consent was asked for, from the callback URL. Example: <code>3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b</code></p>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>request</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="request"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="9f86d081884c7d659a2feaa0c55ad015"
+               data-component="query">
+    <br>
+<p>The validation request this consent answers, from the callback URL. Example: <code>9f86d081884c7d659a2feaa0c55ad015</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>expires</code></b>&nbsp;&nbsp;
 <small>integer</small>&nbsp;
  &nbsp;
@@ -3025,6 +3051,8 @@ fetch(url, {
             &quot;*&quot;
         ],
         &quot;enabled&quot;: true,
+        &quot;validated_at&quot;: &quot;2026-10-20T12:00:05+00:00&quot;,
+        &quot;allowed_rate&quot;: null,
         &quot;disabled_at&quot;: null,
         &quot;disabled_reason&quot;: null,
         &quot;created_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
@@ -3155,7 +3183,51 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                 </form>
 
-                    <h2 id="webhooks-POSTv1-webhooks">Create Webhook</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <p>The request body is an array (<code>object[]</code>`). Each item has the following properties:</p>
+
+                                            <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The label given to the subscription.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>validated_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the endpoint consented to deliveries, or null if it has not.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>allowed_rate</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Deliveries a minute the endpoint granted, or null for no limit.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the subscription was disabled, or null while it is enabled.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why it was disabled, or null.</p>
+                    </div>
+                                                    <h2 id="webhooks-POSTv1-webhooks">Create Webhook</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -3225,6 +3297,8 @@ fetch(url, {
             &quot;*&quot;
         ],
         &quot;enabled&quot;: true,
+        &quot;validated_at&quot;: &quot;2026-10-20T12:00:05+00:00&quot;,
+        &quot;allowed_rate&quot;: null,
         &quot;disabled_at&quot;: null,
         &quot;disabled_reason&quot;: null,
         &quot;created_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
@@ -3401,7 +3475,61 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-                    <h2 id="webhooks-GETv1-webhooks--webhook-">Show Webhook</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The label given to the subscription.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>validated_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the endpoint consented to deliveries, or null if it has not.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>allowed_rate</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Deliveries a minute the endpoint granted, or null for no limit.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the subscription was disabled, or null while it is enabled.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why it was disabled, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                        <h2 id="webhooks-GETv1-webhooks--webhook-">Show Webhook</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -3454,6 +3582,8 @@ fetch(url, {
             &quot;*&quot;
         ],
         &quot;enabled&quot;: true,
+        &quot;validated_at&quot;: &quot;2026-10-20T12:00:05+00:00&quot;,
+        &quot;allowed_rate&quot;: null,
         &quot;disabled_at&quot;: null,
         &quot;disabled_reason&quot;: null,
         &quot;created_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
@@ -3596,7 +3726,61 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="webhooks-PATCHv1-webhooks--webhook-">Update Webhook</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The label given to the subscription.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>validated_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the endpoint consented to deliveries, or null if it has not.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>allowed_rate</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Deliveries a minute the endpoint granted, or null for no limit.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the subscription was disabled, or null while it is enabled.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why it was disabled, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                        <h2 id="webhooks-PATCHv1-webhooks--webhook-">Update Webhook</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -3668,6 +3852,8 @@ fetch(url, {
             &quot;*&quot;
         ],
         &quot;enabled&quot;: true,
+        &quot;validated_at&quot;: &quot;2026-10-20T12:00:05+00:00&quot;,
+        &quot;allowed_rate&quot;: null,
         &quot;disabled_at&quot;: null,
         &quot;disabled_reason&quot;: null,
         &quot;created_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
@@ -3888,7 +4074,61 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-                    <h2 id="webhooks-DELETEv1-webhooks--webhook-">Delete Webhook</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The label given to the subscription.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>validated_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the endpoint consented to deliveries, or null if it has not.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>allowed_rate</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Deliveries a minute the endpoint granted, or null for no limit.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the subscription was disabled, or null while it is enabled.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why it was disabled, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                        <h2 id="webhooks-DELETEv1-webhooks--webhook-">Delete Webhook</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -4121,6 +4361,8 @@ fetch(url, {
             &quot;*&quot;
         ],
         &quot;enabled&quot;: true,
+        &quot;validated_at&quot;: &quot;2026-10-20T12:00:05+00:00&quot;,
+        &quot;allowed_rate&quot;: null,
         &quot;disabled_at&quot;: null,
         &quot;disabled_reason&quot;: null,
         &quot;created_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
@@ -4266,7 +4508,61 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="webhooks-POSTv1-webhooks--webhook--validate">Validate Webhook Endpoint</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The label given to the subscription.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>validated_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the endpoint consented to deliveries, or null if it has not.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>allowed_rate</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Deliveries a minute the endpoint granted, or null for no limit.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the subscription was disabled, or null while it is enabled.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why it was disabled, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                        <h2 id="webhooks-POSTv1-webhooks--webhook--validate">Validate Webhook Endpoint</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -4320,6 +4616,7 @@ fetch(url, {
         ],
         &quot;enabled&quot;: true,
         &quot;validated_at&quot;: null,
+        &quot;allowed_rate&quot;: null,
         &quot;disabled_at&quot;: null,
         &quot;disabled_reason&quot;: null,
         &quot;created_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
@@ -4462,7 +4759,61 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="webhooks-POSTv1-webhooks--webhook--ping">Ping Webhook</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The label given to the subscription.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>validated_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the endpoint consented to deliveries, or null if it has not.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>allowed_rate</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Deliveries a minute the endpoint granted, or null for no limit.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the subscription was disabled, or null while it is enabled.</p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>disabled_reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why it was disabled, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                        <h2 id="webhooks-POSTv1-webhooks--webhook--ping">Ping Webhook</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -4676,7 +5027,73 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="webhooks-GETv1-webhooks--webhook--deliveries">List Webhook Deliveries</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>next_attempt_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the next attempt is due, or null when none is.</p>
+                    </div>
+                                                                <div style=" margin-left: 14px; clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>attempts</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>response_status</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The endpoint's status code, or null when no response arrived.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>response_body</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The start of the response body, or null.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>error</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why the attempt failed without a response, or null.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>duration_ms</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>How long the attempt took, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                                        </details>
+        </div>
+                        <h2 id="webhooks-GETv1-webhooks--webhook--deliveries">List Webhook Deliveries</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -4897,7 +5314,63 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                 </form>
 
-                    <h2 id="webhooks-POSTv1-webhooks--webhook--deliveries--delivery--redeliver">Redeliver Webhook</h2>
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <p>The request body is an array (<code>object[]</code>`). Each item has the following properties:</p>
+
+                                            <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>next_attempt_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the next attempt is due, or null when none is.</p>
+                    </div>
+                                                                <div style=" margin-left: 28px; clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>attempts</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 42px; clear: unset;">
+                        <b style="line-height: 2;"><code>response_status</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The endpoint's status code, or null when no response arrived.</p>
+                    </div>
+                                                                <div style="margin-left: 42px; clear: unset;">
+                        <b style="line-height: 2;"><code>response_body</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The start of the response body, or null.</p>
+                    </div>
+                                                                <div style="margin-left: 42px; clear: unset;">
+                        <b style="line-height: 2;"><code>error</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why the attempt failed without a response, or null.</p>
+                    </div>
+                                                                <div style="margin-left: 42px; clear: unset;">
+                        <b style="line-height: 2;"><code>duration_ms</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>How long the attempt took, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                                                        <h2 id="webhooks-POSTv1-webhooks--webhook--deliveries--delivery--redeliver">Redeliver Webhook</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -5111,7 +5584,73 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-            
+    <h3>Response</h3>
+    <h4 class="fancy-heading-panel"><b>Response Fields</b></h4>
+    <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>data</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>next_attempt_at</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>When the next attempt is due, or null when none is.</p>
+                    </div>
+                                                                <div style=" margin-left: 14px; clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>attempts</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>response_status</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The endpoint's status code, or null when no response arrived.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>response_body</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>The start of the response body, or null.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>error</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Why the attempt failed without a response, or null.</p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>duration_ms</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>How long the attempt took, or null.</p>
+                    </div>
+                                    </details>
+        </div>
+                                        </details>
+        </div>
+                
 
         
     </div>

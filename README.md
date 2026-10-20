@@ -40,7 +40,7 @@ API design, HTTP standards, documentation, testing and security.
 - HTTP standards: `juststeveking/api-toolbox`
 - Docs/OpenAPI: `knuckleswtf/scribe` (attributes, not docblocks)
 - Test Runner: Pest + Laravel test tooling
-- Static Analysis / Quality: PHPStan (Larastan, level 10), Pint
+- Static Analysis / Quality: PHPStan (Larastan, level 10), Pint, Rector
 
 ## Quick Start
 
@@ -408,6 +408,11 @@ https only, redirects never followed, and every request carries `WebHook-Request
   through the `WebHook-Request-Callback` URL sent with it: a signed link, valid for
   `WEBHOOKS_CALLBACK_HOURS` (72), opened with GET or POSTed to, and refused if the subscription's URL
   has changed since.
+- **Rate-limited as the endpoint asks**: an endpoint grants a rate with `WebHook-Allowed-Rate`
+  (deliveries a minute, or `*` for none), in its handshake response or its consent callback, and
+  kit stays within it; a delivery over the rate waits, without spending a retry. Set
+  `WEBHOOKS_REQUEST_RATE` to ask for a rate with `WebHook-Request-Rate`; that rate applies when an
+  endpoint consents without granting one. Limiting needs a queue that can delay, not `sync`.
 - **Recorded**: each attempt keeps its status, a response excerpt, its duration and any error. A
   `null` status means no response arrived, as distinct from an error status.
 - **Safe to point at**: URLs must be https and must not resolve to a private, loopback or reserved
@@ -482,9 +487,15 @@ composer test
 Other quality commands:
 
 ```bash
-composer lint
-composer stan
+composer lint           # Pint, PER preset, in check mode
+composer rector:check   # Rector, in check mode
+composer stan           # PHPStan, level 10
 ```
+
+To apply them, run `composer rector` and then `composer pint`, in that order. Rector changes code
+(PHP and Laravel upgrades, dead code, type declarations) and never formatting: Pint's PER preset
+owns style, so Rector's coding-style set is off, and Pint has the last word on anything Rector
+writes. `rector.php` lists the rules skipped on purpose, with the reasons.
 
 Feature tests include:
 
@@ -517,7 +528,7 @@ Boost's block appended below Kit's guide, which it leaves alone.
 GitHub Actions workflows:
 
 - `.github/workflows/ci-tests.yml`
-  - Runs Pint, PHPStan, the test suite and legible on every push and pull request
+  - Runs Pint, Rector, PHPStan, the test suite and legible on every push and pull request
   - Builds the production image, boots it with production settings and makes requests to it
 - `.github/workflows/dependency-updates.yml`
   - Runs weekly, Mondays at `03:00 UTC`

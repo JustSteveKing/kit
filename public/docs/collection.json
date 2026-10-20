@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "e16ac1f8-a662-4567-8b4a-41cfda5bf45d",
+        "_postman_id": "85480295-50a0-41c1-bdc1-878a79a97a85",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,7 +56,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"01m5ch3jt5tj2t77hs3f321nbt\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:28:20+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cjb70r9fgm3p1vsa3t5kbd\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +100,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5ch3jtc6tvn4etrg4aczmpe\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:28:20+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cjb75mxp8226rd0k5yd7gz\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -138,7 +138,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5ch3jv63p5b5s19wrecwsk5\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:28:20+00:00\",\"created_at\":null,\"updated_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cjb7b0xwcwsjy7am2c6xm2\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -676,6 +676,12 @@
                                     "disabled": false
                                 },
                                 {
+                                    "key": "request",
+                                    "value": "9f86d081884c7d659a2feaa0c55ad015",
+                                    "description": "The validation request this consent answers, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
                                     "key": "expires",
                                     "value": "1761220800",
                                     "description": "When the callback URL expires, from the callback URL.",
@@ -688,7 +694,7 @@
                                     "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&request=9f86d081884c7d659a2feaa0c55ad015&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
                             "variable": [
                                 {
                                     "id": "webhook",
@@ -738,7 +744,7 @@
                             "header": [],
                             "code": 409,
                             "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook's URL has changed since this consent link was sent.\"}",
-                            "name": "Consent was asked for a URL the subscription no longer uses."
+                            "name": "Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one."
                         }
                     ]
                 },
@@ -756,6 +762,12 @@
                                     "disabled": false
                                 },
                                 {
+                                    "key": "request",
+                                    "value": "9f86d081884c7d659a2feaa0c55ad015",
+                                    "description": "The validation request this consent answers, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
                                     "key": "expires",
                                     "value": "1761220800",
                                     "description": "When the callback URL expires, from the callback URL.",
@@ -768,7 +780,7 @@
                                     "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&request=9f86d081884c7d659a2feaa0c55ad015&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
                             "variable": [
                                 {
                                     "id": "webhook",
@@ -818,7 +830,7 @@
                             "header": [],
                             "code": 409,
                             "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook's URL has changed since this consent link was sent.\"}",
-                            "name": "Consent was asked for a URL the subscription no longer uses."
+                            "name": "Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one."
                         }
                     ]
                 },
@@ -856,7 +868,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "[{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}]",
+                            "body": "[{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":\"2026-10-20T12:00:05+00:00\",\"allowed_rate\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}]",
                             "name": "One page of subscriptions."
                         },
                         {
@@ -903,7 +915,7 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"},\"meta\":{\"secret\":\"whsec_8f3c...\"}}",
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":\"2026-10-20T12:00:05+00:00\",\"allowed_rate\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"},\"meta\":{\"secret\":\"whsec_8f3c...\"}}",
                             "name": "Subscription created. meta.secret is the only time the secret is returned."
                         },
                         {
@@ -961,7 +973,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":\"2026-10-20T12:00:05+00:00\",\"allowed_rate\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
                             "name": "The subscription."
                         },
                         {
@@ -1022,7 +1034,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":\"2026-10-20T12:00:05+00:00\",\"allowed_rate\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
                             "name": "The updated subscription."
                         },
                         {
@@ -1144,7 +1156,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"},\"meta\":{\"secret\":\"whsec_2b9e...\"}}",
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":\"2026-10-20T12:00:05+00:00\",\"allowed_rate\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"},\"meta\":{\"secret\":\"whsec_2b9e...\"}}",
                             "name": "Secret rotated. meta.secret is the only time the new secret is returned."
                         },
                         {
@@ -1202,7 +1214,7 @@
                         {
                             "header": [],
                             "code": 202,
-                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":null,\"allowed_rate\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
                             "name": "Validation queued."
                         },
                         {

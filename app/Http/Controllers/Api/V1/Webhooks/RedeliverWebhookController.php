@@ -15,6 +15,7 @@ use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Knuckles\Scribe\Attributes\UrlParam;
 
 #[Group(name: 'Webhooks')]
@@ -70,6 +71,11 @@ use Knuckles\Scribe\Attributes\UrlParam;
     status: 403,
     description: 'Token is missing the webhooks:write ability.',
 )]
+#[ResponseField('data.next_attempt_at', 'string', 'When the next attempt is due, or null when none is.', nullable: true)]
+#[ResponseField('data.attempts[].response_status', 'integer', 'The endpoint\'s status code, or null when no response arrived.', nullable: true)]
+#[ResponseField('data.attempts[].response_body', 'string', 'The start of the response body, or null.', nullable: true)]
+#[ResponseField('data.attempts[].error', 'string', 'Why the attempt failed without a response, or null.', nullable: true)]
+#[ResponseField('data.attempts[].duration_ms', 'integer', 'How long the attempt took, or null.', nullable: true)]
 final class RedeliverWebhookController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user, Webhooks $webhooks): JsonResponse

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\WebhookSubscriptionFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Override;
 
 /**
  * @property string $id
@@ -24,6 +26,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $disabled_at
  * @property string|null $disabled_reason
  * @property Carbon|null $validated_at
+ * @property int|null $allowed_rate
+ * @property string|null $validation_request
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
@@ -37,11 +41,13 @@ final class WebhookSubscription extends Model
     /**
      * @var list<string>
      */
+    #[Override]
     protected $fillable = ['url', 'description', 'events', 'secret'];
 
     /**
      * @var list<string>
      */
+    #[Override]
     protected $hidden = ['secret'];
 
     public static function newSecret(): string
@@ -91,7 +97,8 @@ final class WebhookSubscription extends Model
     /**
      * @param  Builder<self>  $query
      */
-    public function scopeEnabled(Builder $query): void
+    #[Scope]
+    protected function enabled(Builder $query): void
     {
         $query->whereNull('disabled_at');
     }
@@ -104,6 +111,7 @@ final class WebhookSubscription extends Model
             'secret' => 'encrypted',
             'disabled_at' => 'datetime',
             'validated_at' => 'datetime',
+            'allowed_rate' => 'integer',
         ];
     }
 }

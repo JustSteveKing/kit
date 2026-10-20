@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use App\Models\WebhookDelivery;
+use App\Models\WebhookEvent;
+use App\Models\WebhookSubscription;
+use App\Webhooks\DeliveryState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -16,16 +20,24 @@ uses(RefreshDatabase::class);
 /**
  * @return array<string, mixed>
  */
+/**
+ * The spec, generated from the current code when $forceGenerate is set. Generated at most once per
+ * process: Scribe cannot run twice in one process (its translations are gone the second time), and
+ * once is enough to be sure the spec is this run's.
+ */
 function generateOpenApiSpec(bool $forceGenerate = false): array
 {
+    static $generated = false;
+
     $specPath = base_path('public/docs/openapi.yaml');
 
-    if ($forceGenerate || ! File::exists($specPath)) {
+    if (($forceGenerate && ! $generated) || ! File::exists($specPath)) {
         $exitCode = Artisan::call('scribe:generate', [
             '--no-interaction' => true,
         ]);
 
         expect($exitCode)->toBe(0);
+        $generated = true;
     }
 
     expect(File::exists($specPath))->toBeTrue();
@@ -96,7 +108,6 @@ function resolveOpenApiSchema(array $spec, array $schema): array
 /**
  * @param  array<string, mixed>  $spec
  * @param  array<string, mixed>  $schema
- * @param  mixed  $value
  */
 function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, string $path = '$'): void
 {
@@ -161,7 +172,6 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
 /**
  * @param  array<string, mixed>  $spec
  * @param  array<string, mixed>  $schema
- * @param  mixed  $value
  */
 function assertOpenApiObject(array $spec, array $schema, mixed $value, string $path): void
 {
@@ -199,7 +209,6 @@ function assertOpenApiObject(array $spec, array $schema, mixed $value, string $p
 /**
  * @param  array<string, mixed>  $spec
  * @param  array<string, mixed>  $schema
- * @param  mixed  $value
  */
 function assertOpenApiArray(array $spec, array $schema, mixed $value, string $path): void
 {
@@ -227,21 +236,21 @@ it('generates openapi and documents every v1 route', function (): void {
         ->flatMap(
             fn(array $operations, string $path) => collect($operations)
                 ->keys()
-                ->filter(fn(string $method) => in_array(mb_strtoupper($method), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'], true))
-                ->reject(fn(string $method) => 'HEAD' === mb_strtoupper($method))
-                ->map(fn(string $method) => mb_strtoupper($method) . ' ' . $path),
+                ->filter(fn(string $method): bool => in_array(mb_strtoupper($method), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'], true))
+                ->reject(fn(string $method): bool => 'HEAD' === mb_strtoupper($method))
+                ->map(fn(string $method): string => mb_strtoupper($method) . ' ' . $path),
         )
         ->sort()
         ->values();
 
     $routeOperations = collect(Route::getRoutes()->getRoutes())
-        ->filter(fn(Illuminate\Routing\Route $route) => str_starts_with($route->uri(), 'v1/'))
+        ->filter(fn(Illuminate\Routing\Route $route): bool => str_starts_with($route->uri(), 'v1/'))
         ->flatMap(function (Illuminate\Routing\Route $route) {
             $uri = '/' . $route->uri();
 
             return collect($route->methods())
-                ->reject(fn(string $method) => 'HEAD' === $method)
-                ->map(fn(string $method) => mb_strtoupper($method) . ' ' . $uri);
+                ->reject(fn(string $method): bool => 'HEAD' === $method)
+                ->map(fn(string $method): string => mb_strtoupper($method) . ' ' . $uri);
         })
         ->unique()
         ->sort()
@@ -375,7 +384,7 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
         $path = $check['path'];
         $response = $check['response'];
         $actualStatus = $response->status();
-        $documentedResponses = array_map('intval', array_keys($paths[$path][$method]['responses'] ?? []));
+        $documentedResponses = array_map(intval(...), array_keys($paths[$path][$method]['responses'] ?? []));
 
         $this->assertContains(
             $actualStatus,
@@ -407,5 +416,39 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
         $payload = json_decode($rawContent, true);
         $this->assertNotNull($payload, sprintf('Expected JSON response body for %s %s status %d.', mb_strtoupper($method), $path, $actualStatus));
         assertMatchesOpenApiSchema($spec, $schema, $payload, '$');
+    }
+});
+
+it('keeps authenticated webhook responses aligned with their documented schemas, nulls included', function (): void {
+    $spec = generateOpenApiSpec(forceGenerate: true);
+    $user = User::factory()->create();
+
+    // A fresh subscription: no description, never validated, no granted rate, enabled.
+    $subscription = WebhookSubscription::factory()->for($user)->create(['description' => null]);
+    // And one validated with a granted rate, so the non-null types are checked too.
+    $granted = WebhookSubscription::factory()->for($user)->create(['validated_at' => now(), 'allowed_rate' => 30]);
+    $event = WebhookEvent::query()->create(['user_id' => $user->id, 'type' => 'webhook.ping', 'source' => 'https://api.example.test/v1', 'data' => []]);
+    $delivery = WebhookDelivery::query()->create([
+        'webhook_subscription_id' => $subscription->id,
+        'webhook_event_id' => $event->id,
+        'state' => DeliveryState::Failed,
+    ]);
+    $delivery->attempts()->create(['attempt' => 1, 'error' => 'cURL error 28: Operation timed out', 'attempted_at' => now()]);
+
+    $token = $user->createToken('contract', ['webhooks:read'])->plainTextToken;
+
+    $checks = [
+        ['GET', '/v1/webhooks/{webhook}', '/v1/webhooks/' . $subscription->id],
+        ['GET', '/v1/webhooks/{webhook}', '/v1/webhooks/' . $granted->id],
+        ['GET', '/v1/webhooks', '/v1/webhooks'],
+        ['GET', '/v1/webhooks/{webhook}/deliveries', '/v1/webhooks/' . $subscription->id . '/deliveries'],
+    ];
+
+    foreach ($checks as [$method, $documented, $uri]) {
+        $response = $this->withToken($token)->getJson($uri)->assertOk();
+        $schema = documentedResponseSchema($spec, $documented, $method, 200);
+
+        expect($schema)->not->toBeNull();
+        assertMatchesOpenApiSchema($spec, (array) $schema, $response->json(), '$');
     }
 });

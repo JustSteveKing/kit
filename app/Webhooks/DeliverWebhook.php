@@ -13,6 +13,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
 /**
@@ -48,6 +49,13 @@ final class DeliverWebhook implements ShouldQueue
 
         if ( ! $subscription->receivesDeliveries()) {
             $this->finish($delivery, DeliveryState::Failed);
+
+            return;
+        }
+
+        // The rate the endpoint granted. Waiting for it is not an attempt, so it costs no retry.
+        if ($this->overRate($subscription)) {
+            self::dispatch($delivery->id)->delay(RateLimiter::availableIn($this->rateKey($subscription)));
 
             return;
         }
@@ -98,7 +106,7 @@ final class DeliverWebhook implements ShouldQueue
 
         if ($retry && $number <= count($backoff)) {
             // A 429 names when to try again, and the sender must not try sooner.
-            $delay = max($backoff[$number - 1], 429 === $status ? $this->retryAfter($response) : 0);
+            $delay = max($backoff[$number - 1], 429 === $status ? $this->secondsFromRetryAfter($response) : 0);
             $delivery->update(['state' => DeliveryState::Retrying, 'next_attempt_at' => now()->addSeconds($delay)]);
             self::dispatch($delivery->id)->delay($delay);
 
@@ -127,6 +135,24 @@ final class DeliverWebhook implements ShouldQueue
             ->acceptJson()
             ->withBody((string) json_encode($delivery->event->payload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), WebhookEventModel::CONTENT_TYPE)
             ->post($url);
+    }
+
+    private function overRate(WebhookSubscription $subscription): bool
+    {
+        // The sync queue runs a delayed job at once, so waiting there would loop; a rate needs a
+        // queue that can delay.
+        if (null === $subscription->allowed_rate || 'sync' === $this->job?->getConnectionName()) {
+            return false;
+        }
+
+        // Increment first, then compare: the increment is atomic, so two workers delivering to one
+        // subscription each claim their own slot. Checking before incrementing would let both pass.
+        return RateLimiter::hit($this->rateKey($subscription), 60) > $subscription->allowed_rate;
+    }
+
+    private function rateKey(WebhookSubscription $subscription): string
+    {
+        return "webhooks:rate:{$subscription->id}";
     }
 
     private function finish(WebhookDelivery $delivery, DeliveryState $state): void
@@ -164,7 +190,7 @@ final class DeliverWebhook implements ShouldQueue
     /**
      * Seconds from a Retry-After field, which is either a number of seconds or an HTTP date.
      */
-    private function retryAfter(?Response $response): int
+    private function secondsFromRetryAfter(?Response $response): int
     {
         $value = mb_trim((string) $response?->header('Retry-After'));
 

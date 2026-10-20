@@ -8,12 +8,24 @@ use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Knuckles\Scribe\Attributes\Authenticated;
+use Knuckles\Scribe\Attributes\Endpoint;
+use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\Unauthenticated;
+use Knuckles\Scribe\Attributes\UrlParam;
 
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
+
+use Override;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Scaffolds an endpoint the way AGENTS.md describes one: controller with Scribe attributes, Form
@@ -26,6 +38,7 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
     /**
      * @var string
      */
+    #[Override]
     protected $signature = 'make:endpoint
         {name : Domain and action, such as Projects/CreateProject}
         {--method= : GET, POST, PUT, PATCH or DELETE}
@@ -37,6 +50,7 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
     /**
      * @var string
      */
+    #[Override]
     protected $description = 'Scaffold a v1 endpoint: controller, Form Request, payload, test and route';
 
     public function __construct(
@@ -120,7 +134,7 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
         ];
     }
 
-    protected function afterPromptingForMissingArguments(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): void
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output): void
     {
         if (null === $input->getOption('method')) {
             $input->setOption('method', select('Which HTTP method?', self::METHODS, default: 'POST'));
@@ -136,10 +150,10 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
     private function controller(EndpointBlueprint $endpoint): string
     {
         $imports = [
-            'Illuminate\Http\JsonResponse',
-            'Knuckles\Scribe\Attributes\Endpoint',
-            'Knuckles\Scribe\Attributes\Group',
-            'Knuckles\Scribe\Attributes\Response',
+            JsonResponse::class,
+            Endpoint::class,
+            Group::class,
+            Response::class,
         ];
         $attributes = [];
         $parameters = [];
@@ -154,15 +168,15 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
         }
 
         foreach ($endpoint->pathParameters() as $parameter) {
-            $imports[] = 'Knuckles\Scribe\Attributes\UrlParam';
+            $imports[] = UrlParam::class;
             $attributes[] = "#[UrlParam('{$parameter}', type: 'string', description: 'TODO: Describe {$parameter}.', required: true, example: 'TODO')]";
         }
 
         if (null === $endpoint->ability) {
-            $imports[] = 'Knuckles\Scribe\Attributes\Unauthenticated';
+            $imports[] = Unauthenticated::class;
             $attributes[] = '#[Unauthenticated]';
         } else {
-            $imports[] = 'Knuckles\Scribe\Attributes\Authenticated';
+            $imports[] = Authenticated::class;
             $attributes[] = '#[Authenticated]';
             $attributes[] = $this->problemAttribute(401, 'unauthorized', 'Unauthorized', 'Unauthenticated.', 'Authentication failed.');
             $attributes[] = $this->problemAttribute(403, 'forbidden', 'Forbidden', 'Forbidden.', "Token is missing the {$endpoint->ability} ability.");
@@ -173,7 +187,7 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
         }
 
         if ([] === $parameters) {
-            $imports[] = 'Illuminate\Http\Request';
+            $imports[] = Request::class;
             $parameters[] = 'Request $request';
         }
 

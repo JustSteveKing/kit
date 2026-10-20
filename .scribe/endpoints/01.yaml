@@ -45,6 +45,17 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      request:
+        custom: []
+        name: request
+        description: 'The validation request this consent answers, from the callback URL.'
+        required: true
+        example: 9f86d081884c7d659a2feaa0c55ad015
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
       expires:
         custom: []
         name: expires
@@ -69,6 +80,7 @@ endpoints:
         deprecated: false
     cleanQueryParameters:
       url_hash: 3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b
+      request: 9f86d081884c7d659a2feaa0c55ad015
       expires: 1761220800
       signature: 0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f
     bodyParameters: []
@@ -98,7 +110,7 @@ endpoints:
         status: 409
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-conflict","title":"Resource Conflict","status":409,"detail":"The webhook''s URL has changed since this consent link was sent."}'
         headers: []
-        description: 'Consent was asked for a URL the subscription no longer uses.'
+        description: 'Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.'
     responseFields: []
     auth: []
     controller: null
@@ -148,6 +160,17 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      request:
+        custom: []
+        name: request
+        description: 'The validation request this consent answers, from the callback URL.'
+        required: true
+        example: 9f86d081884c7d659a2feaa0c55ad015
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
       expires:
         custom: []
         name: expires
@@ -172,6 +195,7 @@ endpoints:
         deprecated: false
     cleanQueryParameters:
       url_hash: 3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b
+      request: 9f86d081884c7d659a2feaa0c55ad015
       expires: 1761220800
       signature: 0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f
     bodyParameters: []
@@ -201,7 +225,7 @@ endpoints:
         status: 409
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-conflict","title":"Resource Conflict","status":409,"detail":"The webhook''s URL has changed since this consent link was sent."}'
         headers: []
-        description: 'Consent was asked for a URL the subscription no longer uses.'
+        description: 'Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.'
     responseFields: []
     auth: []
     controller: null
@@ -249,7 +273,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '[{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}]'
+        content: '[{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}]'
         headers: []
         description: 'One page of subscriptions.'
       -
@@ -264,7 +288,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
         headers: []
         description: 'Token is missing the webhooks:read ability.'
-    responseFields: []
+    responseFields:
+      '[].description':
+        custom: []
+        name: '[].description'
+        description: 'The label given to the subscription.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].validated_at':
+        custom: []
+        name: '[].validated_at'
+        description: 'When the endpoint consented to deliveries, or null if it has not.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].allowed_rate':
+        custom: []
+        name: '[].allowed_rate'
+        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].disabled_at':
+        custom: []
+        name: '[].disabled_at'
+        description: 'When the subscription was disabled, or null while it is enabled.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].disabled_reason':
+        custom: []
+        name: '[].disabled_reason'
+        description: 'Why it was disabled, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -340,7 +419,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_8f3c..."}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_8f3c..."}}'
         headers: []
         description: 'Subscription created. meta.secret is the only time the secret is returned.'
       -
@@ -361,7 +440,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"Webhook URLs must use https.","errors":{"url":["Webhook URLs must use https."]}}'
         headers: []
         description: 'The URL is not https, resolves to a private address, or an event type is unknown.'
-    responseFields: []
+    responseFields:
+      data.description:
+        custom: []
+        name: data.description
+        description: 'The label given to the subscription.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.validated_at:
+        custom: []
+        name: data.validated_at
+        description: 'When the endpoint consented to deliveries, or null if it has not.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.allowed_rate:
+        custom: []
+        name: data.allowed_rate
+        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_at:
+        custom: []
+        name: data.disabled_at
+        description: 'When the subscription was disabled, or null while it is enabled.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_reason:
+        custom: []
+        name: data.disabled_reason
+        description: 'Why it was disabled, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -411,7 +545,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
         headers: []
         description: 'The subscription.'
       -
@@ -432,7 +566,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
         headers: []
         description: 'No webhook with this ID belongs to the authenticated user.'
-    responseFields: []
+    responseFields:
+      data.description:
+        custom: []
+        name: data.description
+        description: 'The label given to the subscription.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.validated_at:
+        custom: []
+        name: data.validated_at
+        description: 'When the endpoint consented to deliveries, or null if it has not.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.allowed_rate:
+        custom: []
+        name: data.allowed_rate
+        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_at:
+        custom: []
+        name: data.disabled_at
+        description: 'When the subscription was disabled, or null while it is enabled.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_reason:
+        custom: []
+        name: data.disabled_reason
+        description: 'Why it was disabled, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -532,7 +721,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
         headers: []
         description: 'The updated subscription.'
       -
@@ -559,7 +748,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"Webhook URLs must use https.","errors":{"url":["Webhook URLs must use https."]}}'
         headers: []
         description: 'The URL is not https, resolves to a private address, or an event type is unknown.'
-    responseFields: []
+    responseFields:
+      data.description:
+        custom: []
+        name: data.description
+        description: 'The label given to the subscription.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.validated_at:
+        custom: []
+        name: data.validated_at
+        description: 'When the endpoint consented to deliveries, or null if it has not.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.allowed_rate:
+        custom: []
+        name: data.allowed_rate
+        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_at:
+        custom: []
+        name: data.disabled_at
+        description: 'When the subscription was disabled, or null while it is enabled.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_reason:
+        custom: []
+        name: data.disabled_reason
+        description: 'Why it was disabled, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -680,7 +924,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_2b9e..."}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":"2026-10-20T12:00:05+00:00","allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"},"meta":{"secret":"whsec_2b9e..."}}'
         headers: []
         description: 'Secret rotated. meta.secret is the only time the new secret is returned.'
       -
@@ -701,7 +945,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
         headers: []
         description: 'No webhook with this ID belongs to the authenticated user.'
-    responseFields: []
+    responseFields:
+      data.description:
+        custom: []
+        name: data.description
+        description: 'The label given to the subscription.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.validated_at:
+        custom: []
+        name: data.validated_at
+        description: 'When the endpoint consented to deliveries, or null if it has not.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.allowed_rate:
+        custom: []
+        name: data.allowed_rate
+        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_at:
+        custom: []
+        name: data.disabled_at
+        description: 'When the subscription was disabled, or null while it is enabled.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_reason:
+        custom: []
+        name: data.disabled_reason
+        description: 'Why it was disabled, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -751,7 +1050,7 @@ endpoints:
       -
         custom: []
         status: 202
-        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":null,"allowed_rate":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
         headers: []
         description: 'Validation queued.'
       -
@@ -772,7 +1071,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
         headers: []
         description: 'No webhook with this ID belongs to the authenticated user.'
-    responseFields: []
+    responseFields:
+      data.description:
+        custom: []
+        name: data.description
+        description: 'The label given to the subscription.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.validated_at:
+        custom: []
+        name: data.validated_at
+        description: 'When the endpoint consented to deliveries, or null if it has not.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.allowed_rate:
+        custom: []
+        name: data.allowed_rate
+        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_at:
+        custom: []
+        name: data.disabled_at
+        description: 'When the subscription was disabled, or null while it is enabled.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      data.disabled_reason:
+        custom: []
+        name: data.disabled_reason
+        description: 'Why it was disabled, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -849,7 +1203,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-conflict","title":"Resource Conflict","status":409,"detail":"The webhook endpoint has not consented to deliveries yet."}'
         headers: []
         description: 'The subscription is disabled, or its endpoint has not been validated.'
-    responseFields: []
+    responseFields:
+      data.next_attempt_at:
+        custom: []
+        name: data.next_attempt_at
+        description: 'When the next attempt is due, or null when none is.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].response_status':
+        custom: []
+        name: 'data.attempts[].response_status'
+        description: "The endpoint's status code, or null when no response arrived."
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].response_body':
+        custom: []
+        name: 'data.attempts[].response_body'
+        description: 'The start of the response body, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].error':
+        custom: []
+        name: 'data.attempts[].error'
+        description: 'Why the attempt failed without a response, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].duration_ms':
+        custom: []
+        name: 'data.attempts[].duration_ms'
+        description: 'How long the attempt took, or null.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -932,7 +1341,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
         headers: []
         description: 'No webhook with this ID belongs to the authenticated user.'
-    responseFields: []
+    responseFields:
+      '[].next_attempt_at':
+        custom: []
+        name: '[].next_attempt_at'
+        description: 'When the next attempt is due, or null when none is.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].attempts[].response_status':
+        custom: []
+        name: '[].attempts[].response_status'
+        description: "The endpoint's status code, or null when no response arrived."
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].attempts[].response_body':
+        custom: []
+        name: '[].attempts[].response_body'
+        description: 'The start of the response body, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].attempts[].error':
+        custom: []
+        name: '[].attempts[].error'
+        description: 'Why the attempt failed without a response, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      '[].attempts[].duration_ms':
+        custom: []
+        name: '[].attempts[].duration_ms'
+        description: 'How long the attempt took, or null.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization
@@ -1015,7 +1479,62 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
         headers: []
         description: 'No webhook with this ID belongs to the authenticated user.'
-    responseFields: []
+    responseFields:
+      data.next_attempt_at:
+        custom: []
+        name: data.next_attempt_at
+        description: 'When the next attempt is due, or null when none is.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].response_status':
+        custom: []
+        name: 'data.attempts[].response_status'
+        description: "The endpoint's status code, or null when no response arrived."
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].response_body':
+        custom: []
+        name: 'data.attempts[].response_body'
+        description: 'The start of the response body, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].error':
+        custom: []
+        name: 'data.attempts[].error'
+        description: 'Why the attempt failed without a response, or null.'
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'data.attempts[].duration_ms':
+        custom: []
+        name: 'data.attempts[].duration_ms'
+        description: 'How long the attempt took, or null.'
+        required: true
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     auth:
       - headers
       - Authorization

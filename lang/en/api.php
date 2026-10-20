@@ -35,6 +35,7 @@ return [
         'not_validated' => 'The webhook endpoint has not consented to deliveries yet.',
         'invalid_consent_link' => 'This consent link is invalid or has expired. Validate the webhook again for a new one.',
         'consent_url_changed' => 'The webhook\'s URL has changed since this consent link was sent.',
+        'consent_superseded' => 'A newer validation request replaced the one this consent link was sent with.',
         'consent_granted' => 'Deliveries to this webhook endpoint are allowed.',
     ],
     'sunset' => [

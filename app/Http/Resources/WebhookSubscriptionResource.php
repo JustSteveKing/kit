@@ -25,6 +25,7 @@ final class WebhookSubscriptionResource extends JsonResource
             'events' => $subscription->events,
             'enabled' => $subscription->isEnabled(),
             'validated_at' => $subscription->validated_at?->toAtomString(),
+            'allowed_rate' => $subscription->allowed_rate,
             'disabled_at' => $subscription->disabled_at?->toAtomString(),
             'disabled_reason' => $subscription->disabled_reason,
             'created_at' => $subscription->created_at?->toAtomString(),

@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Support\NoContentOpenApiGenerator;
+use App\Support\ProblemDetailsOpenApiGenerator;
+use App\Support\ResponseFieldsOpenApiGenerator;
 use Knuckles\Scribe\Config\AuthIn;
-
-use function Knuckles\Scribe\Config\configureStrategy;
-
 use Knuckles\Scribe\Config\Defaults;
 
 use function Knuckles\Scribe\Config\removeStrategies;
 
-use Knuckles\Scribe\Extracting\Strategies;
+use Knuckles\Scribe\Extracting\Strategies\Responses\ResponseCalls;
+use Knuckles\Scribe\Extracting\Strategies\StaticData;
 
 // Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
 
@@ -180,8 +181,9 @@ return [
         // Additional generators to use when generating the OpenAPI spec.
         // Should extend `Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator`.
         'generators' => [
-            App\Support\ProblemDetailsOpenApiGenerator::class,
-            App\Support\NoContentOpenApiGenerator::class,
+            ProblemDetailsOpenApiGenerator::class,
+            NoContentOpenApiGenerator::class,
+            ResponseFieldsOpenApiGenerator::class,
         ],
     ],
 
@@ -232,7 +234,7 @@ return [
         ],
         'headers' => [
             ...Defaults::HEADERS_STRATEGIES,
-            Strategies\StaticData::withSettings(data: [
+            StaticData::withSettings(data: [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ]),
@@ -248,7 +250,7 @@ return [
         ],
         'responses' => removeStrategies(
             Defaults::RESPONSES_STRATEGIES,
-            [Strategies\Responses\ResponseCalls::class],
+            [ResponseCalls::class],
         ),
         'responseFields' => [
             ...Defaults::RESPONSE_FIELDS_STRATEGIES,

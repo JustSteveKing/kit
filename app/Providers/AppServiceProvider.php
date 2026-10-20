@@ -44,19 +44,19 @@ final class AppServiceProvider extends ServiceProvider
             Scribe::normalizeEndpointUrlUsing(static fn(string $uri): string => $uri);
         }
 
-        RateLimiter::for('auth-register', fn(Request $request) => [
+        RateLimiter::for('auth-register', fn(Request $request): array => [
             Limit::perMinute(10)->by($request->ip()),
         ]);
 
-        RateLimiter::for('auth-login', fn(Request $request) => [
+        RateLimiter::for('auth-login', fn(Request $request): array => [
             Limit::perMinute(10)->by(sprintf('%s|%s', $request->ip(), $request->string('email')->value())),
         ]);
 
-        RateLimiter::for('auth-password', fn(Request $request) => [
+        RateLimiter::for('auth-password', fn(Request $request): array => [
             Limit::perMinute(5)->by(sprintf('%s|%s', $request->ip(), $request->string('email')->value())),
         ]);
 
-        RateLimiter::for('auth-protected', fn(Request $request) => [
+        RateLimiter::for('auth-protected', fn(Request $request): array => [
             Limit::perMinute(60)->by(
                 $request->user() instanceof User ? $request->user()->id : (string) $request->ip(),
             ),

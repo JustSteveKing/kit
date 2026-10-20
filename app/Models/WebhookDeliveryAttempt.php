@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Override;
 
 /**
  * One HTTP attempt. A null response_status means no response arrived, which needs a different fix
@@ -22,11 +23,13 @@ use Illuminate\Support\Carbon;
  */
 final class WebhookDeliveryAttempt extends Model
 {
+    #[Override]
     public $timestamps = false;
 
     /**
      * @var list<string>
      */
+    #[Override]
     protected $fillable = ['attempt', 'response_status', 'response_body', 'error', 'duration_ms', 'attempted_at'];
 
     /** @return array<string, string> */

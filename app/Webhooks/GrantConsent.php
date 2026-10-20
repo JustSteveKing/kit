@@ -30,15 +30,23 @@ final class GrantConsent
             abort(409, __('api.webhooks.consent_url_changed'));
         }
 
-        if (null === $subscription->validated_at) {
-            $subscription->forceFill(['validated_at' => now()])->save();
-
-            SecurityAudit::log('webhooks.consented', [
-                'user_id' => $subscription->user_id,
-                'webhook_id' => $subscription->id,
-                'via' => 'callback',
-            ]);
+        // A later validation request replaced the one this link was sent with.
+        if (null === $subscription->validation_request || ! hash_equals($subscription->validation_request, $request->string('request')->value())) {
+            abort(409, __('api.webhooks.consent_superseded'));
         }
+
+        // Applied on every call, so a callback answering a re-validation updates the granted rate.
+        $subscription->forceFill([
+            'validated_at' => now(),
+            'allowed_rate' => AllowedRate::from($request->header('WebHook-Allowed-Rate')),
+        ])->save();
+
+        SecurityAudit::log('webhooks.consented', [
+            'user_id' => $subscription->user_id,
+            'webhook_id' => $subscription->id,
+            'via' => 'callback',
+            'allowed_rate' => $subscription->allowed_rate,
+        ]);
 
         return new JsonResponse(['message' => __('api.webhooks.consent_granted')]);
     }

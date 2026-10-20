@@ -19,14 +19,22 @@ return new class extends Migration {
             $table->unsignedInteger('consecutive_failures')->default(0);
             $table->timestamp('disabled_at')->nullable();
             $table->string('disabled_reason')->nullable();
+            // When the endpoint consented to deliveries (CloudEvents webhook handshake), if it has,
+            // and the latest validation request: only its answer or its callback may grant consent.
+            $table->timestamp('validated_at')->nullable();
+            $table->string('validation_request', 32)->nullable();
+            // Deliveries a minute the endpoint granted (WebHook-Allowed-Rate); null means no limit.
+            $table->unsignedInteger('allowed_rate')->nullable();
             $table->timestamps();
         });
 
-        // The event itself: what every delivery and redelivery of it sends, byte for byte.
+        // The event itself, a CloudEvent: what every delivery and redelivery of it sends, byte for byte.
         Schema::create('webhook_events', function (Blueprint $table): void {
             $table->ulid('id')->primary();
             $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
             $table->string('type');
+            $table->string('source');
+            $table->string('subject')->nullable();
             $table->json('data');
             $table->timestamp('created_at')->index();
         });
