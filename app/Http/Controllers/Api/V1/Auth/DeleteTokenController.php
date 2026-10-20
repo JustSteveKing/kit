@@ -9,7 +9,6 @@ use App\Http\Requests\Auth\DeleteTokenRequest;
 use App\Models\User;
 use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
@@ -29,22 +28,20 @@ use Knuckles\Scribe\Attributes\UrlParam;
 #[ScribeResponse(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
 final class DeleteTokenController
 {
-    public function __invoke(DeleteTokenRequest $request, #[CurrentUser] User $user): Response|JsonResponse
+    public function __invoke(DeleteTokenRequest $request, #[CurrentUser] User $user): Response
     {
         $payload = DeleteTokenPayload::fromReqest($request);
 
         $token = $user->tokens()->whereKey($payload->tokenId)->first();
 
-        if (! $token) {
+        if ( ! $token) {
             SecurityAudit::log('auth.tokens.revoke_failed', [
                 'user_id' => (string) $user->getKey(),
                 'token_id' => (string) $payload->tokenId,
                 'reason' => 'not_found',
             ]);
 
-            return new JsonResponse([
-                'message' => __('api.auth.token_not_found'),
-            ], 404);
+            abort(404, __('api.auth.token_not_found'));
         }
 
         SecurityAudit::log('auth.tokens.revoked', [

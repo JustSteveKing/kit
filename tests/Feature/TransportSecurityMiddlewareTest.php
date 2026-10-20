@@ -10,8 +10,8 @@ it('rejects insecure requests when https enforcement is enabled', function (): v
     config()->set('security.force_https', true);
 
     $this->getJson('/v1/auth/me')
-        ->assertStatus(400)
-        ->assertJsonPath('message', __('api.errors.https_required'));
+        ->assertProblem(400)
+        ->assertJsonPath('detail', __('api.errors.https_required'));
 });
 
 it('localizes https enforcement errors', function (): void {
@@ -20,9 +20,9 @@ it('localizes https enforcement errors', function (): void {
     $this->withHeaders([
         'Accept-Language' => 'es',
     ])->getJson('/v1/auth/me')
-        ->assertStatus(400)
+        ->assertProblem(400)
         ->assertHeader('Content-Language', 'es')
-        ->assertJsonPath('message', __('api.errors.https_required', [], 'es'));
+        ->assertJsonPath('detail', __('api.errors.https_required', [], 'es'));
 });
 
 it('adds hsts header for secure requests when enabled', function (): void {

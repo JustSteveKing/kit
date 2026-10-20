@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,9 +16,7 @@ final class EnforceTransportSecurity
     public function handle(Request $request, Closure $next): Response
     {
         if ((bool) config('security.force_https', false) && ! $request->isSecure()) {
-            return new JsonResponse([
-                'message' => __('api.errors.https_required'),
-            ], 400);
+            abort(400, __('api.errors.https_required'));
         }
 
         $response = $next($request);

@@ -13,6 +13,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
+        "juststeveking/api-toolbox": "^0.2",
         "laravel/framework": "^13.30",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",

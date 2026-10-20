@@ -6,6 +6,7 @@ namespace App\Support;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use JustSteveKing\Toolbox\Contracts\RequestIdentifier;
 
 final class SecurityAudit
 {
@@ -26,7 +27,7 @@ final class SecurityAudit
 
     public static function hashEmail(string $email): string
     {
-        return hash('sha256', mb_strtolower(trim($email)));
+        return hash('sha256', mb_strtolower(mb_trim($email)));
     }
 
     /**
@@ -34,7 +35,7 @@ final class SecurityAudit
      */
     private static function requestContext(): array
     {
-        if (! app()->bound('request')) {
+        if ( ! app()->bound('request')) {
             return [];
         }
 
@@ -42,7 +43,7 @@ final class SecurityAudit
         $request = app('request');
 
         return [
-            'request_id' => $request->attributes->get('request_id'),
+            'request_id' => app()->bound(RequestIdentifier::class) ? app(RequestIdentifier::class)->current() : null,
             'ip' => $request->ip(),
             'method' => $request->method(),
             'path' => $request->path(),

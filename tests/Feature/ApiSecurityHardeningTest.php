@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\PersonalAccessToken;
+use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 
@@ -14,31 +16,28 @@ it('rejects non json payloads on write endpoints', function (): void {
         'password' => 'password123',
     ]);
 
-    $this->post('/v1/auth/login', [
+    postForm($this, '/v1/auth/login', [
         'email' => 'non-json@example.com',
         'password' => 'password123',
         'device_name' => 'ios-app',
     ])
-        ->assertStatus(415)
-        ->assertJsonPath('message', __('api.errors.unsupported_media_type'));
+        ->assertProblemType('https://apiguide.dev/errors/unsupported-media-type', 415)
+        ->assertHeader('Accept', 'application/json');
 });
 
-it('localizes unsupported media type responses', function (): void {
+it('keeps the unsupported media type problem stable whatever the requested language', function (): void {
     User::factory()->create([
         'email' => 'non-json-es@example.com',
         'password' => 'password123',
     ]);
 
-    $this->withHeaders([
-        'Accept-Language' => 'es',
-    ])->post('/v1/auth/login', [
+    postForm($this, '/v1/auth/login', [
         'email' => 'non-json-es@example.com',
         'password' => 'password123',
         'device_name' => 'ios-app',
-    ])
-        ->assertStatus(415)
-        ->assertHeader('Content-Language', 'es')
-        ->assertJsonPath('message', __('api.errors.unsupported_media_type', [], 'es'));
+    ], ['HTTP_ACCEPT_LANGUAGE' => 'es'])
+        ->assertProblemType('https://apiguide.dev/errors/unsupported-media-type', 415)
+        ->assertHeader('Content-Language', 'es');
 });
 
 it('issues expiring sanctum tokens by default', function (): void {
@@ -85,3 +84,24 @@ it('adds baseline security headers to api responses', function (): void {
         ->assertHeader('X-Frame-Options', 'DENY')
         ->assertHeader('Referrer-Policy', 'no-referrer');
 });
+
+it('renders problems for api requests that do not ask for json', function (): void {
+    $this->get('/v1/auth/me')
+        ->assertProblemType('https://apiguide.dev/errors/unauthorized', 401)
+        ->assertHeader('WWW-Authenticate', 'Bearer');
+});
+
+/**
+ * A form-encoded POST with a real body, as a browser or curl -d sends it. Laravel's post() helper
+ * passes the fields as parsed parameters and leaves the body empty.
+ *
+ * @param  array<string, string>  $fields
+ * @param  array<string, string>  $server
+ */
+function postForm(TestCase $test, string $uri, array $fields, array $server = []): TestResponse
+{
+    return $test->call('POST', $uri, [], [], [], [
+        'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
+        ...$server,
+    ], http_build_query($fields));
+}
