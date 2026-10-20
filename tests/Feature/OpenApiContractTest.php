@@ -216,7 +216,7 @@ function assertOpenApiArray(array $spec, array $schema, mixed $value, string $pa
     }
 }
 
-it('generates openapi and documents all v1 auth routes', function (): void {
+it('generates openapi and documents every v1 route', function (): void {
     $spec = generateOpenApiSpec(forceGenerate: true);
     $paths = $spec['paths'] ?? [];
 
@@ -235,7 +235,7 @@ it('generates openapi and documents all v1 auth routes', function (): void {
         ->values();
 
     $routeOperations = collect(Route::getRoutes()->getRoutes())
-        ->filter(fn(Illuminate\Routing\Route $route) => str_starts_with($route->uri(), 'v1/auth'))
+        ->filter(fn(Illuminate\Routing\Route $route) => str_starts_with($route->uri(), 'v1/'))
         ->flatMap(function (Illuminate\Routing\Route $route) {
             $uri = '/' . $route->uri();
 
