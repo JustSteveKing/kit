@@ -30,6 +30,9 @@ return [
         'target_unresolvable' => 'The webhook URL\'s host does not resolve.',
         'target_private' => 'Webhook URLs must not point at a private, loopback or reserved address.',
         'disabled_after_failures' => 'Disabled after :count deliveries in a row failed.',
+        'disabled_gone' => 'Disabled because the endpoint answered 410 Gone.',
+        'disabled' => 'The webhook subscription is disabled.',
+        'not_validated' => 'The webhook endpoint has not consented to deliveries yet.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'This endpoint has been sunset and is no longer available.',

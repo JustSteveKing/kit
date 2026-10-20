@@ -143,8 +143,9 @@ The `api-toolbox-development` Boost skill has the detail for each of these.
 
 Kit sends signed webhooks to endpoints its API consumers subscribe. To add an event:
 
-1. A class implementing `App\Webhooks\WebhookEvent`: `type()` is dotted and past tense, such as
-   `project.created`, and `data()` is the payload's `data` member. Treat `data()` as public API:
+1. A class implementing `App\Webhooks\WebhookEvent`, which is delivered as a CloudEvent: `type()`
+   is dotted and past tense, such as `project.created`; `subject()` is what it is about, such as
+   the project's ID, or null; and `data()` is the event's `data`. Treat `data()` as public API:
    subscribers parse it, so add to it rather than change it.
 2. The type in `config/webhooks.php` under `events`, so subscriptions can ask for it.
 3. Dispatch it where the change happens, for the user who owns the data:
@@ -156,10 +157,10 @@ Kit sends signed webhooks to endpoints its API consumers subscribe. To add an ev
    Deliveries are queued after the surrounding transaction commits, so dispatch inside the
    transaction that writes the change; a subscriber is never told about a row it cannot find.
 
-Do not send webhooks with `Http` directly. The `Webhooks` service and `DeliverWebhook` job sign each
-delivery with the subscription's secret, check the URL is public on every send, record every
-attempt, retry on the published schedule (`webhooks.backoff`), and disable an endpoint that keeps
-failing. In tests, bind `App\Webhooks\HostResolver` to answer without DNS, and use `Http::fake()`.
+Do not send webhooks with `Http` directly. The `Webhooks` service and `DeliverWebhook` job build
+the CloudEvent, sign each delivery with the subscription's secret, check the URL is public on every
+send, record every attempt, retry on the published schedule (`webhooks.backoff`) while honouring a
+429's `Retry-After`, stop on 410, and disable an endpoint that keeps failing. In tests, bind `App\Webhooks\HostResolver` to answer without DNS, and use `Http::fake()`.
 
 ## Localization
 

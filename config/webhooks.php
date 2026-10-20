@@ -21,6 +21,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | CloudEvents
+    |--------------------------------------------------------------------------
+    |
+    | Deliveries are CloudEvents 1.0 in structured mode. "source" identifies
+    | this API in every event. "origin" is the DNS name sent as
+    | WebHook-Request-Origin, from the CloudEvents webhook specification.
+    |
+    */
+
+    'source' => env('WEBHOOKS_SOURCE', mb_rtrim((string) env('APP_URL', 'http://localhost'), '/') . '/v1'),
+
+    'origin' => env('WEBHOOKS_ORIGIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?: 'localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Endpoint Validation
+    |--------------------------------------------------------------------------
+    |
+    | When on, a subscription receives nothing until its endpoint consents to
+    | deliveries through the CloudEvents webhook handshake: an OPTIONS request
+    | answered with WebHook-Allowed-Origin. It proves the URL's owner wants the
+    | events, which the address checks below cannot.
+    |
+    */
+
+    'validate_endpoints' => (bool) env('WEBHOOKS_VALIDATE_ENDPOINTS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Retry Schedule
     |--------------------------------------------------------------------------
     |

@@ -6,6 +6,7 @@ namespace App\Webhooks;
 
 use App\Models\WebhookDelivery;
 use App\Models\WebhookDeliveryAttempt;
+use App\Models\WebhookEvent as WebhookEventModel;
 use App\Models\WebhookSubscription;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -45,7 +46,7 @@ final class DeliverWebhook implements ShouldQueue
 
         $subscription = $delivery->subscription;
 
-        if ( ! $subscription->isEnabled()) {
+        if ( ! $subscription->receivesDeliveries()) {
             $this->finish($delivery, DeliveryState::Failed);
 
             return;
@@ -55,6 +56,7 @@ final class DeliverWebhook implements ShouldQueue
         $attempt = new WebhookDeliveryAttempt(['attempt' => $number, 'attempted_at' => now()]);
         $started = hrtime(true);
         $retry = true;
+        $response = null;
 
         try {
             $response = $this->send($delivery, $targets->resolve($subscription->url));
@@ -71,16 +73,32 @@ final class DeliverWebhook implements ShouldQueue
         $attempt->duration_ms = (int) ((hrtime(true) - $started) / 1_000_000);
         $delivery->attempts()->save($attempt);
 
-        if (null !== $attempt->response_status && $attempt->response_status >= 200 && $attempt->response_status < 300) {
+        $status = $attempt->response_status;
+
+        if (null !== $status && $status >= 200 && $status < 300) {
             $this->finish($delivery, DeliveryState::Succeeded);
 
             return;
         }
 
+        // CloudEvents webhook specification, section 2.2: 410 means the target is retired and the
+        // sender should stop, and 415 means the format is not understood, which a retry won't fix.
+        if (410 === $status) {
+            $this->finish($delivery, DeliveryState::Failed);
+            $this->disable($subscription, __('api.webhooks.disabled_gone'));
+
+            return;
+        }
+
+        if (415 === $status) {
+            $retry = false;
+        }
+
         $backoff = $this->schedule();
 
         if ($retry && $number <= count($backoff)) {
-            $delay = $backoff[$number - 1];
+            // A 429 names when to try again, and the sender must not try sooner.
+            $delay = max($backoff[$number - 1], 429 === $status ? $this->retryAfter($response) : 0);
             $delivery->update(['state' => DeliveryState::Retrying, 'next_attempt_at' => now()->addSeconds($delay)]);
             self::dispatch($delivery->id)->delay($delay);
 
@@ -100,13 +118,14 @@ final class DeliverWebhook implements ShouldQueue
         return Http::withSignature($subscription->id, self::COVERED)
             ->withHeaders([
                 'Idempotency-Key' => '"' . $delivery->event->id . '"',
+                'WebHook-Request-Origin' => config()->string('webhooks.origin'),
                 'User-Agent' => config()->string('app.name', 'Laravel') . ' Webhooks',
             ])
             ->withOptions(['curl' => [CURLOPT_RESOLVE => ["{$host}:{$port}:{$address}"]]])
             ->withoutRedirecting()
             ->timeout(config()->integer('webhooks.timeout', 10))
             ->acceptJson()
-            ->withBody((string) json_encode($delivery->event->payload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 'application/json')
+            ->withBody((string) json_encode($delivery->event->payload(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), WebhookEventModel::CONTENT_TYPE)
             ->post($url);
     }
 
@@ -130,12 +149,36 @@ final class DeliverWebhook implements ShouldQueue
     {
         $limit = config()->integer('webhooks.disable_after', 10);
 
-        if ($subscription->isEnabled() && $limit > 0 && $subscription->consecutive_failures >= $limit) {
-            $subscription->forceFill([
-                'disabled_at' => now(),
-                'disabled_reason' => __('api.webhooks.disabled_after_failures', ['count' => (string) $limit]),
-            ])->save();
+        if ($limit > 0 && $subscription->consecutive_failures >= $limit) {
+            $this->disable($subscription, __('api.webhooks.disabled_after_failures', ['count' => (string) $limit]));
         }
+    }
+
+    private function disable(WebhookSubscription $subscription, string $reason): void
+    {
+        if ($subscription->isEnabled()) {
+            $subscription->forceFill(['disabled_at' => now(), 'disabled_reason' => $reason])->save();
+        }
+    }
+
+    /**
+     * Seconds from a Retry-After field, which is either a number of seconds or an HTTP date.
+     */
+    private function retryAfter(?Response $response): int
+    {
+        $value = mb_trim((string) $response?->header('Retry-After'));
+
+        if ('' === $value) {
+            return 0;
+        }
+
+        if (ctype_digit($value)) {
+            return (int) $value;
+        }
+
+        $date = strtotime($value);
+
+        return false === $date ? 0 : max(0, $date - now()->getTimestamp());
     }
 
     /**

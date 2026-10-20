@@ -9,7 +9,9 @@ use App\Http\Payloads\V1\UpdateWebhookPayload;
 use App\Http\Requests\Webhooks\UpdateWebhookRequest;
 use App\Http\Resources\WebhookSubscriptionResource;
 use App\Models\User;
+use App\Models\WebhookSubscription;
 use App\Support\SecurityAudit;
+use App\Webhooks\ValidateWebhookEndpoint;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Knuckles\Scribe\Attributes\Authenticated;
@@ -97,7 +99,16 @@ final class UpdateWebhookController
             $subscription->forceFill(['disabled_at' => now(), 'disabled_reason' => null]);
         }
 
+        // Consent was given to the old URL, not the new one.
+        if ($subscription->isDirty('url')) {
+            $subscription->forceFill(['validated_at' => null]);
+        }
+
         $subscription->save();
+
+        if ($subscription->wasChanged('url') && WebhookSubscription::validationRequired()) {
+            ValidateWebhookEndpoint::dispatch($subscription->id)->afterCommit();
+        }
 
         SecurityAudit::log('webhooks.updated', [
             'user_id' => $user->id,

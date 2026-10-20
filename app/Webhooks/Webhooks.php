@@ -23,7 +23,7 @@ final class Webhooks
     public function dispatch(User $owner, WebhookEvent $event): array
     {
         $subscriptions = $owner->webhookSubscriptions()->enabled()->get()
-            ->filter(static fn(WebhookSubscription $subscription): bool => $subscription->wants($event->type()));
+            ->filter(static fn(WebhookSubscription $subscription): bool => $subscription->receivesDeliveries() && $subscription->wants($event->type()));
 
         if ($subscriptions->isEmpty()) {
             return [];
@@ -57,6 +57,8 @@ final class Webhooks
         return StoredEvent::query()->create([
             'user_id' => $owner->id,
             'type' => $event->type(),
+            'source' => config()->string('webhooks.source'),
+            'subject' => $event->subject(),
             'data' => $event->data(),
         ]);
     }

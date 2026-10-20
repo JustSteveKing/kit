@@ -10,6 +10,7 @@ use App\Http\Resources\WebhookSubscriptionResource;
 use App\Models\User;
 use App\Models\WebhookSubscription;
 use App\Support\SecurityAudit;
+use App\Webhooks\ValidateWebhookEndpoint;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Knuckles\Scribe\Attributes\Authenticated;
@@ -82,6 +83,11 @@ final class CreateWebhookController
             'events' => $payload->events,
             'secret' => $secret,
         ]);
+
+        // CloudEvents webhook handshake: the endpoint consents before anything is delivered.
+        if (WebhookSubscription::validationRequired()) {
+            ValidateWebhookEndpoint::dispatch($subscription->id)->afterCommit();
+        }
 
         SecurityAudit::log('webhooks.created', [
             'user_id' => $user->id,

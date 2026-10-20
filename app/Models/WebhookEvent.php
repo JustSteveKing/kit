@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * An event as it was sent: every delivery and redelivery of it sends this same body.
+ * An event as it was sent: every delivery and redelivery of it sends this same CloudEvent.
  *
  * @property string $id
  * @property string $user_id
  * @property string $type
+ * @property string $source
+ * @property string|null $subject
  * @property array<string, mixed> $data
  * @property Carbon $created_at
  */
@@ -26,25 +28,33 @@ final class WebhookEvent extends Model
 
     public const null UPDATED_AT = null;
 
+    public const string SPEC_VERSION = '1.0';
+
+    public const string CONTENT_TYPE = 'application/cloudevents+json; charset=utf-8';
+
     /**
      * @var list<string>
      */
-    protected $fillable = ['user_id', 'type', 'data'];
+    protected $fillable = ['user_id', 'type', 'source', 'subject', 'data'];
 
     /**
-     * The body every delivery sends.
+     * The body every delivery sends: a CloudEvent in structured content mode (CloudEvents 1.0 and
+     * its JSON format). An event with no subject leaves the attribute out rather than sending null.
      *
-     * @return array{id: string, type: string, api_version: string, created_at: string, data: array<string, mixed>}
+     * @return array<string, mixed>
      */
     public function payload(): array
     {
-        return [
+        return array_filter([
+            'specversion' => self::SPEC_VERSION,
             'id' => $this->id,
+            'source' => $this->source,
             'type' => $this->type,
-            'api_version' => 'v1',
-            'created_at' => $this->created_at->toAtomString(),
+            'subject' => $this->subject,
+            'time' => $this->created_at->toRfc3339String(),
+            'datacontenttype' => 'application/json',
             'data' => $this->data,
-        ];
+        ], static fn(mixed $value): bool => null !== $value);
     }
 
     /**

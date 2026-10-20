@@ -68,17 +68,57 @@ it('signs a ping so that an api-toolbox receiver verifies it', function (): void
     expect($delivery->state)->toBe(DeliveryState::Succeeded);
     expect($delivery->attempts()->sole()->response_status)->toBe(200);
 
-    Http::assertSent(function (ClientRequest $request) use ($subscription, $delivery): bool {
-        $payload = $request->data();
-
-        return str_contains($request->header('Signature-Input')[0] ?? '', 'keyid="' . $subscription->id . '"')
+    Http::assertSent(fn(ClientRequest $request): bool => str_contains($request->header('Signature-Input')[0] ?? '', 'keyid="' . $subscription->id . '"')
             && $request->hasHeader('Content-Digest')
             && $request->header('Idempotency-Key')[0] === '"' . $delivery->event->id . '"'
-            && $payload['id'] === $delivery->event->id
-            && 'webhook.ping' === $payload['type']
-            && 'v1' === $payload['api_version']
-            && $payload['data'] === ['subscription_id' => $subscription->id];
+            && $request->header('WebHook-Request-Origin')[0] === config('webhooks.origin'));
+});
+
+it('delivers a CloudEvent in structured content mode', function (): void {
+    config()->set(['webhooks.source' => 'https://api.example.test/v1', 'webhooks.origin' => 'api.example.test']);
+    $user = User::factory()->create();
+    WebhookSubscription::factory()->for($user)->create();
+    Http::fake(['*' => Http::response('', 204)]);
+    $this->freezeSecond();
+
+    [$delivery] = app(Webhooks::class)->dispatch($user, new ProjectCreated('01jbproject'));
+
+    Http::assertSent(fn(ClientRequest $request): bool => 'application/cloudevents+json; charset=utf-8' === $request->header('Content-Type')[0]
+            && json_decode($request->body(), true) === [
+                'specversion' => '1.0',
+                'id' => $delivery->webhook_event_id,
+                'source' => 'https://api.example.test/v1',
+                'type' => 'project.created',
+                'subject' => '01jbproject',
+                'time' => now()->toRfc3339String(),
+                'datacontenttype' => 'application/json',
+                'data' => ['project_id' => '01jbproject'],
+            ]);
+});
+
+it('leaves out the subject of an event that has none', function (): void {
+    $user = User::factory()->create();
+    WebhookSubscription::factory()->for($user)->create();
+    Http::fake(['*' => Http::response('', 204)]);
+
+    app(Webhooks::class)->dispatch($user, new class implements WebhookEvent {
+        public function type(): string
+        {
+            return 'project.created';
+        }
+
+        public function subject(): ?string
+        {
+            return null;
+        }
+
+        public function data(): array
+        {
+            return [];
+        }
     });
+
+    Http::assertSent(fn(ClientRequest $request): bool => ! array_key_exists('subject', (array) json_decode($request->body(), true)));
 });
 
 it('retries on the published schedule and then fails, recording every attempt', function (): void {
@@ -114,6 +154,48 @@ it('marks a delivery retrying, and queues the next attempt for when it says', fu
     expect($delivery->next_attempt_at?->equalTo(now()->addSeconds(10)))->toBeTrue();
     Queue::assertPushed(DeliverWebhook::class, fn(DeliverWebhook $job): bool => $job->deliveryId === $delivery->id && 10 === $job->delay);
 });
+
+it('stops and disables the subscription when the endpoint answers 410 Gone', function (): void {
+    $user = User::factory()->create();
+    $subscription = WebhookSubscription::factory()->for($user)->create();
+    Http::fake(['*' => Http::response('', 410)]);
+
+    [$delivery] = app(Webhooks::class)->dispatch($user, new ProjectCreated('1'));
+
+    expect($delivery->refresh()->state)->toBe(DeliveryState::Failed);
+    expect($delivery->attempts()->count())->toBe(1);
+    expect($subscription->refresh()->isEnabled())->toBeFalse();
+    expect($subscription->disabled_reason)->toBe(__('api.webhooks.disabled_gone'));
+});
+
+it('does not retry a delivery the endpoint answered 415, as the format will not change', function (): void {
+    $user = User::factory()->create();
+    WebhookSubscription::factory()->for($user)->create();
+    Http::fake(['*' => Http::response('', 415)]);
+
+    [$delivery] = app(Webhooks::class)->dispatch($user, new ProjectCreated('1'));
+
+    expect($delivery->refresh()->state)->toBe(DeliveryState::Failed);
+    expect($delivery->attempts()->count())->toBe(1);
+});
+
+it('waits as long as a 429 Retry-After says, when that is longer than the schedule', function (string $retryAfter, int $expected): void {
+    $user = User::factory()->create();
+    WebhookSubscription::factory()->for($user)->create();
+    Queue::fake();
+    $this->freezeSecond();
+    Http::fake(['*' => Http::response('slow down', 429, ['Retry-After' => $retryAfter])]);
+
+    [$delivery] = app(Webhooks::class)->dispatch($user, new ProjectCreated('1'));
+    (new DeliverWebhook($delivery->id))->handle(app(WebhookTargets::class));
+
+    expect($delivery->refresh()->next_attempt_at?->equalTo(now()->addSeconds($expected)))->toBeTrue();
+    Queue::assertPushed(DeliverWebhook::class, fn(DeliverWebhook $job): bool => $expected === $job->delay);
+})->with([
+    'seconds, longer than the schedule' => ['120', 120],
+    'seconds, shorter than the schedule' => ['3', 10],
+    'an HTTP date' => [fn(): string => now()->addMinutes(5)->toRfc7231String(), 300],
+]);
 
 it('records a missing response as a null status, not a zero', function (): void {
     $user = User::factory()->create();
@@ -254,6 +336,11 @@ final readonly class ProjectCreated implements WebhookEvent
     public function type(): string
     {
         return 'project.created';
+    }
+
+    public function subject(): string
+    {
+        return $this->projectId;
     }
 
     public function data(): array

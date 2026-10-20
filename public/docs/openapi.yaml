@@ -38,10 +38,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cfz0vq7h5x00rd9hr7mk8h
+                    id: 01m5cgghhj8n1xr73hnz44dxrg
                     name: 'Justina Gaylord'
                     email: lafayette.considine@example.com
-                    email_verified_at: '2026-10-20T11:08:22+00:00'
+                    email_verified_at: '2026-10-20T11:17:56+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -54,7 +54,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cfz0vq7h5x00rd9hr7mk8h
+                        example: 01m5cgghhj8n1xr73hnz44dxrg
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -63,7 +63,7 @@ paths:
                         example: lafayette.considine@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:08:22+00:00'
+                        example: '2026-10-20T11:17:56+00:00'
                       created_at:
                         type: string
                         example: null
@@ -166,10 +166,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cfz0w2qh152qzhy96hxf37
+                    id: 01m5cgghhw5eq6wyq8a4sqys83
                     name: 'Justina Gaylord'
                     email: cormier.nick@example.com
-                    email_verified_at: '2026-10-20T11:08:22+00:00'
+                    email_verified_at: '2026-10-20T11:17:56+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -182,7 +182,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cfz0w2qh152qzhy96hxf37
+                        example: 01m5cgghhw5eq6wyq8a4sqys83
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -191,7 +191,7 @@ paths:
                         example: cormier.nick@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:08:22+00:00'
+                        example: '2026-10-20T11:17:56+00:00'
                       created_at:
                         type: string
                         example: null
@@ -615,10 +615,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cfz0wpadw1nnc7k1n2a5p5
+                    id: 01m5cgghjhw6dj7qr57wfaab2k
                     name: 'Morgan Hirthe'
                     email: dare.emelie@example.com
-                    email_verified_at: '2026-10-20T11:08:22+00:00'
+                    email_verified_at: '2026-10-20T11:17:56+00:00'
                     created_at: null
                     updated_at: null
                 properties:
@@ -627,7 +627,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cfz0wpadw1nnc7k1n2a5p5
+                        example: 01m5cgghjhw6dj7qr57wfaab2k
                       name:
                         type: string
                         example: 'Morgan Hirthe'
@@ -636,7 +636,7 @@ paths:
                         example: dare.emelie@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:08:22+00:00'
+                        example: '2026-10-20T11:17:56+00:00'
                       created_at:
                         type: string
                         example: null
@@ -2084,6 +2084,155 @@ paths:
         required: true
         schema:
           type: string
+  '/v1/webhooks/{webhook}/validate':
+    post:
+      summary: 'Validate Webhook Endpoint'
+      operationId: validateWebhookEndpoint
+      description: 'Ask the endpoint again for consent to deliveries, using the CloudEvents webhook handshake: an OPTIONS request carrying WebHook-Request-Origin, which the endpoint grants by answering with WebHook-Allowed-Origin. Use it after setting up the receiver when this API requires validated endpoints; until then the subscription receives nothing. Returns 202 with the subscription, whose validated_at is set once consent arrives.'
+      parameters: []
+      responses:
+        202:
+          description: 'Validation queued.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url: 'https://hooks.example.com/kit'
+                    description: 'Production receiver'
+                    events:
+                      - '*'
+                    enabled: true
+                    validated_at: null
+                    disabled_at: null
+                    disabled_reason: null
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                      url:
+                        type: string
+                        example: 'https://hooks.example.com/kit'
+                      description:
+                        type: string
+                        example: 'Production receiver'
+                      events:
+                        type: array
+                        example:
+                          - '*'
+                        items:
+                          type: string
+                      enabled:
+                        type: boolean
+                        example: true
+                      validated_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      disabled_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      disabled_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    parameters:
+      -
+        in: path
+        name: webhook
+        description: 'The webhook subscription ID.'
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        required: true
+        schema:
+          type: string
   '/v1/webhooks/{webhook}/ping':
     post:
       summary: 'Ping Webhook'
@@ -2243,6 +2392,30 @@ paths:
                   detail:
                     type: string
                     example: 'The resource was not found.'
+        409:
+          description: 'The subscription is disabled, or its endpoint has not been validated.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-conflict'
+                  title: 'Resource Conflict'
+                  status: 409
+                  detail: 'The webhook endpoint has not consented to deliveries yet.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-conflict'
+                  title:
+                    type: string
+                    example: 'Resource Conflict'
+                  status:
+                    type: integer
+                    example: 409
+                  detail:
+                    type: string
+                    example: 'The webhook endpoint has not consented to deliveries yet.'
       tags:
         - Webhooks
     parameters:
