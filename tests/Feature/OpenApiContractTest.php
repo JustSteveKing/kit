@@ -117,6 +117,18 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
         return;
     }
 
+    if (isset($resolvedSchema['allOf']) && is_array($resolvedSchema['allOf'])) {
+        foreach ($resolvedSchema['allOf'] as $part) {
+            if (is_array($part)) {
+                assertMatchesOpenApiSchema($spec, $part, $value, $path);
+            }
+        }
+    }
+
+    if (isset($resolvedSchema['enum']) && is_array($resolvedSchema['enum']) && null !== $value) {
+        test()->assertContains($value, $resolvedSchema['enum'], sprintf('Value at %s is not one of the enum.', $path));
+    }
+
     if (isset($resolvedSchema['oneOf']) && is_array($resolvedSchema['oneOf'])) {
         foreach ($resolvedSchema['oneOf'] as $candidate) {
             if ( ! is_array($candidate)) {
@@ -153,7 +165,8 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
         test()->fail(sprintf('Value at %s did not match any anyOf schema.', $path));
     }
 
-    $type = $resolvedSchema['type'] ?? null;
+    // A schema with properties but no type, as an allOf part often is, describes an object.
+    $type = $resolvedSchema['type'] ?? (isset($resolvedSchema['properties']) || isset($resolvedSchema['required']) ? 'object' : null);
     if ( ! is_string($type)) {
         return;
     }
