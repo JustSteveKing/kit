@@ -1,7 +1,6 @@
 {
     "agents": [
-        "claude_code",
-        "gemini"
+        "claude_code"
     ],
     "cloud": false,
     "guidelines": true,
