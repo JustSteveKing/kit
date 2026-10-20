@@ -22,14 +22,13 @@ it('registers a user and returns a bearer token', function (): void {
 
     $response
         ->assertCreated()
-        ->assertHeader('Content-Type', 'application/vnd.api+json')
+        ->assertHeader('Content-Type', 'application/json')
         ->assertJsonStructure([
             'meta' => ['token', 'token_type', 'expires_at'],
-            'data' => ['id', 'type', 'attributes' => ['name', 'email']],
+            'data' => ['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at'],
         ])
         ->assertJsonPath('meta.token_type', 'Bearer')
-        ->assertJsonPath('data.type', 'users')
-        ->assertJsonPath('data.attributes.email', 'jane@example.com');
+        ->assertJsonPath('data.email', 'jane@example.com');
 
     $user = User::query()->where('email', 'jane@example.com')->first();
 
@@ -52,10 +51,9 @@ it('logs in and returns a bearer token', function (): void {
 
     $response
         ->assertOk()
-        ->assertHeader('Content-Type', 'application/vnd.api+json')
+        ->assertHeader('Content-Type', 'application/json')
         ->assertJsonPath('meta.token_type', 'Bearer')
-        ->assertJsonPath('data.type', 'users')
-        ->assertJsonPath('data.attributes.email', 'john@example.com');
+        ->assertJsonPath('data.email', 'john@example.com');
 
     expect(PersonalAccessToken::query()->count())->toBe(1);
 });
@@ -104,9 +102,23 @@ it('returns the authenticated user for me endpoint', function (): void {
     $this->withToken($token)
         ->getJson('/v1/auth/me')
         ->assertOk()
-        ->assertHeader('Content-Type', 'application/vnd.api+json')
-        ->assertJsonPath('data.type', 'users')
-        ->assertJsonPath('data.attributes.email', 'me@example.com');
+        ->assertHeader('Content-Type', 'application/json')
+        ->assertJsonPath('data.email', 'me@example.com');
+});
+
+it('answers a repeat me request with 304 when the etag still matches', function (): void {
+    $user = User::factory()->create();
+    $token = $user->createToken('test-suite')->plainTextToken;
+
+    $first = $this->withToken($token)
+        ->getJson('/v1/auth/me')
+        ->assertOk()
+        ->assertETag();
+
+    $this->withToken($token)
+        ->withHeaders(['If-None-Match' => (string) $first->headers->get('ETag')])
+        ->getJson('/v1/auth/me')
+        ->assertNotModified();
 });
 
 it('revokes current token on logout', function (): void {

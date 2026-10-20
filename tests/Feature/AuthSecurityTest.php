@@ -155,8 +155,8 @@ it('forbids me endpoint when token lacks required ability', function (): void {
 
     $this->withToken($token)
         ->getJson('/v1/auth/me')
-        ->assertForbidden()
-        ->assertJsonPath('message', __('api.errors.forbidden'));
+        ->assertProblem(403)
+        ->assertJsonPath('detail', __('api.errors.forbidden'));
 });
 
 it('forbids logout when token lacks required ability', function (): void {
@@ -165,8 +165,8 @@ it('forbids logout when token lacks required ability', function (): void {
 
     $this->withToken($token)
         ->postJson('/v1/auth/logout')
-        ->assertForbidden()
-        ->assertJsonPath('message', __('api.errors.forbidden'));
+        ->assertProblem(403)
+        ->assertJsonPath('detail', __('api.errors.forbidden'));
 });
 
 it('forbids resend verification when token lacks required ability', function (): void {
@@ -175,8 +175,8 @@ it('forbids resend verification when token lacks required ability', function ():
 
     $this->withToken($token)
         ->postJson('/v1/auth/email/verification-notification')
-        ->assertForbidden()
-        ->assertJsonPath('message', __('api.errors.forbidden'));
+        ->assertProblem(403)
+        ->assertJsonPath('detail', __('api.errors.forbidden'));
 });
 
 it('throttles repeated failed login attempts', function (): void {

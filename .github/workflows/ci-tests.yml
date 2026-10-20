@@ -23,13 +23,22 @@ jobs:
           extensions: mbstring, dom, curl, sqlite3, pdo_sqlite
           coverage: none
 
+      # Before install: Composer's post-autoload-dump boots the app, which without a .env runs as
+      # production and fails ProductionSecurityChecks.
+      - name: Prepare environment
+        run: cp .env.example .env
+
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Prepare app key
-        run: |
-          cp .env.example .env
-          php artisan key:generate
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Check code style
+        run: composer lint
+
+      - name: Run static analysis
+        run: composer stan
 
       - name: Run test suite
         run: php artisan test

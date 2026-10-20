@@ -6,6 +6,7 @@ namespace App\Http\Payloads\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 final readonly class ShowResetPasswordTokenPayload
 {
@@ -14,13 +15,13 @@ final readonly class ShowResetPasswordTokenPayload
         public ?string $email,
     ) {}
 
-    public static function fromReqest(Request $request): self
+    public static function fromRequest(Request $request): self
     {
         $data = self::validatedData($request);
 
         return new self(
-            token: (string) $data['token'],
-            email: isset($data['email']) ? (string) $data['email'] : null,
+            token: Arr::string($data, 'token'),
+            email: isset($data['email']) ? Arr::string($data, 'email') : null,
         );
     }
 
@@ -29,10 +30,9 @@ final readonly class ShowResetPasswordTokenPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

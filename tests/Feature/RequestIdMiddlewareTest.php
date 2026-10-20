@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
-it('adds a request id header when one is not provided', function (): void {
+it('assigns a uuidv7 request id when one is not provided', function (): void {
     $response = $this->getJson('/v1/auth/me')
-        ->assertUnauthorized();
+        ->assertUnauthorized()
+        ->assertRequestId();
 
-    $requestId = $response->headers->get('X-Request-Id');
+    $requestId = (string) $response->headers->get('X-Request-Id');
 
-    expect($requestId)->not->toBeNull();
-    expect((string) $requestId)->toMatch('/^[A-Za-z0-9._-]{8,128}$/');
+    expect(Str::isUuid($requestId))->toBeTrue();
+    expect($requestId[14])->toBe('7');
 });
 
 it('uses the incoming request id header when valid', function (): void {
@@ -24,31 +26,34 @@ it('uses the incoming request id header when valid', function (): void {
         'X-Request-Id' => $provided,
     ])->getJson('/v1/auth/me')
         ->assertUnauthorized()
-        ->assertHeader('X-Request-Id', $provided);
+        ->assertRequestId($provided);
 });
 
-it('replaces invalid incoming request id values', function (): void {
-    $provided = '***invalid***';
+it('replaces incoming request ids that are too long', function (): void {
+    $provided = str_repeat('a', 201);
 
     $response = $this->withHeaders([
         'X-Request-Id' => $provided,
     ])->getJson('/v1/auth/me')
-        ->assertUnauthorized();
+        ->assertUnauthorized()
+        ->assertRequestId();
 
-    $actual = $response->headers->get('X-Request-Id');
+    expect(Str::isUuid((string) $response->headers->get('X-Request-Id')))->toBeTrue();
+});
 
-    expect($actual)->not->toBeNull();
-    expect((string) $actual)->not->toBe($provided);
-    expect((string) $actual)->toMatch('/^[A-Za-z0-9._-]{8,128}$/');
+it('identifies problems by request id', function (): void {
+    $response = $this->getJson('/v1/auth/me')
+        ->assertProblem(401);
+
+    expect($response->json('instance'))->toBe('urn:uuid:' . $response->headers->get('X-Request-Id'));
 });
 
 it('includes request id header on successful authenticated responses', function (): void {
     $user = User::factory()->create();
     $token = $user->createToken('request-id-success')->plainTextToken;
 
-    $response = $this->withToken($token)
+    $this->withToken($token)
         ->getJson('/v1/auth/me')
-        ->assertOk();
-
-    expect($response->headers->get('X-Request-Id'))->not->toBeNull();
+        ->assertOk()
+        ->assertRequestId();
 });

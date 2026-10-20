@@ -31,17 +31,20 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 #[Response(content: ['message' => 'Your password has been reset.'], status: 200, description: 'Password reset succeeded.')]
 #[Response(
     content: [
-        'message' => 'The given data was invalid.',
+        'type' => 'https://apiguide.dev/errors/validation-failed',
+        'title' => 'Validation Failed',
+        'status' => 422,
+        'detail' => 'This password reset token is invalid.',
         'errors' => ['email' => ['This password reset token is invalid.']],
     ],
     status: 422,
-    description: 'Reset token or payload was invalid.'
+    description: 'Reset token or payload was invalid.',
 )]
 final class ResetPasswordController
 {
     public function __invoke(ResetPasswordRequest $request): JsonResponse
     {
-        $payload = ResetPasswordPayload::fromReqest($request);
+        $payload = ResetPasswordPayload::fromRequest($request);
         $resetUserId = null;
 
         $status = Password::broker()->reset(
@@ -57,13 +60,15 @@ final class ResetPasswordController
                     'remember_token' => Str::random(60),
                 ])->save();
 
-                $resetUserId = (string) $user->getKey();
+                $resetUserId = $user->id;
 
                 event(new PasswordReset($user));
-            }
+            },
         );
 
-        if ($status !== Password::PASSWORD_RESET) {
+        if (Password::PASSWORD_RESET !== $status) {
+            $status = is_string($status) ? $status : 'unknown';
+
             SecurityAudit::log('auth.password_reset.failed', [
                 'email_hash' => SecurityAudit::hashEmail($payload->email),
                 'status' => $status,

@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 servers:
   -
-    url: 'http://kit.test'
+    url: 'http://localhost'
 tags:
   -
     name: Authentication
@@ -35,14 +35,12 @@ paths:
                 type: object
                 example:
                   data:
-                    id: ''
-                    type: users
-                    attributes:
-                      name: 'Justina Gaylord'
-                      email: lafayette.considine@example.com
-                      email_verified_at: '2026-02-23T19:05:13+00:00'
-                      created_at: null
-                      updated_at: null
+                    id: 01m5cb6hssde51qe3kn813thmv
+                    name: 'Justina Gaylord'
+                    email: lafayette.considine@example.com
+                    email_verified_at: '2026-10-20T09:45:06+00:00'
+                    created_at: null
+                    updated_at: null
                   meta:
                     token: 1|example-token
                     token_type: Bearer
@@ -53,30 +51,24 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: ''
-                      type:
+                        example: 01m5cb6hssde51qe3kn813thmv
+                      name:
                         type: string
-                        example: users
-                      attributes:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            example: 'Justina Gaylord'
-                          email:
-                            type: string
-                            example: lafayette.considine@example.com
-                          email_verified_at:
-                            type: string
-                            example: '2026-02-23T19:05:13+00:00'
-                          created_at:
-                            type: string
-                            example: null
-                            nullable: true
-                          updated_at:
-                            type: string
-                            example: null
-                            nullable: true
+                        example: 'Justina Gaylord'
+                      email:
+                        type: string
+                        example: lafayette.considine@example.com
+                      email_verified_at:
+                        type: string
+                        example: '2026-10-20T09:45:06+00:00'
+                      created_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      updated_at:
+                        type: string
+                        example: null
+                        nullable: true
                   meta:
                     type: object
                     properties:
@@ -93,18 +85,30 @@ paths:
         422:
           description: 'Validation failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: 'The given data was invalid.'
+                  type: 'https://apiguide.dev/errors/validation-failed'
+                  title: 'Validation Failed'
+                  status: 422
+                  detail: 'The email has already been taken.'
                   errors:
                     email:
                       - 'The email has already been taken.'
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'The given data was invalid.'
+                    example: 'https://apiguide.dev/errors/validation-failed'
+                  title:
+                    type: string
+                    example: 'Validation Failed'
+                  status:
+                    type: integer
+                    example: 422
+                  detail:
+                    type: string
+                    example: 'The email has already been taken.'
                   errors:
                     type: object
                     properties:
@@ -159,14 +163,12 @@ paths:
                 type: object
                 example:
                   data:
-                    id: ''
-                    type: users
-                    attributes:
-                      name: 'Justina Gaylord'
-                      email: cormier.nick@example.com
-                      email_verified_at: '2026-02-23T19:05:13+00:00'
-                      created_at: null
-                      updated_at: null
+                    id: 01m5cb6ht2em5q96y8t1rffqv6
+                    name: 'Justina Gaylord'
+                    email: cormier.nick@example.com
+                    email_verified_at: '2026-10-20T09:45:06+00:00'
+                    created_at: null
+                    updated_at: null
                   meta:
                     token: 1|example-token
                     token_type: Bearer
@@ -177,30 +179,24 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: ''
-                      type:
+                        example: 01m5cb6ht2em5q96y8t1rffqv6
+                      name:
                         type: string
-                        example: users
-                      attributes:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            example: 'Justina Gaylord'
-                          email:
-                            type: string
-                            example: cormier.nick@example.com
-                          email_verified_at:
-                            type: string
-                            example: '2026-02-23T19:05:13+00:00'
-                          created_at:
-                            type: string
-                            example: null
-                            nullable: true
-                          updated_at:
-                            type: string
-                            example: null
-                            nullable: true
+                        example: 'Justina Gaylord'
+                      email:
+                        type: string
+                        example: cormier.nick@example.com
+                      email_verified_at:
+                        type: string
+                        example: '2026-10-20T09:45:06+00:00'
+                      created_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      updated_at:
+                        type: string
+                        example: null
+                        nullable: true
                   meta:
                     type: object
                     properties:
@@ -217,18 +213,30 @@ paths:
         422:
           description: 'Credentials were invalid.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: 'The given data was invalid.'
+                  type: 'https://apiguide.dev/errors/validation-failed'
+                  title: 'Validation Failed'
+                  status: 422
+                  detail: 'The provided credentials are incorrect.'
                   errors:
                     email:
                       - 'The provided credentials are incorrect.'
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'The given data was invalid.'
+                    example: 'https://apiguide.dev/errors/validation-failed'
+                  title:
+                    type: string
+                    example: 'Validation Failed'
+                  status:
+                    type: integer
+                    example: 422
+                  detail:
+                    type: string
+                    example: 'The provided credentials are incorrect.'
                   errors:
                     type: object
                     properties:
@@ -321,18 +329,30 @@ paths:
         422:
           description: 'Reset token or payload was invalid.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: 'The given data was invalid.'
+                  type: 'https://apiguide.dev/errors/validation-failed'
+                  title: 'Validation Failed'
+                  status: 422
+                  detail: 'This password reset token is invalid.'
                   errors:
                     email:
                       - 'This password reset token is invalid.'
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'The given data was invalid.'
+                    example: 'https://apiguide.dev/errors/validation-failed'
+                  title:
+                    type: string
+                    example: 'Validation Failed'
+                  status:
+                    type: integer
+                    example: 422
+                  detail:
+                    type: string
+                    example: 'This password reset token is invalid.'
                   errors:
                     type: object
                     properties:
@@ -458,13 +478,25 @@ paths:
         403:
           description: 'Signed URL was invalid, expired, or mismatched.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: 'Invalid verification link.'
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: 'Invalid verification link.'
                 properties:
-                  message:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
                     type: string
                     example: 'Invalid verification link.'
       tags:
@@ -478,7 +510,7 @@ paths:
               properties:
                 id:
                   type: string
-                  description: 'The <code>id</code> of an existing record in the users table.'
+                  description: 'Must match an existing stored value.'
                   example: architecto
                 hash:
                   type: string
@@ -520,54 +552,58 @@ paths:
                 type: object
                 example:
                   data:
-                    id: ''
-                    type: users
-                    attributes:
-                      name: 'Morgan Hirthe'
-                      email: dare.emelie@example.com
-                      email_verified_at: '2026-02-23T19:05:13+00:00'
-                      created_at: null
-                      updated_at: null
+                    id: 01m5cb6htrjmdsahn6h774frrz
+                    name: 'Morgan Hirthe'
+                    email: dare.emelie@example.com
+                    email_verified_at: '2026-10-20T09:45:06+00:00'
+                    created_at: null
+                    updated_at: null
                 properties:
                   data:
                     type: object
                     properties:
                       id:
                         type: string
-                        example: ''
-                      type:
+                        example: 01m5cb6htrjmdsahn6h774frrz
+                      name:
                         type: string
-                        example: users
-                      attributes:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            example: 'Morgan Hirthe'
-                          email:
-                            type: string
-                            example: dare.emelie@example.com
-                          email_verified_at:
-                            type: string
-                            example: '2026-02-23T19:05:13+00:00'
-                          created_at:
-                            type: string
-                            example: null
-                            nullable: true
-                          updated_at:
-                            type: string
-                            example: null
-                            nullable: true
+                        example: 'Morgan Hirthe'
+                      email:
+                        type: string
+                        example: dare.emelie@example.com
+                      email_verified_at:
+                        type: string
+                        example: '2026-10-20T09:45:06+00:00'
+                      created_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      updated_at:
+                        type: string
+                        example: null
+                        nullable: true
         401:
           description: 'Authentication failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
                 properties:
-                  message:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
                     type: string
                     example: Unauthenticated.
       tags:
@@ -589,7 +625,7 @@ paths:
         401:
           description: 'Authentication failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
@@ -605,106 +641,114 @@ paths:
       summary: 'List Tokens'
       operationId: listTokens
       description: 'List personal access tokens for the authenticated user.'
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: cursor
+          description: 'Opaque cursor from a Link header. Omit it for the first page.'
+          example: architecto
+          required: false
+          schema:
+            type: string
+            description: 'Opaque cursor from a Link header. Omit it for the first page.'
+            example: architecto
       responses:
         200:
-          description: 'Token list payload.'
+          description: 'One page of tokens, newest first. Navigation is in RFC 8288 Link headers: rel="next" and rel="prev" when there is a page that way, and rel="first".'
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: '1'
+                    name:
+                      type: string
+                      example: ios-app
+                    abilities:
+                      type: array
+                      example:
+                        - 'auth:me'
+                        - 'auth:logout'
+                      items:
+                        type: string
+                    last_used_at:
+                      type: string
+                      example: null
+                      nullable: true
+                    expires_at:
+                      type: string
+                      example: '2026-02-24T12:00:00+00:00'
+                    created_at:
+                      type: string
+                      example: '2026-02-23T12:00:00+00:00'
+                    updated_at:
+                      type: string
+                      example: '2026-02-23T12:00:00+00:00'
+                    is_current:
+                      type: boolean
+                      example: true
                 example:
-                  data:
-                    -
-                      id: '1'
-                      type: personal-access-tokens
-                      attributes:
-                        name: ios-app
-                        abilities:
-                          - 'auth:me'
-                          - 'auth:logout'
-                        last_used_at: null
-                        expires_at: '2026-02-24T12:00:00+00:00'
-                        created_at: '2026-02-23T12:00:00+00:00'
-                        updated_at: '2026-02-23T12:00:00+00:00'
-                        is_current: true
-                properties:
-                  data:
-                    type: array
-                    example:
-                      -
-                        id: '1'
-                        type: personal-access-tokens
-                        attributes:
-                          name: ios-app
-                          abilities:
-                            - 'auth:me'
-                            - 'auth:logout'
-                          last_used_at: null
-                          expires_at: '2026-02-24T12:00:00+00:00'
-                          created_at: '2026-02-23T12:00:00+00:00'
-                          updated_at: '2026-02-23T12:00:00+00:00'
-                          is_current: true
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          example: '1'
-                        type:
-                          type: string
-                          example: personal-access-tokens
-                        attributes:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                              example: ios-app
-                            abilities:
-                              type: array
-                              example:
-                                - 'auth:me'
-                                - 'auth:logout'
-                              items:
-                                type: string
-                            last_used_at:
-                              type: string
-                              example: null
-                              nullable: true
-                            expires_at:
-                              type: string
-                              example: '2026-02-24T12:00:00+00:00'
-                            created_at:
-                              type: string
-                              example: '2026-02-23T12:00:00+00:00'
-                            updated_at:
-                              type: string
-                              example: '2026-02-23T12:00:00+00:00'
-                            is_current:
-                              type: boolean
-                              example: true
+                  -
+                    id: '1'
+                    name: ios-app
+                    abilities:
+                      - 'auth:me'
+                      - 'auth:logout'
+                    last_used_at: null
+                    expires_at: '2026-02-24T12:00:00+00:00'
+                    created_at: '2026-02-23T12:00:00+00:00'
+                    updated_at: '2026-02-23T12:00:00+00:00'
+                    is_current: true
         401:
           description: 'Authentication failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
                 properties:
-                  message:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
                     type: string
                     example: Unauthenticated.
         403:
           description: 'Token is missing required ability.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: Forbidden.
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
                 properties:
-                  message:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
                     type: string
                     example: Forbidden.
       tags:
@@ -725,7 +769,7 @@ paths:
         401:
           description: 'Authentication failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
@@ -737,7 +781,7 @@ paths:
         403:
           description: 'Token is missing required ability.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
@@ -765,7 +809,7 @@ paths:
         401:
           description: 'Authentication failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
@@ -777,7 +821,7 @@ paths:
         403:
           description: 'Token is missing required ability.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
@@ -789,7 +833,7 @@ paths:
         404:
           description: 'Token does not belong to current user or no longer exists.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
@@ -856,13 +900,25 @@ paths:
         401:
           description: 'Authentication failed.'
           content:
-            application/json:
+            application/problem+json:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
                 properties:
-                  message:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
                     type: string
                     example: Unauthenticated.
       tags:

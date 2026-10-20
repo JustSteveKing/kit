@@ -5,12 +5,12 @@
             "key": "baseUrl",
             "type": "string",
             "name": "string",
-            "value": "http:\/\/kit.test"
+            "value": "http:\/\/localhost"
         }
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "832787c5-41fd-49c5-a4fd-2328037fd698",
+        "_postman_id": "b4c68cd2-a1c9-4855-bafb-771176ff6d3e",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,13 +56,13 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-02-23T19:05:13+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cb6hssde51qe3kn813thmv\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T09:45:06+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
                                     "header": [],
                                     "code": 422,
-                                    "body": "{\"message\":\"The given data was invalid.\",\"errors\":{\"email\":[\"The email has already been taken.\"]}}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/validation-failed\",\"title\":\"Validation Failed\",\"status\":422,\"detail\":\"The email has already been taken.\",\"errors\":{\"email\":[\"The email has already been taken.\"]}}",
                                     "name": "Validation failed."
                                 }
                             ]
@@ -100,13 +100,13 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-02-23T19:05:13+00:00\",\"created_at\":null,\"updated_at\":null}},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cb6ht2em5q96y8t1rffqv6\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T09:45:06+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
                                     "header": [],
                                     "code": 422,
-                                    "body": "{\"message\":\"The given data was invalid.\",\"errors\":{\"email\":[\"The provided credentials are incorrect.\"]}}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/validation-failed\",\"title\":\"Validation Failed\",\"status\":422,\"detail\":\"The provided credentials are incorrect.\",\"errors\":{\"email\":[\"The provided credentials are incorrect.\"]}}",
                                     "name": "Credentials were invalid."
                                 }
                             ]
@@ -138,13 +138,13 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"\",\"type\":\"users\",\"attributes\":{\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-02-23T19:05:13+00:00\",\"created_at\":null,\"updated_at\":null}}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cb6htrjmdsahn6h774frrz\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T09:45:06+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
                                     "header": [],
                                     "code": 401,
-                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
                                     "name": "Authentication failed."
                                 }
                             ]
@@ -193,8 +193,15 @@
                                 "url": {
                                     "host": "{{baseUrl}}",
                                     "path": "v1\/auth\/tokens",
-                                    "query": [],
-                                    "raw": "{{baseUrl}}\/v1\/auth\/tokens"
+                                    "query": [
+                                        {
+                                            "key": "cursor",
+                                            "value": "architecto",
+                                            "description": "Opaque cursor from a Link header. Omit it for the first page.",
+                                            "disabled": false
+                                        }
+                                    ],
+                                    "raw": "{{baseUrl}}\/v1\/auth\/tokens?cursor=architecto"
                                 },
                                 "method": "GET",
                                 "header": [
@@ -214,19 +221,19 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":[{\"id\":\"1\",\"type\":\"personal-access-tokens\",\"attributes\":{\"name\":\"ios-app\",\"abilities\":[\"auth:me\",\"auth:logout\"],\"last_used_at\":null,\"expires_at\":\"2026-02-24T12:00:00+00:00\",\"created_at\":\"2026-02-23T12:00:00+00:00\",\"updated_at\":\"2026-02-23T12:00:00+00:00\",\"is_current\":true}}]}",
-                                    "name": "Token list payload."
+                                    "body": "[{\"id\":\"1\",\"name\":\"ios-app\",\"abilities\":[\"auth:me\",\"auth:logout\"],\"last_used_at\":null,\"expires_at\":\"2026-02-24T12:00:00+00:00\",\"created_at\":\"2026-02-23T12:00:00+00:00\",\"updated_at\":\"2026-02-23T12:00:00+00:00\",\"is_current\":true}]",
+                                    "name": "One page of tokens, newest first. Navigation is in RFC 8288 Link headers: rel=\"next\" and rel=\"prev\" when there is a page that way, and rel=\"first\"."
                                 },
                                 {
                                     "header": [],
                                     "code": 401,
-                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
                                     "name": "Authentication failed."
                                 },
                                 {
                                     "header": [],
                                     "code": 403,
-                                    "body": "{\"message\":\"Forbidden.\"}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
                                     "name": "Token is missing required ability."
                                 }
                             ]
@@ -287,7 +294,7 @@
                                         {
                                             "id": "token_id",
                                             "key": "token_id",
-                                            "value": "42",
+                                            "value": 42,
                                             "description": "Personal access token id."
                                         }
                                     ]
@@ -419,7 +426,7 @@
                                 {
                                     "header": [],
                                     "code": 422,
-                                    "body": "{\"message\":\"The given data was invalid.\",\"errors\":{\"email\":[\"This password reset token is invalid.\"]}}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/validation-failed\",\"title\":\"Validation Failed\",\"status\":422,\"detail\":\"This password reset token is invalid.\",\"errors\":{\"email\":[\"This password reset token is invalid.\"]}}",
                                     "name": "Reset token or payload was invalid."
                                 }
                             ]
@@ -433,7 +440,7 @@
                                     "query": [
                                         {
                                             "key": "email",
-                                            "value": "jane%40example.com",
+                                            "value": "jane@example.com",
                                             "description": "Account email from the reset link.",
                                             "disabled": false
                                         }
@@ -536,7 +543,7 @@
                                 {
                                     "header": [],
                                     "code": 403,
-                                    "body": "{\"message\":\"Invalid verification link.\"}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Invalid verification link.\"}",
                                     "name": "Signed URL was invalid, expired, or mismatched."
                                 }
                             ]
@@ -580,7 +587,7 @@
                                 {
                                     "header": [],
                                     "code": 401,
-                                    "body": "{\"message\":\"Unauthenticated.\"}",
+                                    "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
                                     "name": "Authentication failed."
                                 }
                             ]

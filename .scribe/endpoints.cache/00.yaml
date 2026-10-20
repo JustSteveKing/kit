@@ -80,13 +80,13 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5cb6hssde51qe3kn813thmv","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T09:45:06+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Registration succeeded.'
       -
         custom: []
         status: 422
-        content: '{"message":"The given data was invalid.","errors":{"email":["The email has already been taken."]}}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"The email has already been taken.","errors":{"email":["The email has already been taken."]}}'
         headers: []
         description: 'Validation failed.'
     responseFields: []
@@ -159,13 +159,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5cb6ht2em5q96y8t1rffqv6","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T09:45:06+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Login succeeded.'
       -
         custom: []
         status: 422
-        content: '{"message":"The given data was invalid.","errors":{"email":["The provided credentials are incorrect."]}}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"The provided credentials are incorrect.","errors":{"email":["The provided credentials are incorrect."]}}'
         headers: []
         description: 'Credentials were invalid.'
     responseFields: []
@@ -305,7 +305,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"The given data was invalid.","errors":{"email":["This password reset token is invalid."]}}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"This password reset token is invalid.","errors":{"email":["This password reset token is invalid."]}}'
         headers: []
         description: 'Reset token or payload was invalid.'
     responseFields: []
@@ -448,7 +448,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The <code>id</code> of an existing record in the users table.'
+        description: 'Must match an existing stored value.'
         required: true
         example: architecto
         type: string
@@ -481,7 +481,7 @@ endpoints:
       -
         custom: []
         status: 403
-        content: '{"message":"Invalid verification link."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Invalid verification link."}'
         headers: []
         description: 'Signed URL was invalid, expired, or mismatched.'
     responseFields: []
@@ -519,13 +519,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}}}'
+        content: '{"data":{"id":"01m5cb6htrjmdsahn6h774frrz","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T09:45:06+00:00","created_at":null,"updated_at":null}}'
         headers: []
         description: 'Authenticated user profile.'
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
     responseFields: []
@@ -604,8 +604,20 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      cursor:
+        custom: []
+        name: cursor
+        description: 'Opaque cursor from a Link header. Omit it for the first page.'
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      cursor: architecto
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -613,19 +625,19 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"1","type":"personal-access-tokens","attributes":{"name":"ios-app","abilities":["auth:me","auth:logout"],"last_used_at":null,"expires_at":"2026-02-24T12:00:00+00:00","created_at":"2026-02-23T12:00:00+00:00","updated_at":"2026-02-23T12:00:00+00:00","is_current":true}}]}'
+        content: '[{"id":"1","name":"ios-app","abilities":["auth:me","auth:logout"],"last_used_at":null,"expires_at":"2026-02-24T12:00:00+00:00","created_at":"2026-02-23T12:00:00+00:00","updated_at":"2026-02-23T12:00:00+00:00","is_current":true}]'
         headers: []
-        description: 'Token list payload.'
+        description: 'One page of tokens, newest first. Navigation is in RFC 8288 Link headers: rel="next" and rel="prev" when there is a page that way, and rel="first".'
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
       -
         custom: []
         status: 403
-        content: '{"message":"Forbidden."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
         headers: []
         description: 'Token is missing required ability.'
     responseFields: []
@@ -814,7 +826,7 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
     responseFields: []

@@ -2,19 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\AttachRequestId;
-use App\Http\Middleware\EnsureJsonApiRequest;
+use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\EnforceTransportSecurity;
-use App\Http\Middleware\IdempotencyKey;
+use App\Http\Middleware\RetireSunsetEndpoints;
 use App\Http\Middleware\SetRequestLocale;
-use App\Http\Middleware\Sunset;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Validation\ValidationException;
@@ -34,112 +32,96 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
-            'idempotency' => IdempotencyKey::class,
-            'sunset' => Sunset::class,
         ]);
 
+        // There is no login page to send a guest to; a 401 problem is the whole answer.
+        $middleware->redirectGuestsTo(static fn(): ?string => null);
+
         $trustedProxies = (string) env('TRUSTED_PROXIES', '*');
-        $middleware->trustProxies($trustedProxies !== '' ? $trustedProxies : null);
+        $middleware->trustProxies('' !== $trustedProxies ? $trustedProxies : null);
 
         $trustedHosts = array_values(array_filter(array_map(
-            static fn (string $host): string => trim($host),
+            static fn(string $host): string => mb_trim($host),
             explode(',', (string) env('TRUSTED_HOSTS', '')),
         )));
-        if ($trustedHosts !== []) {
+        if ([] !== $trustedHosts) {
             $middleware->trustHosts(at: $trustedHosts, subdomains: false);
         }
 
-        $middleware->prependToGroup('api', EnsureJsonApiRequest::class);
+        $middleware->prependToGroup('api', AddSecurityHeaders::class);
         $middleware->prependToGroup('api', EnforceTransportSecurity::class);
         $middleware->prependToGroup('api', SetRequestLocale::class);
-        $middleware->prependToGroup('api', AttachRequestId::class);
+        $middleware->appendToGroup('api', RetireSunsetEndpoints::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (AuthenticationException $exception, Request $request): ?JsonResponse {
-            if (! $request->expectsJson()) {
-                return null;
+        // api-toolbox renders every API error as RFC 9457 problem details. These maps only swap
+        // in a translated message, which becomes the problem's "detail"; the type is unchanged.
+        $exceptions->map(AuthenticationException::class, static fn(AuthenticationException $exception): AuthenticationException => new AuthenticationException(
+            __('api.errors.unauthenticated'),
+            $exception->guards(),
+        ));
+
+        $exceptions->map(AuthorizationException::class, static fn(AuthorizationException $exception): AccessDeniedHttpException => new AccessDeniedHttpException(
+            __('api.errors.forbidden'),
+            $exception,
+        ));
+
+        $exceptions->map(InvalidSignatureException::class, static fn(InvalidSignatureException $exception): AccessDeniedHttpException => new AccessDeniedHttpException(
+            __('api.auth.invalid_verification_link'),
+            $exception,
+        ));
+
+        $exceptions->map(ThrottleRequestsException::class, static fn(ThrottleRequestsException $exception): ThrottleRequestsException => new ThrottleRequestsException(
+            __('api.errors.too_many_requests'),
+            $exception,
+            $exception->getHeaders(),
+        ));
+
+        // Audit callbacks run before api-toolbox's renderer and return null, so the problem
+        // response is still the package's.
+        $exceptions->render(function (AuthenticationException $exception, Request $request): null {
+            if ($request->expectsJson()) {
+                SecurityAudit::log('auth.unauthenticated', [
+                    'guard' => 'sanctum',
+                ]);
             }
 
-            SecurityAudit::log('auth.unauthenticated', [
-                'guard' => 'sanctum',
-            ]);
-
-            return new JsonResponse([
-                'message' => __('api.errors.unauthenticated'),
-            ], 401);
+            return null;
         });
 
-        $exceptions->render(function (AuthorizationException $exception, Request $request): ?JsonResponse {
-            if (! $request->expectsJson()) {
+        $exceptions->render(function (AccessDeniedHttpException $exception, Request $request): null {
+            if ( ! $request->expectsJson()) {
                 return null;
             }
 
-            SecurityAudit::log('auth.forbidden', [
-                'exception' => $exception::class,
-            ]);
+            $cause = $exception->getPrevious() ?? $exception;
 
-            return new JsonResponse([
-                'message' => __('api.errors.forbidden'),
-            ], 403);
+            if ($cause instanceof InvalidSignatureException) {
+                SecurityAudit::log('auth.email_verification.invalid_signature');
+            } else {
+                SecurityAudit::log('auth.forbidden', [
+                    'exception' => $cause::class,
+                ]);
+            }
+
+            return null;
         });
 
-        $exceptions->render(function (AccessDeniedHttpException $exception, Request $request): ?JsonResponse {
-            if (! $request->expectsJson()) {
-                return null;
+        $exceptions->render(function (TooManyRequestsHttpException $exception, Request $request): null {
+            if ($request->expectsJson()) {
+                SecurityAudit::log('api.rate_limited');
             }
 
-            SecurityAudit::log('auth.forbidden', [
-                'exception' => $exception::class,
-            ]);
-
-            return new JsonResponse([
-                'message' => __('api.errors.forbidden'),
-            ], 403);
+            return null;
         });
 
-        $exceptions->render(function (TooManyRequestsHttpException $exception, Request $request): ?JsonResponse {
-            if (! $request->expectsJson()) {
-                return null;
+        $exceptions->render(function (ValidationException $exception, Request $request): null {
+            if ($request->expectsJson()) {
+                SecurityAudit::log('api.validation_failed', [
+                    'errors' => array_keys($exception->errors()),
+                ]);
             }
 
-            SecurityAudit::log('api.rate_limited');
-
-            $response = new JsonResponse([
-                'message' => __('api.errors.too_many_requests'),
-            ], 429);
-
-            $retryAfter = $exception->getHeaders()['Retry-After'] ?? null;
-            if ($retryAfter !== null) {
-                $response->headers->set('Retry-After', (string) $retryAfter);
-            }
-
-            return $response;
-        });
-
-        $exceptions->render(function (ValidationException $exception, Request $request): ?JsonResponse {
-            if (! $request->expectsJson()) {
-                return null;
-            }
-
-            SecurityAudit::log('api.validation_failed', [
-                'errors' => array_keys($exception->errors()),
-            ]);
-
-            return new JsonResponse([
-                'message' => __('api.errors.validation_failed'),
-                'errors' => $exception->errors(),
-            ], $exception->status);
-        });
-
-        $exceptions->render(function (InvalidSignatureException $exception, Request $request): ?JsonResponse {
-            if (! $request->expectsJson()) {
-                return null;
-            }
-
-            SecurityAudit::log('auth.email_verification.invalid_signature');
-
-            return new JsonResponse([
-                'message' => __('api.auth.invalid_verification_link'),
-            ], 403);
+            return null;
         });
     })->create();

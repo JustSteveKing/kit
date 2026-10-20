@@ -18,6 +18,7 @@ final class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => mb_strtolower((string) Str::ulid()),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
