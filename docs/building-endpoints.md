@@ -241,11 +241,16 @@ api-toolbox adds assertions such as `assertProblem()`, `assertProblemType()`,
 ## Taking a type other than JSON
 
 `consumes:application/json` sits on the whole `v1` group, so every write route accepts JSON and
-nothing else. An upload route has to lift the group's declaration as well as add its own, or the
-group refuses the request before the route ever sees it:
+nothing else unless it says otherwise. A route that declares its own `consumes:` replaces the
+group's:
 
 ```php
 Route::post('/imports', CreateImportController::class)
-    ->withoutMiddleware('consumes:application/json')
     ->middleware('consumes:multipart/form-data');
 ```
+
+List every type the route takes, JSON included if it still takes JSON:
+`consumes:application/json,multipart/form-data`.
+
+A merge patch `PATCH` is the other common case. [HTTP standards](http-standards.md#partial-updates)
+shows the route.

@@ -25,6 +25,7 @@ different for local development, the table says so.
 | `API_KEY_DEFAULT_DAYS` | `90` | Days an API key lasts when it is created without `expires_at` |
 | `API_KEY_MAX_DAYS` | `365` | The furthest away an API key's `expires_at` can be |
 | `IDEMPOTENCY_TTL` | `86400` | Seconds an idempotent response is kept for replay |
+| `APP_PREVIOUS_KEYS` | none | Laravel's own. Keep a rotated `APP_KEY` here for at least `IDEMPOTENCY_TTL`, or stored idempotent responses cannot be decrypted |
 
 ## Security
 

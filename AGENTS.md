@@ -127,22 +127,22 @@ api-toolbox is configured in `config/api-toolbox.php`. Before hand-rolling any o
 | A retry must not repeat a write | `idempotent` middleware, `idempotent:required` to insist on the key |
 | A list endpoint | `CursorPage::of($query->cursorPaginate($perPage), Resource::class)`, never offset pages |
 | Cheap re-fetches of a resource | `conditional` middleware (ETag, `304`) |
-| Stop lost updates | the model implements `HasValidators`, the write route adds `preconditions.required` |
-| A `PATCH` | `merge-patch` middleware and `application/merge-patch+json` |
+| Stop lost updates | the model implements `HasValidators` and is bound to the route, which adds `conditional` and `preconditions.required`: the first gives the `412`, the second only the `428` |
+| A `PATCH` | `merge-patch` and `consumes:application/merge-patch+json`, which replaces the group's `consumes:` |
 | Retire an endpoint | `#[Deprecation]` and `#[Sunset]` on the controller class; Kit answers `410` after the sunset date |
 | Work that outlives the request | Async operations; switched off in the config, and turning it on adds a route to document |
 | Signed webhooks | Message signatures; keys go in the config, never in code |
 
 Deprecation attributes are read from controller classes only, not closures. Write routes accept
 `application/json` only, because `consumes:application/json` sits on the whole `v1` group. A route
-that takes another type, such as an upload, has to lift the group's declaration as well as add its
-own, or the group refuses the request first:
+that takes another type, such as an upload, declares its own, which replaces the group's:
 
 ```php
 Route::post('/imports', CreateImportController::class)
-    ->withoutMiddleware('consumes:application/json')
     ->middleware('consumes:multipart/form-data');
 ```
+
+There is no need to lift the group's declaration with `withoutMiddleware()` first.
 
 The `api-toolbox-development` Boost skill has the detail for each of these.
 

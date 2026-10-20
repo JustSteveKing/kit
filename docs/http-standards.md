@@ -14,7 +14,7 @@ including its middleware alias, its routes and its test assertions.
 | Safe retries | Idempotency-Key draft | `idempotent` middleware |
 | Lists | RFC 8288 | `CursorPage` with `Link` headers |
 | Cheap re-fetches | RFC 9110 | `conditional` middleware, `ETag` and `304` |
-| Lost updates | RFC 9110 | `HasValidators` and `preconditions.required` |
+| Lost updates | RFC 9110 | `HasValidators`, `conditional` and `preconditions.required` |
 | Partial updates | RFC 7396 | `merge-patch` middleware |
 | Retiring endpoints | RFC 9745, RFC 8594 | `#[Deprecation]` and `#[Sunset]` |
 | Tracing | W3C Trace Context | On every request |
@@ -43,7 +43,14 @@ curl -X POST http://127.0.0.1:8000/v1/auth/register \
 | Malformed key | `400` |
 
 Keys belong to the user, or to the client's address before sign-in, and last for
-`IDEMPOTENCY_TTL` seconds, a day by default. Register, forgot password, creating an API key and
+`IDEMPOTENCY_TTL` seconds, a day by default.
+
+A replay returns the original response, secrets included: retrying the request that created an API
+key gives back the same key, which is the point when the first response was lost. So each stored
+response is encrypted with a key derived from `APP_KEY` and the client's `Idempotency-Key`, and
+nothing in the cache can be read without the key the client sent. When you rotate `APP_KEY`, keep
+the old one in `APP_PREVIOUS_KEYS` for at least `IDEMPOTENCY_TTL`, or stored responses are forgotten
+and retries run again. Register, forgot password, creating an API key and
 creating a webhook subscription all honour them, and `make:endpoint` adds `idempotent` to every POST
 it generates.
 
@@ -94,16 +101,59 @@ curl -i http://127.0.0.1:8000/v1/auth/me \
 
 Add the `conditional` middleware to any GET a client is likely to fetch more than once.
 
-The same headers stop two clients overwriting each other's changes. Have the model implement
-api-toolbox's `HasValidators` contract (the `HasModelValidators` trait does the work) and add
-`preconditions.required` to the write route. A write without `If-Match` is then a `428`, and one
-with a stale ETag is a `412`. Reach for this before you add a `version` field to the body.
+The same headers stop two clients overwriting each other's changes. Reach for this before you add
+a `version` field to the body. It takes three things:
+
+1. The model implements api-toolbox's `HasValidators` contract. The `HasModelValidators` trait does
+   the work.
+2. The model is bound to the route. The middleware finds the current ETag in the route's bound
+   parameters, so a controller that looks the record up itself, as Kit's own controllers do, has
+   nothing for it to check against.
+3. The write route takes both `conditional` and `preconditions.required`.
+
+```php
+Route::patch('/projects/{project}', UpdateProjectController::class)
+    ->middleware(['abilities:projects:write', 'conditional', 'preconditions.required']);
+```
+
+The two middleware do different jobs. `preconditions.required` only insists that a precondition is
+there, and answers `428` when `If-Match` is missing. `conditional` is what compares `If-Match` with
+the current ETag and answers `412` when it is stale. With `preconditions.required` alone, a stale
+`If-Match` is let straight through.
+
+Bind the model within the user, in `AppServiceProvider::boot()`, so another user's record is a
+`404` like one that does not exist:
+
+```php
+Route::bind('project', static fn (string $id): Project => Project::query()
+    ->whereBelongsTo(request()->user())
+    ->findOrFail($id));
+```
+
+On a nested route, such as `/projects/{project}/tasks/{task}`, the ETag comes from the last bound
+parameter, the task, and `If-Match` is checked against the task and never the project.
+
+`HasModelValidators` builds the ETag from `updated_at`. MySQL's default timestamp columns store
+whole seconds, so two writes in the same second share an ETag. For a resource people edit at the
+same time, add an integer column that every write increments and return it from
+`entityTagVersion()`.
 
 ## Partial updates
 
 For a `PATCH` that takes a partial document, use JSON Merge Patch, with the `merge-patch`
 middleware and the `application/merge-patch+json` media type. Validate the merged document instead
 of the patch, so a field set to `null` goes through the same rules as one sent in full.
+
+The `v1` group consumes `application/json`, so a merge patch route declares the type it takes
+itself. A route's own `consumes:` replaces its group's, so the group's does not need lifting:
+
+```php
+Route::patch('/projects/{project}', UpdateProjectController::class)
+    ->middleware(['abilities:projects:write', 'consumes:application/merge-patch+json', 'merge-patch', 'conditional', 'preconditions.required']);
+```
+
+A merge patch replaces arrays whole, so a client that changes one item in a list sends the entire
+list.
 
 Kit's own `PATCH /v1/webhooks/{webhook}` takes plain JSON containing only the fields that change.
 For a resource that small, that is enough.
