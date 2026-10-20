@@ -10,11 +10,17 @@ use App\Webhooks\DnsHostResolver;
 use App\Webhooks\HostResolver;
 use App\Webhooks\SubscriptionSigningKeys;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use JustSteveKing\Toolbox\Idempotency\Http\Middleware\EnsureIdempotency;
 use JustSteveKing\Toolbox\MessageSignatures\Contracts\KeyResolver;
 use Knuckles\Scribe\Scribe;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +42,20 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         ProductionSecurityChecks::assertForEnvironment((string) app()->environment());
+
+        // A token without the ability is refused before anything else looks at the request: before
+        // idempotency, so the refusal is not stored and replayed to a retry with a better token, and
+        // before route parameters are bound, so a bound route answers 403 and not 404. Done once
+        // the kernel exists, because api-toolbox places its idempotency middleware then too.
+        $this->callAfterResolving(KernelContract::class, static function (KernelContract $kernel): void {
+            if ($kernel instanceof Kernel) {
+                // Before whichever comes first, so it holds with idempotency switched off too.
+                $first = [EnsureIdempotency::class, SubstituteBindings::class];
+
+                $kernel->addToMiddlewarePriorityBefore($first, CheckAbilities::class);
+                $kernel->addToMiddlewarePriorityBefore($first, CheckForAnyAbility::class);
+            }
+        });
 
         // Document path parameters as the routes name them. Scribe otherwise renames {project}
         // to {id} when it guesses at route model binding, and the spec stops matching the routes.
