@@ -3,12 +3,18 @@
         "claude_code",
         "gemini"
     ],
+    "cloud": false,
     "guidelines": true,
     "mcp": true,
     "nightwatch_mcp": false,
+    "packages": [
+        "juststeveking/api-toolbox"
+    ],
     "sail": false,
     "skills": [
+        "infer-conventions",
         "laravel-best-practices",
-        "pest-testing"
+        "testing-best-practices",
+        "api-toolbox-development"
     ]
 }
