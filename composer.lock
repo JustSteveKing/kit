@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "03747733f6409bed0295c502afdc1d22",
+    "content-hash": "73d58616bb102b251cd068c45e4c482c",
     "packages": [
         {
             "name": "brick/math",
@@ -1061,16 +1061,16 @@
         },
         {
             "name": "juststeveking/api-toolbox",
-            "version": "v0.2.0",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JustSteveKing/api-toolbox.git",
-                "reference": "a4f6ee4382450414232f58ff05aab701e212872a"
+                "reference": "7917bf194ff02829280b0a7e07aca3f5d8c3002a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JustSteveKing/api-toolbox/zipball/a4f6ee4382450414232f58ff05aab701e212872a",
-                "reference": "a4f6ee4382450414232f58ff05aab701e212872a",
+                "url": "https://api.github.com/repos/JustSteveKing/api-toolbox/zipball/7917bf194ff02829280b0a7e07aca3f5d8c3002a",
+                "reference": "7917bf194ff02829280b0a7e07aca3f5d8c3002a",
                 "shasum": ""
             },
             "require": {
@@ -1121,9 +1121,9 @@
             ],
             "support": {
                 "issues": "https://github.com/JustSteveKing/api-toolbox/issues",
-                "source": "https://github.com/JustSteveKing/api-toolbox/tree/v0.2.0"
+                "source": "https://github.com/JustSteveKing/api-toolbox/tree/v0.3.0"
             },
-            "time": "2026-10-15T12:12:47+00:00"
+            "time": "2026-10-20T09:42:04+00:00"
         },
         {
             "name": "laravel/framework",

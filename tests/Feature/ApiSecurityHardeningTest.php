@@ -25,7 +25,7 @@ it('rejects non json payloads on write endpoints', function (): void {
         ->assertHeader('Accept', 'application/json');
 });
 
-it('keeps the unsupported media type problem stable whatever the requested language', function (): void {
+it('localizes unsupported media type problems', function (): void {
     User::factory()->create([
         'email' => 'non-json-es@example.com',
         'password' => 'password123',
@@ -37,7 +37,11 @@ it('keeps the unsupported media type problem stable whatever the requested langu
         'device_name' => 'ios-app',
     ], ['HTTP_ACCEPT_LANGUAGE' => 'es'])
         ->assertProblemType('https://apiguide.dev/errors/unsupported-media-type', 415)
-        ->assertHeader('Content-Language', 'es');
+        ->assertHeader('Content-Language', 'es')
+        ->assertJsonPath('detail', __('api-toolbox::problems.negotiation.unsupported_media_type', [
+            'type' => 'application/x-www-form-urlencoded',
+            'types' => 'application/json',
+        ], 'es'));
 });
 
 it('issues expiring sanctum tokens by default', function (): void {

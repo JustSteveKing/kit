@@ -16,6 +16,7 @@ use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\QueryParam;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\Subgroup;
+use Laravel\Sanctum\PersonalAccessToken;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
@@ -60,6 +61,9 @@ final class ListTokensController
 {
     public const int PER_PAGE = 25;
 
+    /**
+     * @return CursorPage<int, PersonalAccessToken>
+     */
     public function __invoke(Request $request, #[CurrentUser] User $user): CursorPage
     {
         $tokens = $user->tokens()
@@ -71,9 +75,6 @@ final class ListTokensController
             'count' => count($tokens->items()),
         ]);
 
-        // CursorPage::of() asks for CursorPaginator<array-key, mixed>, which no paginator with int
-        // keys can satisfy because TKey is invariant. Remove once api-toolbox widens the type.
-        // @phpstan-ignore argument.type
         return CursorPage::of($tokens, PersonalAccessTokenResource::class);
     }
 }

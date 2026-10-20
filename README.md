@@ -172,10 +172,16 @@ Locale resolution is API-first:
 - Response includes `Content-Language`
 - Unsupported locales fall back to `APP_FALLBACK_LOCALE`
 
-Messages Kit raises itself, and Laravel's validation messages, are translated via
-`lang/{en,es}/api.php` and `lang/{en,es}/validation.php`. Problems raised inside api-toolbox, such
-as an idempotency conflict or an unsupported media type, have an English `detail`; their `type` is
-what clients should key on.
+Every problem's `detail` is translated; its `type` and `title` stay the same in every language,
+so clients key on the `type`:
+
+- Messages Kit raises itself, and Laravel's validation messages: `lang/{en,es}/api.php` and
+  `lang/{en,es}/validation.php`
+- Problems api-toolbox raises, such as an idempotency conflict or an unsupported media type:
+  English ships with the package, Spanish is in `lang/vendor/api-toolbox/es/problems.php`. A test
+  fails if a package upgrade adds a line the Spanish file does not have
+
+To add a language, add it to `APP_SUPPORTED_LOCALES` and give it each of those files.
 
 Relevant config/env:
 

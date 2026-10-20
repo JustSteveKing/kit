@@ -104,7 +104,7 @@ it('rejects malformed idempotency keys', function (): void {
         ->assertProblem(400);
 });
 
-it('keeps the conflict type stable whatever the requested language', function (): void {
+it('localizes idempotency conflict problems', function (): void {
     $headers = ['Idempotency-Key' => 'register-key-es'];
 
     $this->withHeaders($headers)
@@ -126,5 +126,7 @@ it('keeps the conflict type stable whatever the requested language', function ()
         'device_name' => 'ios-app',
     ])
         ->assertProblemType('https://apiguide.dev/errors/idempotency-key-conflict', 422)
-        ->assertHeader('Content-Language', 'es');
+        ->assertHeader('Content-Language', 'es')
+        ->assertJsonPath('title', 'Idempotency Key Conflict')
+        ->assertJsonPath('detail', __('api-toolbox::problems.idempotency.conflict', [], 'es'));
 });

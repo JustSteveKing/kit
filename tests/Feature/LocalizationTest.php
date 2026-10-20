@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -95,6 +96,13 @@ it('translates sunset enforcement responses from accept language header', functi
         ->assertProblem(410)
         ->assertHeader('Content-Language', 'es')
         ->assertJsonPath('detail', __('api.sunset.endpoint_unavailable', [], 'es'));
+});
+
+it('translates every problem detail api-toolbox can raise', function (): void {
+    $english = require base_path('vendor/juststeveking/api-toolbox/resources/lang/en/problems.php');
+    $spanish = require lang_path('vendor/api-toolbox/es/problems.php');
+
+    expect(array_keys(Arr::dot($spanish)))->toEqualCanonicalizing(array_keys(Arr::dot($english)));
 });
 
 #[Sunset(at: '2000-01-01T00:00:00Z')]
