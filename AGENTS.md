@@ -9,14 +9,18 @@ this file is how to change it.
 ## Before you call anything done
 
 ```bash
-composer lint     # Pint, the PER preset plus the rules in pint.json
-composer stan     # PHPStan with Larastan at level 10
+composer lint           # Pint, the PER preset plus the rules in pint.json
+composer rector:check   # Rector: PHP and Laravel upgrades, dead code, types
+composer stan           # PHPStan with Larastan at level 10
 php artisan test  # Pest, including the OpenAPI contract tests
 legible check public/docs/openapi.yaml   # agent readiness, against .legible.yaml
 ```
 
-CI runs all four, and builds and boots the production image. A change that fails any of them is
-not finished. [legible](https://github.com/JustSteveKing/legible) is a single binary from its
+CI runs all five, and builds and boots the production image. A change that fails any of them is
+not finished. To fix Rector and Pint findings, run `composer rector` and then `composer pint`, in
+that order: Rector changes code, Pint owns formatting (the PER preset), and Pint has the last word.
+Never enable Rector's coding-style set or add rules that format; skip a rule in `rector.php` with
+the reason rather than letting the two disagree. [legible](https://github.com/JustSteveKing/legible) is a single binary from its
 releases; CI pins the version in `.github/workflows/ci-tests.yml`. Fix style with
 `vendor/bin/pint --dirty`, never by loosening `pint.json` or `phpstan.neon`.
 
@@ -33,6 +37,9 @@ It writes the six pieces below, appends the route, formats them with Pint and pr
 leaves to you. `--ability=` overrides the default (`projects:write`, or `projects:read` for a GET),
 `--guest` leaves the route public, and `--force` overwrites. The templates are in
 `stubs/endpoint/`.
+
+Finish a generated endpoint before running `composer rector`, which removes the placeholders it
+leaves (an unused payload, an empty constructor) as dead code.
 
 What it cannot know stays visible until you write it: the controller answers `501`, path
 parameters carry a TODO to constrain them, and the description is three TODO sentences. CI fails

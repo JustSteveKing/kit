@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Override;
 
 /**
  * @property string $id
@@ -29,6 +30,7 @@ final class WebhookDelivery extends Model
     /**
      * @var list<string>
      */
+    #[Override]
     protected $fillable = ['webhook_subscription_id', 'webhook_event_id', 'state', 'next_attempt_at'];
 
     /**

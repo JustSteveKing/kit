@@ -106,7 +106,7 @@ final class DeliverWebhook implements ShouldQueue
 
         if ($retry && $number <= count($backoff)) {
             // A 429 names when to try again, and the sender must not try sooner.
-            $delay = max($backoff[$number - 1], 429 === $status ? $this->retryAfter($response) : 0);
+            $delay = max($backoff[$number - 1], 429 === $status ? $this->secondsFromRetryAfter($response) : 0);
             $delivery->update(['state' => DeliveryState::Retrying, 'next_attempt_at' => now()->addSeconds($delay)]);
             self::dispatch($delivery->id)->delay($delay);
 
@@ -196,7 +196,7 @@ final class DeliverWebhook implements ShouldQueue
     /**
      * Seconds from a Retry-After field, which is either a number of seconds or an HTTP date.
      */
-    private function retryAfter(?Response $response): int
+    private function secondsFromRetryAfter(?Response $response): int
     {
         $value = mb_trim((string) $response?->header('Retry-After'));
 

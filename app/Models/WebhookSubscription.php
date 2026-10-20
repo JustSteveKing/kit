@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\WebhookSubscriptionFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Override;
 
 /**
  * @property string $id
@@ -38,11 +40,13 @@ final class WebhookSubscription extends Model
     /**
      * @var list<string>
      */
+    #[Override]
     protected $fillable = ['url', 'description', 'events', 'secret'];
 
     /**
      * @var list<string>
      */
+    #[Override]
     protected $hidden = ['secret'];
 
     public static function newSecret(): string
@@ -92,7 +96,8 @@ final class WebhookSubscription extends Model
     /**
      * @param  Builder<self>  $query
      */
-    public function scopeEnabled(Builder $query): void
+    #[Scope]
+    protected function enabled(Builder $query): void
     {
         $query->whereNull('disabled_at');
     }

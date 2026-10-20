@@ -15,7 +15,7 @@ return [
     'trusted_proxies' => env('TRUSTED_PROXIES', '*'),
 
     'trusted_hosts' => array_values(array_filter(array_map(
-        static fn(string $host): string => mb_trim($host),
+        mb_trim(...),
         explode(',', (string) env('TRUSTED_HOSTS', '')),
     ))),
 ];

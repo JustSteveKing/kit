@@ -37,6 +37,9 @@ jobs:
       - name: Check code style
         run: composer lint
 
+      - name: Check Rector has nothing to change
+        run: composer rector:check
+
       - name: Run static analysis
         run: composer stan
 

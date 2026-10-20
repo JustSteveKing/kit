@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Override;
 
 /**
  * An event as it was sent: every delivery and redelivery of it sends this same CloudEvent.
@@ -35,6 +36,7 @@ final class WebhookEvent extends Model
     /**
      * @var list<string>
      */
+    #[Override]
     protected $fillable = ['user_id', 'type', 'source', 'subject', 'data'];
 
     /**

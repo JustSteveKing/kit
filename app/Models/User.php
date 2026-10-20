@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -13,17 +14,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
+use Override;
 use SensitiveParameter;
 
 /**
- * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property Carbon|null $email_verified_at
  */
 final class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
 
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasUlids;
     use MustVerifyEmailTrait;
@@ -32,11 +35,13 @@ final class User extends Authenticatable implements MustVerifyEmail
     /**
      * @var list<string>
      */
+    #[Override]
     protected $fillable = ['name', 'email', 'password'];
 
     /**
      * @var list<string>
      */
+    #[Override]
     protected $hidden = ['password', 'remember_token'];
 
     /**
@@ -53,7 +58,7 @@ final class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify((new VerifyEmail())->locale(app()->getLocale()));
+        $this->notify(new VerifyEmail()->locale(app()->getLocale()));
     }
 
     /**
@@ -61,7 +66,7 @@ final class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification(#[SensitiveParameter] $token): void
     {
-        $this->notify((new ResetPassword($token))->locale(app()->getLocale()));
+        $this->notify(new ResetPassword($token)->locale(app()->getLocale()));
     }
 
     /** @return array<string,string> */

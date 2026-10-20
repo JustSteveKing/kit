@@ -44,7 +44,7 @@ it('signs a ping so that an api-toolbox receiver verifies it', function (): void
     $subscription = WebhookSubscription::factory()->for($user)->create(['url' => 'https://hooks.example.com/receive']);
 
     // The receiver: this application, with api-toolbox's verifier and the subscription's secret.
-    Route::post('/receive', fn() => ['verified' => true])->middleware('signature.verify');
+    Route::post('/receive', fn(): array => ['verified' => true])->middleware('signature.verify');
 
     Http::fake(function (ClientRequest $request) {
         $server = ['HTTP_HOST' => 'hooks.example.com', 'HTTPS' => 'on', 'CONTENT_TYPE' => $request->header('Content-Type')[0] ?? ''];
@@ -146,7 +146,7 @@ it('marks a delivery retrying, and queues the next attempt for when it says', fu
     $this->freezeSecond();
 
     [$delivery] = app(Webhooks::class)->dispatch($user, new ProjectCreated('01jb'));
-    (new DeliverWebhook($delivery->id))->handle(app(WebhookTargets::class));
+    new DeliverWebhook($delivery->id)->handle(app(WebhookTargets::class));
 
     $delivery->refresh();
 
@@ -187,7 +187,7 @@ it('waits as long as a 429 Retry-After says, when that is longer than the schedu
     Http::fake(['*' => Http::response('slow down', 429, ['Retry-After' => $retryAfter])]);
 
     [$delivery] = app(Webhooks::class)->dispatch($user, new ProjectCreated('1'));
-    (new DeliverWebhook($delivery->id))->handle(app(WebhookTargets::class));
+    new DeliverWebhook($delivery->id)->handle(app(WebhookTargets::class));
 
     expect($delivery->refresh()->next_attempt_at?->equalTo(now()->addSeconds($expected)))->toBeTrue();
     Queue::assertPushed(DeliverWebhook::class, fn(DeliverWebhook $job): bool => $expected === $job->delay);
