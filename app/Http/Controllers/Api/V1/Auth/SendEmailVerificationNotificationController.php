@@ -16,7 +16,10 @@ use Knuckles\Scribe\Attributes\Subgroup;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Email Verification')]
-#[Endpoint(title: 'Send Verification Email', description: 'Send (or resend) an email verification link to the authenticated user.')]
+#[Endpoint(
+    title: 'Send Verification Email',
+    description: 'Send the authenticated user a new email verification link. Use it when the first link expired or never arrived; it is limited to six requests a minute. Returns a message saying the link was sent, or that the email is already verified.',
+)]
 #[Authenticated]
 #[Response(content: ['message' => 'Verification link sent.'], status: 200, description: 'Verification email queued/sent.')]
 #[Response(content: ['message' => 'Email is already verified.'], status: 200, description: 'User already verified.')]

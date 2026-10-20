@@ -42,3 +42,16 @@ jobs:
 
       - name: Run test suite
         run: php artisan test
+
+      # The test suite regenerates public/docs/openapi.yaml, so this grades the spec the code
+      # produces now, against .legible.yaml.
+      - name: Check the OpenAPI spec is agent-ready
+        env:
+          LEGIBLE_VERSION: 0.1.2
+        run: |
+          archive="legible_${LEGIBLE_VERSION}_linux_amd64.tar.gz"
+          base="https://github.com/JustSteveKing/legible/releases/download/v${LEGIBLE_VERSION}"
+          curl -fsSLO "${base}/${archive}"
+          curl -fsSL "${base}/checksums.txt" | grep " ${archive}\$" | sha256sum -c -
+          tar xzf "${archive}" legible
+          ./legible check public/docs/openapi.yaml

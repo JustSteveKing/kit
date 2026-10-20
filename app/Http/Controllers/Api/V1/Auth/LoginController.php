@@ -22,7 +22,10 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
-#[Endpoint(title: 'Login', description: 'Authenticate a user and issue a Sanctum bearer token.')]
+#[Endpoint(
+    title: 'Login',
+    description: 'Exchange an email and password for a bearer token. Use it when a user signs in on a new device, naming the device in device_name. Returns the user with the token, its type and expiry in meta; wrong credentials are a 422 on the email field.',
+)]
 #[Unauthenticated]
 #[BodyParam('email', type: 'string', description: 'User email address.', required: true, example: 'jane@example.com')]
 #[BodyParam('password', type: 'string', description: 'User password.', required: true, example: 'password123')]

@@ -21,7 +21,10 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
-#[Endpoint(title: 'Register', description: 'Create a new account and issue a Sanctum bearer token.')]
+#[Endpoint(
+    title: 'Register',
+    description: 'Create an account and issue its first bearer token. Use it once per new user; send an Idempotency-Key so a retried request cannot create a second account. Returns the user with the token, its type and expiry in meta, and sends a verification email.',
+)]
 #[Unauthenticated]
 #[BodyParam('name', type: 'string', description: 'Display name for the account.', required: true, example: 'Jane Doe')]
 #[BodyParam('email', type: 'string', description: 'Unique email address for login.', required: true, example: 'jane@example.com')]

@@ -18,7 +18,10 @@ use Knuckles\Scribe\Attributes\Subgroup;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
-#[Endpoint(title: 'Get Current User', description: 'Return the authenticated user for the current bearer token.')]
+#[Endpoint(
+    title: 'Get Current User',
+    description: 'Return the user the bearer token belongs to. Use it to check a token still works and to read the account\'s profile and verification state. The response carries an ETag: send it back in If-None-Match and an unchanged user returns 304 with no body.',
+)]
 #[Authenticated]
 #[ResponseFromApiResource(name: UserResource::class, model: User::class, status: 200, description: 'Authenticated user profile.')]
 #[Response(

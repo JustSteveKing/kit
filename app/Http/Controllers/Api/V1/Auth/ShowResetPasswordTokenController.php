@@ -17,11 +17,25 @@ use Knuckles\Scribe\Attributes\UrlParam;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Password Reset')]
-#[Endpoint(title: 'Read Reset Token Payload', description: 'Return reset token and email payload for API clients handling email reset links.')]
+#[Endpoint(
+    title: 'Read Reset Token Payload',
+    description: 'Return the token and email from a password reset link, for a client that opens the link and shows its own reset form. It does not check the token; Reset Password does. Returns the token and the email, if the link carried one.',
+)]
 #[Unauthenticated]
 #[UrlParam('token', type: 'string', description: 'Password reset token from reset link.', required: true, example: 'reset-token-value')]
 #[QueryParam('email', type: 'string', description: 'Account email from the reset link.', required: false, example: 'jane@example.com')]
 #[Response(content: ['token' => 'reset-token-value', 'email' => 'jane@example.com'], status: 200, description: 'Reset payload data.')]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/validation-failed',
+        'title' => 'Validation Failed',
+        'status' => 422,
+        'detail' => 'The email field must be a valid email address.',
+        'errors' => ['email' => ['The email field must be a valid email address.']],
+    ],
+    status: 422,
+    description: 'The email query parameter was not an email address.',
+)]
 final class ShowResetPasswordTokenController
 {
     public function __invoke(ShowResetPasswordTokenRequest $request): JsonResponse

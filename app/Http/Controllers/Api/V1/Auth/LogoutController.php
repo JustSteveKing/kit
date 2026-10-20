@@ -18,10 +18,22 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
-#[Endpoint(title: 'Logout', description: 'Revoke the current Sanctum token.')]
+#[Endpoint(
+    title: 'Logout',
+    description: 'Revoke the bearer token that made this request, and only that one. Use it when a client signs out; the user\'s other tokens keep working. Returns 204 with no body.',
+)]
 #[Authenticated]
 #[ScribeResponse(content: null, status: 204, description: 'Token revoked.')]
-#[ScribeResponse(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
+#[ScribeResponse(
+    content: [
+        'type' => 'https://apiguide.dev/errors/unauthorized',
+        'title' => 'Unauthorized',
+        'status' => 401,
+        'detail' => 'Unauthenticated.',
+    ],
+    status: 401,
+    description: 'Authentication failed.',
+)]
 final class LogoutController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user): Response

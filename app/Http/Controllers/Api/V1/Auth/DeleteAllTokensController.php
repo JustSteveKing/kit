@@ -16,11 +16,32 @@ use Knuckles\Scribe\Attributes\Subgroup;
 
 #[Group(name: 'Authentication')]
 #[Subgroup(name: 'Token Authentication')]
-#[Endpoint(title: 'Revoke All Tokens', description: 'Revoke all personal access tokens for the authenticated user.')]
+#[Endpoint(
+    title: 'Revoke All Tokens',
+    description: 'Revoke every personal access token the authenticated user holds, including the one making this request. Use it to sign out everywhere after a suspected compromise. Returns 204 with no body; every later request with these tokens is a 401.',
+)]
 #[Authenticated]
 #[ScribeResponse(content: null, status: 204, description: 'All tokens revoked.')]
-#[ScribeResponse(content: ['message' => 'Forbidden.'], status: 403, description: 'Token is missing required ability.')]
-#[ScribeResponse(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
+#[ScribeResponse(
+    content: [
+        'type' => 'https://apiguide.dev/errors/forbidden',
+        'title' => 'Forbidden',
+        'status' => 403,
+        'detail' => 'Forbidden.',
+    ],
+    status: 403,
+    description: 'Token is missing required ability.',
+)]
+#[ScribeResponse(
+    content: [
+        'type' => 'https://apiguide.dev/errors/unauthorized',
+        'title' => 'Unauthorized',
+        'status' => 401,
+        'detail' => 'Unauthenticated.',
+    ],
+    status: 401,
+    description: 'Authentication failed.',
+)]
 final class DeleteAllTokensController
 {
     public function __invoke(#[CurrentUser] User $user): Response

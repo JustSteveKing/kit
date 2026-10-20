@@ -175,6 +175,7 @@ return [
         // Should extend `Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator`.
         'generators' => [
             App\Support\ProblemDetailsOpenApiGenerator::class,
+            App\Support\NoContentOpenApiGenerator::class,
         ],
     ],
 

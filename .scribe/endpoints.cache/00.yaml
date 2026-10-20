@@ -15,7 +15,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: Register
-      description: 'Create a new account and issue a Sanctum bearer token.'
+      description: 'Create an account and issue its first bearer token. Use it once per new user; send an Idempotency-Key so a retried request cannot create a second account. Returns the user with the token, its type and expiry in meta, and sends a verification email.'
       authenticated: false
       deprecated: false
     headers:
@@ -80,7 +80,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"01m5cb6hssde51qe3kn813thmv","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T09:45:06+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5cd9s04d0vrecpnz9vnq86a","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T10:21:49+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Registration succeeded.'
       -
@@ -106,7 +106,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: Login
-      description: 'Authenticate a user and issue a Sanctum bearer token.'
+      description: 'Exchange an email and password for a bearer token. Use it when a user signs in on a new device, naming the device in device_name. Returns the user with the token, its type and expiry in meta; wrong credentials are a 422 on the email field.'
       authenticated: false
       deprecated: false
     headers:
@@ -159,7 +159,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01m5cb6ht2em5q96y8t1rffqv6","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T09:45:06+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5cd9s0csvf155wbah7yn3s0","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T10:21:49+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Login succeeded.'
       -
@@ -185,7 +185,7 @@ endpoints:
       subgroup: 'Password Reset'
       subgroupDescription: ''
       title: 'Request Password Reset'
-      description: 'Send a password reset link to the provided email if an account exists.'
+      description: 'Email a password reset link to an address, if an account uses it. Use it from a forgot-password form. The response is the same whether or not the account exists, so it cannot be used to discover accounts; send an Idempotency-Key so a retry does not send a second email.'
       authenticated: false
       deprecated: false
     headers:
@@ -217,6 +217,18 @@ endpoints:
         content: '{"message":"If the account exists, a password reset link has been sent."}'
         headers: []
         description: 'Password reset request accepted.'
+      -
+        custom: []
+        status: 422
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"The email field must be a valid email address.","errors":{"email":["The email field must be a valid email address."]}}'
+        headers: []
+        description: 'The email was missing or not an email address.'
+      -
+        custom: []
+        status: 429
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/rate-limit-exceeded","title":"Rate Limit Exceeded","status":429,"detail":"Too many requests. Please try again later."}'
+        headers: []
+        description: 'Too many reset requests for this address; retry after the Retry-After header.'
     responseFields: []
     auth: []
     controller: null
@@ -234,7 +246,7 @@ endpoints:
       subgroup: 'Password Reset'
       subgroupDescription: ''
       title: 'Reset Password'
-      description: 'Reset the user password using a valid reset token.'
+      description: 'Set a new password using the token from a password reset email. Use it to finish the forgot-password flow. Returns a confirmation message; an invalid or expired token is a 422 on the email field.'
       authenticated: false
       deprecated: false
     headers:
@@ -325,7 +337,7 @@ endpoints:
       subgroup: 'Password Reset'
       subgroupDescription: ''
       title: 'Read Reset Token Payload'
-      description: 'Return reset token and email payload for API clients handling email reset links.'
+      description: 'Return the token and email from a password reset link, for a client that opens the link and shows its own reset form. It does not check the token; Reset Password does. Returns the token and the email, if the link carried one.'
       authenticated: false
       deprecated: false
     headers:
@@ -359,32 +371,8 @@ endpoints:
         deprecated: false
     cleanQueryParameters:
       email: jane@example.com
-    bodyParameters:
-      token:
-        custom: []
-        name: token
-        description: ''
-        required: true
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'Must be a valid email address. Must not be greater than 255 characters.'
-        required: false
-        example: zbailey@example.net
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      token: architecto
-      email: zbailey@example.net
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
@@ -393,6 +381,12 @@ endpoints:
         content: '{"token":"reset-token-value","email":"jane@example.com"}'
         headers: []
         description: 'Reset payload data.'
+      -
+        custom: []
+        status: 422
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/validation-failed","title":"Validation Failed","status":422,"detail":"The email field must be a valid email address.","errors":{"email":["The email field must be a valid email address."]}}'
+        headers: []
+        description: 'The email query parameter was not an email address.'
     responseFields: []
     auth: []
     controller: null
@@ -410,7 +404,7 @@ endpoints:
       subgroup: 'Email Verification'
       subgroupDescription: ''
       title: 'Verify Email'
-      description: 'Verify a user email using the signed verification link parameters.'
+      description: "Mark the user's email as verified using the signed link from the verification email. Clients do not build this URL; they follow the one in the email, which expires. Returns a confirmation message; a link that is invalid, expired or altered is a 403."
       authenticated: false
       deprecated: false
     headers:
@@ -444,32 +438,8 @@ endpoints:
       hash: 8c4f4370e5db9b5be6d0f4c95495f49f998fa32a
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Must match an existing stored value.'
-        required: true
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      hash:
-        custom: []
-        name: hash
-        description: 'Must be 40 characters.'
-        required: true
-        example: ngzmiyvdljnikhwaykcmyuwpwlvqwrsitcpscqld
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      id: architecto
-      hash: ngzmiyvdljnikhwaykcmyuwpwlvqwrsitcpscqld
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
@@ -501,7 +471,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: 'Get Current User'
-      description: 'Return the authenticated user for the current bearer token.'
+      description: "Return the user the bearer token belongs to. Use it to check a token still works and to read the account's profile and verification state. The response carries an ETag: send it back in If-None-Match and an unchanged user returns 304 with no body."
       authenticated: true
       deprecated: false
     headers:
@@ -519,7 +489,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01m5cb6htrjmdsahn6h774frrz","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T09:45:06+00:00","created_at":null,"updated_at":null}}'
+        content: '{"data":{"id":"01m5cd9s12mhvc0tqhs163ps8h","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T10:21:49+00:00","created_at":null,"updated_at":null}}'
         headers: []
         description: 'Authenticated user profile.'
       -
@@ -548,7 +518,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: Logout
-      description: 'Revoke the current Sanctum token.'
+      description: "Revoke the bearer token that made this request, and only that one. Use it when a client signs out; the user's other tokens keep working. Returns 204 with no body."
       authenticated: true
       deprecated: false
     headers:
@@ -572,7 +542,7 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
     responseFields: []
@@ -595,7 +565,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: 'List Tokens'
-      description: 'List personal access tokens for the authenticated user.'
+      description: 'List the authenticated user''s personal access tokens, newest first, 25 to a page. Use it to show signed-in devices or to find a token ID to revoke. Returns an array of tokens, with is_current marking the one making the request; follow the Link header''s rel="next" for the next page.'
       authenticated: true
       deprecated: false
     headers:
@@ -660,7 +630,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: 'Revoke All Tokens'
-      description: 'Revoke all personal access tokens for the authenticated user.'
+      description: 'Revoke every personal access token the authenticated user holds, including the one making this request. Use it to sign out everywhere after a suspected compromise. Returns 204 with no body; every later request with these tokens is a 401.'
       authenticated: true
       deprecated: false
     headers:
@@ -684,13 +654,13 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
       -
         custom: []
         status: 403
-        content: '{"message":"Forbidden."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
         headers: []
         description: 'Token is missing required ability.'
     responseFields: []
@@ -713,7 +683,7 @@ endpoints:
       subgroup: 'Token Authentication'
       subgroupDescription: ''
       title: 'Revoke Token'
-      description: 'Revoke one personal access token owned by the authenticated user.'
+      description: "Revoke one of the authenticated user's personal access tokens by its ID, such as a lost device's. Use List Tokens to find the ID. Returns 204 with no body; a token the user does not own, or that no longer exists, is a 404."
       authenticated: true
       deprecated: false
     headers:
@@ -736,20 +706,8 @@ endpoints:
       token_id: 42
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      token_id:
-        custom: []
-        name: token_id
-        description: ''
-        required: true
-        example: 16
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      token_id: 16
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
@@ -761,19 +719,19 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
         headers: []
         description: 'Authentication failed.'
       -
         custom: []
         status: 403
-        content: '{"message":"Forbidden."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
         headers: []
         description: 'Token is missing required ability.'
       -
         custom: []
         status: 404
-        content: '{"message":"Token not found."}'
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"Token not found."}'
         headers: []
         description: 'Token does not belong to current user or no longer exists.'
     responseFields: []
@@ -796,7 +754,7 @@ endpoints:
       subgroup: 'Email Verification'
       subgroupDescription: ''
       title: 'Send Verification Email'
-      description: 'Send (or resend) an email verification link to the authenticated user.'
+      description: 'Send the authenticated user a new email verification link. Use it when the first link expired or never arrived; it is limited to six requests a minute. Returns a message saying the link was sent, or that the email is already verified.'
       authenticated: true
       deprecated: false
     headers:
