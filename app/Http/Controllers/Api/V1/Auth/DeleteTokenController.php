@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Payloads\V1\DeleteTokenPayload;
-use App\Http\Requests\Auth\DeleteTokenRequest;
 use App\Models\User;
 use App\Support\SecurityAudit;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
@@ -28,7 +28,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
 #[ScribeResponse(content: ['message' => 'Unauthenticated.'], status: 401, description: 'Authentication failed.')]
 final class DeleteTokenController
 {
-    public function __invoke(DeleteTokenRequest $request, #[CurrentUser] User $user): Response
+    public function __invoke(Request $request, #[CurrentUser] User $user): Response
     {
         $payload = DeleteTokenPayload::fromRequest($request);
 

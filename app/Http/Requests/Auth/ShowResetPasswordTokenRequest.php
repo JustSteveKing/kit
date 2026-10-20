@@ -19,21 +19,23 @@ final class ShowResetPasswordTokenRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => ['required', 'string'],
             'email' => ['nullable', 'string', 'email', 'max:255'],
         ];
     }
 
     /**
-     * @return array<string, mixed>
+     * Read by Scribe: the request is a GET, so its rules describe query parameters, and the token is
+     * a path parameter validated by the route.
+     *
+     * @return array<string, array{description: string, example: string}>
      */
-    public function validationData(): array
+    public function queryParameters(): array
     {
-        /** @var array<string, mixed> $data */
-        $data = array_merge($this->all(), [
-            'token' => $this->route('token'),
-        ]);
-
-        return $data;
+        return [
+            'email' => [
+                'description' => 'Account email from the reset link.',
+                'example' => 'jane@example.com',
+            ],
+        ];
     }
 }

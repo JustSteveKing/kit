@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Payloads\V1\VerifyEmailPayload;
-use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Models\User;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\Response;
@@ -36,7 +36,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
 )]
 final class VerifyEmailController
 {
-    public function __invoke(VerifyEmailRequest $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $payload = VerifyEmailPayload::fromRequest($request);
 

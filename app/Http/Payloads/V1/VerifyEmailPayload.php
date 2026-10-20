@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Payloads\V1;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Payloads\RouteParameter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 final readonly class VerifyEmailPayload
 {
@@ -17,22 +16,9 @@ final readonly class VerifyEmailPayload
 
     public static function fromRequest(Request $request): self
     {
-        $data = self::validatedData($request);
-
         return new self(
-            id: Arr::string($data, 'id'),
-            hash: Arr::string($data, 'hash'),
+            id: RouteParameter::string($request, 'id'),
+            hash: RouteParameter::string($request, 'hash'),
         );
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private static function validatedData(Request $request): array
-    {
-        /** @var array<string, mixed> $data */
-        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
-
-        return $data;
     }
 }

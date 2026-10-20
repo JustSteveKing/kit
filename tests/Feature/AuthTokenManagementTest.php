@@ -78,14 +78,13 @@ it('returns not found when revoking a token not owned by the authenticated user'
         ->assertJsonPath('detail', __('api.auth.token_not_found'));
 });
 
-it('validates token id route parameter when revoking a single token', function (): void {
+it('answers 404 for a token id that is not a number', function (): void {
     $user = User::factory()->create();
     $requestToken = $user->createToken('request-token', ['auth:tokens:delete']);
 
     $this->withToken($requestToken->plainTextToken)
         ->deleteJson('/v1/auth/tokens/not-an-integer')
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['token_id']);
+        ->assertProblemType('https://apiguide.dev/errors/resource-not-found', 404);
 });
 
 it('forbids single token revocation when token lacks required ability', function (): void {
