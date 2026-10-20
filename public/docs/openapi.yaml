@@ -10,6 +10,9 @@ tags:
   -
     name: Authentication
     description: ''
+  -
+    name: Webhooks
+    description: ''
 components:
   securitySchemes:
     default:
@@ -35,10 +38,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cdfjnp16kbfqq3s4xsnvb5
+                    id: 01m5cfz0vq7h5x00rd9hr7mk8h
                     name: 'Justina Gaylord'
                     email: lafayette.considine@example.com
-                    email_verified_at: '2026-10-20T10:24:59+00:00'
+                    email_verified_at: '2026-10-20T11:08:22+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -51,7 +54,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cdfjnp16kbfqq3s4xsnvb5
+                        example: 01m5cfz0vq7h5x00rd9hr7mk8h
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -60,7 +63,7 @@ paths:
                         example: lafayette.considine@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T10:24:59+00:00'
+                        example: '2026-10-20T11:08:22+00:00'
                       created_at:
                         type: string
                         example: null
@@ -163,10 +166,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cdfjp0cmx0zgvvy8a4z5zj
+                    id: 01m5cfz0w2qh152qzhy96hxf37
                     name: 'Justina Gaylord'
                     email: cormier.nick@example.com
-                    email_verified_at: '2026-10-20T10:24:59+00:00'
+                    email_verified_at: '2026-10-20T11:08:22+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -179,7 +182,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cdfjp0cmx0zgvvy8a4z5zj
+                        example: 01m5cfz0w2qh152qzhy96hxf37
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -188,7 +191,7 @@ paths:
                         example: cormier.nick@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T10:24:59+00:00'
+                        example: '2026-10-20T11:08:22+00:00'
                       created_at:
                         type: string
                         example: null
@@ -612,10 +615,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5cdfjpm8vqdmrdwtq6fqe98
+                    id: 01m5cfz0wpadw1nnc7k1n2a5p5
                     name: 'Morgan Hirthe'
                     email: dare.emelie@example.com
-                    email_verified_at: '2026-10-20T10:24:59+00:00'
+                    email_verified_at: '2026-10-20T11:08:22+00:00'
                     created_at: null
                     updated_at: null
                 properties:
@@ -624,7 +627,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5cdfjpm8vqdmrdwtq6fqe98
+                        example: 01m5cfz0wpadw1nnc7k1n2a5p5
                       name:
                         type: string
                         example: 'Morgan Hirthe'
@@ -633,7 +636,7 @@ paths:
                         example: dare.emelie@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T10:24:59+00:00'
+                        example: '2026-10-20T11:08:22+00:00'
                       created_at:
                         type: string
                         example: null
@@ -1208,3 +1211,1403 @@ paths:
                     example: Unauthenticated.
       tags:
         - Authentication
+  /v1/webhooks:
+    get:
+      summary: 'List Webhooks'
+      operationId: listWebhooks
+      description: 'List the authenticated user''s webhook subscriptions, newest first, 25 to a page. Use it to see where events are sent and which subscriptions were disabled after failing. Returns an array of subscriptions; follow the Link header''s rel="next" for the next page.'
+      parameters:
+        -
+          in: query
+          name: cursor
+          description: 'Opaque cursor from a Link header. Omit it for the first page.'
+          example: architecto
+          required: false
+          schema:
+            type: string
+            description: 'Opaque cursor from a Link header. Omit it for the first page.'
+            example: architecto
+      responses:
+        200:
+          description: 'One page of subscriptions.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url:
+                      type: string
+                      example: 'https://hooks.example.com/kit'
+                    description:
+                      type: string
+                      example: 'Production receiver'
+                    events:
+                      type: array
+                      example:
+                        - '*'
+                      items:
+                        type: string
+                    enabled:
+                      type: boolean
+                      example: true
+                    disabled_at:
+                      type: string
+                      example: null
+                      nullable: true
+                    disabled_reason:
+                      type: string
+                      example: null
+                      nullable: true
+                    created_at:
+                      type: string
+                      example: '2026-10-20T12:00:00+00:00'
+                    updated_at:
+                      type: string
+                      example: '2026-10-20T12:00:00+00:00'
+                example:
+                  -
+                    id: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url: 'https://hooks.example.com/kit'
+                    description: 'Production receiver'
+                    events:
+                      - '*'
+                    enabled: true
+                    disabled_at: null
+                    disabled_reason: null
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:read ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+      tags:
+        - Webhooks
+    post:
+      summary: 'Create Webhook'
+      operationId: createWebhook
+      description: 'Subscribe an https endpoint to events. Use it once per receiving endpoint; send an Idempotency-Key so a retry does not create a second subscription. Returns the subscription with its signing secret in meta.secret, shown only this once: deliveries are signed with it using RFC 9421 HTTP Message Signatures.'
+      parameters: []
+      responses:
+        201:
+          description: 'Subscription created. meta.secret is the only time the secret is returned.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url: 'https://hooks.example.com/kit'
+                    description: 'Production receiver'
+                    events:
+                      - '*'
+                    enabled: true
+                    disabled_at: null
+                    disabled_reason: null
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+                  meta:
+                    secret: whsec_8f3c...
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                      url:
+                        type: string
+                        example: 'https://hooks.example.com/kit'
+                      description:
+                        type: string
+                        example: 'Production receiver'
+                      events:
+                        type: array
+                        example:
+                          - '*'
+                        items:
+                          type: string
+                      enabled:
+                        type: boolean
+                        example: true
+                      disabled_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      disabled_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                  meta:
+                    type: object
+                    properties:
+                      secret:
+                        type: string
+                        example: whsec_8f3c...
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        422:
+          description: 'The URL is not https, resolves to a private address, or an event type is unknown.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/validation-failed'
+                  title: 'Validation Failed'
+                  status: 422
+                  detail: 'Webhook URLs must use https.'
+                  errors:
+                    url:
+                      - 'Webhook URLs must use https.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/validation-failed'
+                  title:
+                    type: string
+                    example: 'Validation Failed'
+                  status:
+                    type: integer
+                    example: 422
+                  detail:
+                    type: string
+                    example: 'Webhook URLs must use https.'
+                  errors:
+                    type: object
+                    properties:
+                      url:
+                        type: array
+                        example:
+                          - 'Webhook URLs must use https.'
+                        items:
+                          type: string
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: 'The https URL deliveries are POSTed to. It must not resolve to a private, loopback or reserved address.'
+                  example: 'https://hooks.example.com/kit'
+                description:
+                  type: string
+                  description: 'A label for the subscription.'
+                  example: 'Production receiver'
+                events:
+                  type: array
+                  description: 'Event types to receive, or ["*"] for all of them.'
+                  example:
+                    - '*'
+                  items:
+                    type: string
+              required:
+                - url
+                - events
+  '/v1/webhooks/{webhook}':
+    get:
+      summary: 'Show Webhook'
+      operationId: showWebhook
+      description: "Return one of the authenticated user's webhook subscriptions. Use it to check whether a subscription is still enabled and, if it was disabled after failing, why. Returns the subscription without its secret."
+      parameters: []
+      responses:
+        200:
+          description: 'The subscription.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url: 'https://hooks.example.com/kit'
+                    description: 'Production receiver'
+                    events:
+                      - '*'
+                    enabled: true
+                    disabled_at: null
+                    disabled_reason: null
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                      url:
+                        type: string
+                        example: 'https://hooks.example.com/kit'
+                      description:
+                        type: string
+                        example: 'Production receiver'
+                      events:
+                        type: array
+                        example:
+                          - '*'
+                        items:
+                          type: string
+                      enabled:
+                        type: boolean
+                        example: true
+                      disabled_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      disabled_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:read ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    patch:
+      summary: 'Update Webhook'
+      operationId: updateWebhook
+      description: "Change a webhook subscription's URL, description or events, or enable or disable it; fields left out stay as they are. Use enabled: true to resume a subscription disabled after failing, which also resets its failure count. Returns the updated subscription."
+      parameters: []
+      responses:
+        200:
+          description: 'The updated subscription.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url: 'https://hooks.example.com/kit'
+                    description: 'Production receiver'
+                    events:
+                      - '*'
+                    enabled: true
+                    disabled_at: null
+                    disabled_reason: null
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                      url:
+                        type: string
+                        example: 'https://hooks.example.com/kit'
+                      description:
+                        type: string
+                        example: 'Production receiver'
+                      events:
+                        type: array
+                        example:
+                          - '*'
+                        items:
+                          type: string
+                      enabled:
+                        type: boolean
+                        example: true
+                      disabled_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      disabled_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+        422:
+          description: 'The URL is not https, resolves to a private address, or an event type is unknown.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/validation-failed'
+                  title: 'Validation Failed'
+                  status: 422
+                  detail: 'Webhook URLs must use https.'
+                  errors:
+                    url:
+                      - 'Webhook URLs must use https.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/validation-failed'
+                  title:
+                    type: string
+                    example: 'Validation Failed'
+                  status:
+                    type: integer
+                    example: 422
+                  detail:
+                    type: string
+                    example: 'Webhook URLs must use https.'
+                  errors:
+                    type: object
+                    properties:
+                      url:
+                        type: array
+                        example:
+                          - 'Webhook URLs must use https.'
+                        items:
+                          type: string
+      tags:
+        - Webhooks
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: 'A new https URL.'
+                  example: 'https://hooks.example.com/kit-v2'
+                description:
+                  type: string
+                  description: 'A new label, or null to clear it.'
+                  example: 'Staging receiver'
+                events:
+                  type: array
+                  description: 'The event types to receive from now on.'
+                  example:
+                    - '*'
+                  items:
+                    type: string
+                enabled:
+                  type: boolean
+                  description: 'false to pause deliveries, true to resume them.'
+                  example: true
+    delete:
+      summary: 'Delete Webhook'
+      operationId: deleteWebhook
+      description: 'Delete a webhook subscription and its delivery history. Use it when an endpoint is retired; to pause deliveries instead, update it with enabled: false. Returns 204 with no body.'
+      parameters: []
+      responses:
+        204:
+          description: 'Subscription deleted.'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    parameters:
+      -
+        in: path
+        name: webhook
+        description: 'The webhook subscription ID.'
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        required: true
+        schema:
+          type: string
+  '/v1/webhooks/{webhook}/secret':
+    post:
+      summary: 'Rotate Webhook Secret'
+      operationId: rotateWebhookSecret
+      description: "Replace a webhook subscription's signing secret. Use it when the secret may have leaked; deliveries are signed with the new secret from the next attempt, so update the receiver straight away. Returns the subscription with the new secret in meta.secret, shown only this once."
+      parameters: []
+      responses:
+        200:
+          description: 'Secret rotated. meta.secret is the only time the new secret is returned.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                    url: 'https://hooks.example.com/kit'
+                    description: 'Production receiver'
+                    events:
+                      - '*'
+                    enabled: true
+                    disabled_at: null
+                    disabled_reason: null
+                    created_at: '2026-10-20T12:00:00+00:00'
+                    updated_at: '2026-10-20T12:00:00+00:00'
+                  meta:
+                    secret: whsec_2b9e...
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+                      url:
+                        type: string
+                        example: 'https://hooks.example.com/kit'
+                      description:
+                        type: string
+                        example: 'Production receiver'
+                      events:
+                        type: array
+                        example:
+                          - '*'
+                        items:
+                          type: string
+                      enabled:
+                        type: boolean
+                        example: true
+                      disabled_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      disabled_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-10-20T12:00:00+00:00'
+                  meta:
+                    type: object
+                    properties:
+                      secret:
+                        type: string
+                        example: whsec_2b9e...
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    parameters:
+      -
+        in: path
+        name: webhook
+        description: 'The webhook subscription ID.'
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        required: true
+        schema:
+          type: string
+  '/v1/webhooks/{webhook}/ping':
+    post:
+      summary: 'Ping Webhook'
+      operationId: pingWebhook
+      description: 'Send a webhook.ping event to a subscription, whatever events it asked for. Use it to check a new receiver gets and verifies deliveries; it is limited to six a minute. Returns 202 with the queued delivery, whose progress List Webhook Deliveries shows.'
+      parameters: []
+      responses:
+        202:
+          description: 'Ping queued.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x3a4b5c6d7e8f9g0h1j2k
+                    event:
+                      id: 01jb8x3a1b2c3d4e5f6g7h8j9k
+                      type: webhook.ping
+                    state: retrying
+                    next_attempt_at: '2026-10-20T12:01:10+00:00'
+                    created_at: '2026-10-20T12:01:00+00:00'
+                    attempts:
+                      -
+                        attempt: 1
+                        response_status: 503
+                        response_body: 'Service Unavailable'
+                        error: null
+                        duration_ms: 182
+                        attempted_at: '2026-10-20T12:01:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x3a4b5c6d7e8f9g0h1j2k
+                      event:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 01jb8x3a1b2c3d4e5f6g7h8j9k
+                          type:
+                            type: string
+                            example: webhook.ping
+                      state:
+                        type: string
+                        example: retrying
+                      next_attempt_at:
+                        type: string
+                        example: '2026-10-20T12:01:10+00:00'
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:01:00+00:00'
+                      attempts:
+                        type: array
+                        example:
+                          -
+                            attempt: 1
+                            response_status: 503
+                            response_body: 'Service Unavailable'
+                            error: null
+                            duration_ms: 182
+                            attempted_at: '2026-10-20T12:01:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            attempt:
+                              type: integer
+                              example: 1
+                            response_status:
+                              type: integer
+                              example: 503
+                            response_body:
+                              type: string
+                              example: 'Service Unavailable'
+                            error:
+                              type: string
+                              example: null
+                              nullable: true
+                            duration_ms:
+                              type: integer
+                              example: 182
+                            attempted_at:
+                              type: string
+                              example: '2026-10-20T12:01:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    parameters:
+      -
+        in: path
+        name: webhook
+        description: 'The webhook subscription ID.'
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        required: true
+        schema:
+          type: string
+  '/v1/webhooks/{webhook}/deliveries':
+    get:
+      summary: 'List Webhook Deliveries'
+      operationId: listWebhookDeliveries
+      description: 'List a webhook subscription''s deliveries, newest first, 25 to a page, each with every attempt made. Use it to see why a receiver missed an event: a null response_status means no response arrived, as distinct from an error status. Returns an array of deliveries; follow the Link header''s rel="next" for the next page.'
+      parameters:
+        -
+          in: query
+          name: cursor
+          description: 'Opaque cursor from a Link header. Omit it for the first page.'
+          example: architecto
+          required: false
+          schema:
+            type: string
+            description: 'Opaque cursor from a Link header. Omit it for the first page.'
+            example: architecto
+      responses:
+        200:
+          description: 'One page of deliveries.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 01jb8x3a4b5c6d7e8f9g0h1j2k
+                    event:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 01jb8x3a1b2c3d4e5f6g7h8j9k
+                        type:
+                          type: string
+                          example: webhook.ping
+                    state:
+                      type: string
+                      example: retrying
+                    next_attempt_at:
+                      type: string
+                      example: '2026-10-20T12:01:10+00:00'
+                    created_at:
+                      type: string
+                      example: '2026-10-20T12:01:00+00:00'
+                    attempts:
+                      type: array
+                      example:
+                        -
+                          attempt: 1
+                          response_status: 503
+                          response_body: 'Service Unavailable'
+                          error: null
+                          duration_ms: 182
+                          attempted_at: '2026-10-20T12:01:00+00:00'
+                      items:
+                        type: object
+                        properties:
+                          attempt:
+                            type: integer
+                            example: 1
+                          response_status:
+                            type: integer
+                            example: 503
+                          response_body:
+                            type: string
+                            example: 'Service Unavailable'
+                          error:
+                            type: string
+                            example: null
+                            nullable: true
+                          duration_ms:
+                            type: integer
+                            example: 182
+                          attempted_at:
+                            type: string
+                            example: '2026-10-20T12:01:00+00:00'
+                example:
+                  -
+                    id: 01jb8x3a4b5c6d7e8f9g0h1j2k
+                    event:
+                      id: 01jb8x3a1b2c3d4e5f6g7h8j9k
+                      type: webhook.ping
+                    state: retrying
+                    next_attempt_at: '2026-10-20T12:01:10+00:00'
+                    created_at: '2026-10-20T12:01:00+00:00'
+                    attempts:
+                      -
+                        attempt: 1
+                        response_status: 503
+                        response_body: 'Service Unavailable'
+                        error: null
+                        duration_ms: 182
+                        attempted_at: '2026-10-20T12:01:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:read ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    parameters:
+      -
+        in: path
+        name: webhook
+        description: 'The webhook subscription ID.'
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        required: true
+        schema:
+          type: string
+  '/v1/webhooks/{webhook}/deliveries/{delivery}/redeliver':
+    post:
+      summary: 'Redeliver Webhook'
+      operationId: redeliverWebhook
+      description: 'Send an event again to the subscription it was delivered to, as a new delivery with the same body and event ID. Use it once a receiver is fixed; receivers that deduplicate on the Idempotency-Key header will ignore an event they already processed. Returns 202 with the new delivery.'
+      parameters: []
+      responses:
+        202:
+          description: 'Redelivery queued.'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01jb8x3a4b5c6d7e8f9g0h1j2k
+                    event:
+                      id: 01jb8x3a1b2c3d4e5f6g7h8j9k
+                      type: webhook.ping
+                    state: retrying
+                    next_attempt_at: '2026-10-20T12:01:10+00:00'
+                    created_at: '2026-10-20T12:01:00+00:00'
+                    attempts:
+                      -
+                        attempt: 1
+                        response_status: 503
+                        response_body: 'Service Unavailable'
+                        error: null
+                        duration_ms: 182
+                        attempted_at: '2026-10-20T12:01:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01jb8x3a4b5c6d7e8f9g0h1j2k
+                      event:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 01jb8x3a1b2c3d4e5f6g7h8j9k
+                          type:
+                            type: string
+                            example: webhook.ping
+                      state:
+                        type: string
+                        example: retrying
+                      next_attempt_at:
+                        type: string
+                        example: '2026-10-20T12:01:10+00:00'
+                      created_at:
+                        type: string
+                        example: '2026-10-20T12:01:00+00:00'
+                      attempts:
+                        type: array
+                        example:
+                          -
+                            attempt: 1
+                            response_status: 503
+                            response_body: 'Service Unavailable'
+                            error: null
+                            duration_ms: 182
+                            attempted_at: '2026-10-20T12:01:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            attempt:
+                              type: integer
+                              example: 1
+                            response_status:
+                              type: integer
+                              example: 503
+                            response_body:
+                              type: string
+                              example: 'Service Unavailable'
+                            error:
+                              type: string
+                              example: null
+                              nullable: true
+                            duration_ms:
+                              type: integer
+                              example: 182
+                            attempted_at:
+                              type: string
+                              example: '2026-10-20T12:01:00+00:00'
+        401:
+          description: 'Authentication failed.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/unauthorized'
+                  title: Unauthorized
+                  status: 401
+                  detail: Unauthenticated.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/unauthorized'
+                  title:
+                    type: string
+                    example: Unauthorized
+                  status:
+                    type: integer
+                    example: 401
+                  detail:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: 'Token is missing the webhooks:write ability.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/forbidden'
+                  title: Forbidden
+                  status: 403
+                  detail: Forbidden.
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/forbidden'
+                  title:
+                    type: string
+                    example: Forbidden
+                  status:
+                    type: integer
+                    example: 403
+                  detail:
+                    type: string
+                    example: Forbidden.
+        404:
+          description: 'No webhook with this ID belongs to the authenticated user.'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                example:
+                  type: 'https://apiguide.dev/errors/resource-not-found'
+                  title: 'Resource Not Found'
+                  status: 404
+                  detail: 'The resource was not found.'
+                properties:
+                  type:
+                    type: string
+                    example: 'https://apiguide.dev/errors/resource-not-found'
+                  title:
+                    type: string
+                    example: 'Resource Not Found'
+                  status:
+                    type: integer
+                    example: 404
+                  detail:
+                    type: string
+                    example: 'The resource was not found.'
+      tags:
+        - Webhooks
+    parameters:
+      -
+        in: path
+        name: webhook
+        description: 'The webhook subscription ID.'
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: delivery
+        description: 'The delivery to send again.'
+        example: 01jb8x3a4b5c6d7e8f9g0h1j2k
+        required: true
+        schema:
+          type: string

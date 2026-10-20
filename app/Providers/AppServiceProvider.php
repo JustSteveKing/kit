@@ -6,10 +6,14 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Support\ProductionSecurityChecks;
+use App\Webhooks\DnsHostResolver;
+use App\Webhooks\HostResolver;
+use App\Webhooks\SubscriptionSigningKeys;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use JustSteveKing\Toolbox\MessageSignatures\Contracts\KeyResolver;
 use Knuckles\Scribe\Scribe;
 
 final class AppServiceProvider extends ServiceProvider
@@ -17,7 +21,14 @@ final class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(HostResolver::class, DnsHostResolver::class);
+
+        // Each webhook subscription signs with its own secret; other key IDs fall through to
+        // config/api-toolbox.php.
+        $this->app->extend(KeyResolver::class, static fn(KeyResolver $configured): KeyResolver => new SubscriptionSigningKeys($configured));
+    }
 
     /**
      * Bootstrap any application services.

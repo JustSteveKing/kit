@@ -13,6 +13,8 @@ ignore:
       - POST /v1/auth/password/reset
       - GET /v1/auth/password/reset/*
       - POST /v1/auth/tokens
+      - POST /v1/webhooks
+      - PATCH /v1/webhooks/*
     reason: >
       Validation problems add an errors member keyed by field, which apiguide.dev's
       validation-failed type defines. Every problem shares type, title, status and detail.
