@@ -2,7 +2,7 @@ name: dependency-updates
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 3 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -24,18 +24,46 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Install current dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+
+      # Vet's plugin keeps every release younger than vet.json's minimum-release-age out of the
+      # update. It then refuses to install what nobody has trusted yet and exits 1, after the lock
+      # file is written. That refusal is expected here: the pull request carries the review.
       - name: Update Composer dependencies
-        run: composer update --no-interaction --no-progress --prefer-dist --no-scripts
+        run: |
+          composer update --no-interaction --no-progress --prefer-dist --no-scripts --no-ansi 2>&1 | tee update.log || true
+          if grep -q 'could not be resolved' update.log; then
+            exit 1
+          fi
+
+      - name: Install the updated lock without Vet
+        run: composer install --no-plugins --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: Audit with Vet
+        run: |
+          ./vendor/bin/vet --no-interaction --no-ansi > vet-report.txt 2>&1 || true
+          {
+            echo 'Automated weekly dependency refresh: `composer update`, holding back every release younger than `minimum-release-age` in `vet.json`.'
+            echo
+            echo '## Vet'
+            echo
+            echo '```'
+            cat vet-report.txt
+            echo '```'
+            echo
+            echo 'Untrusted packages fail `composer install` in CI. To review, check out this branch, run `composer install --no-plugins`, then `./vendor/bin/vet` in a terminal: read each change, or hand them to your coding agent, and pick the packages you trust. Commit `vet.json` to this branch; that push runs CI.'
+          } > pr-body.md
+          rm update.log vet-report.txt
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: 'bot: dependency updates'
           title: 'bot: dependency updates'
-          body: |
-            Automated daily dependency refresh.
-
-            - Ran `composer update`
-            - Updated lockfile and related dependency constraints
+          body-path: pr-body.md
+          add-paths: |
+            composer.json
+            composer.lock
           branch: bot/dependency-updates
           delete-branch: true

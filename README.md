@@ -215,6 +215,29 @@ Relevant config/env:
   and joins or starts a W3C trace (`traceparent`); both land in the log context
 - Security-sensitive auth/token actions emit structured `security.audit` log events
 - Configurable transport hardening for HTTPS enforcement, HSTS, trusted proxies/hosts, and strict CORS origins
+- Dependencies are audited with [Laravel Vet](https://github.com/laravel/vet): nothing is installed
+  until someone has read it, and no release younger than 7 days is installed at all
+
+## Dependency Audit (Vet)
+
+`composer audit` only knows about published advisories, so a freshly compromised release passes
+it. [Laravel Vet](https://github.com/laravel/vet) (beta) covers that gap as a Composer plugin:
+
+- `vet.json` records the version and file hash of every package someone has read. `composer
+  install` fails on anything else, including the same version re-published with different files.
+- `minimum-release-age: 7` keeps every release younger than a week out of `composer update`, so a
+  bad release has time to be found and pulled. `juststeveking/*` and `roave/security-advisories`
+  are excluded: the first are first-party, the second has to be current to be any use.
+
+After `composer update`, review what changed and record what you trust:
+
+```bash
+./vendor/bin/vet        # in a terminal: read each change, or hand them to your coding agent
+```
+
+Commit `vet.json` with `composer.lock`. If you build your own project from Kit, `vet.json` is the
+trust Kit recorded; run `./vendor/bin/vet --fresh` to take it over as your own, or remove
+`laravel/vet` if you do not want the gate.
 
 ## Idempotency
 
@@ -331,9 +354,11 @@ GitHub Actions workflows:
 - `.github/workflows/ci-tests.yml`
   - Runs Pint, PHPStan and the test suite on every push and pull request
 - `.github/workflows/dependency-updates.yml`
-  - Runs daily at `03:00 UTC`
-  - Executes `composer update`
-  - Opens/updates PR titled `bot: dependency updates`
+  - Runs weekly, Mondays at `03:00 UTC`
+  - Executes `composer update`, holding back releases younger than 7 days
+  - Opens/updates PR titled `bot: dependency updates` with Vet's report of what needs review
+  - The PR cannot pass CI until `vet.json` is updated on its branch: check it out, run
+    `composer install --no-plugins`, then `./vendor/bin/vet`, and commit `vet.json`
 - `.github/workflows/security-gate.yml`
   - Runs Composer security audit
   - Fails on high/critical advisories
