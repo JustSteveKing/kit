@@ -27,6 +27,8 @@ API design, HTTP standards, documentation, testing and security.
   [legible](https://github.com/JustSteveKing/legible) gate that keeps the spec agent-ready
 - `php artisan make:endpoint` scaffolds an endpoint the way the rest of Kit is built
 - A production image: Laravel Octane on FrankenPHP, with the same image as the queue worker
+- Outbound webhooks: consumers subscribe their own endpoints; deliveries are signed (RFC 9421),
+  retried on a published schedule, recorded attempt by attempt, and can be redelivered
 - GitHub Actions for style, static analysis, tests, security audits and weekly, Vet-audited dependency update PRs
 - An [`AGENTS.md`](AGENTS.md) that tells coding agents, and you, how to build on Kit the way it is built
 
@@ -346,6 +348,49 @@ Behaviour:
 - `GET /v1/auth/me` sends an `ETag`; repeat the request with `If-None-Match` and an unchanged user
   gets `304 Not Modified`
 
+## Webhooks
+
+API consumers subscribe their own https endpoints to events, behind the `webhooks:read` and
+`webhooks:write` abilities:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/webhooks` | List subscriptions |
+| POST | `/v1/webhooks` | Subscribe a URL to events; the secret is returned once |
+| GET | `/v1/webhooks/{webhook}` | Show a subscription, and why it was disabled if it was |
+| PATCH | `/v1/webhooks/{webhook}` | Change the URL, events or description, or enable and disable it |
+| DELETE | `/v1/webhooks/{webhook}` | Delete a subscription and its history |
+| POST | `/v1/webhooks/{webhook}/secret` | Rotate the signing secret |
+| POST | `/v1/webhooks/{webhook}/ping` | Send a `webhook.ping` to test the endpoint |
+| GET | `/v1/webhooks/{webhook}/deliveries` | Deliveries, each with every attempt |
+| POST | `/v1/webhooks/{webhook}/deliveries/{delivery}/redeliver` | Send an event again |
+
+Every delivery is a POST of:
+
+```json
+{"id": "01jb8x3a1b2c3d4e5f6g7h8j9k", "type": "project.created", "api_version": "v1", "created_at": "2026-10-20T12:01:00+00:00", "data": {}}
+```
+
+- **Signed** with [RFC 9421](https://www.rfc-editor.org/rfc/rfc9421) HTTP Message Signatures
+  (`Signature`, `Signature-Input`, with `keyid` set to the subscription ID), using HMAC-SHA256 and
+  the subscription's secret, over the method, URI, `Content-Type` and a `Content-Digest` of the
+  body. A Laravel receiver with api-toolbox verifies it with the `signature.verify` middleware.
+- **Deduplicable**: the event ID is sent as `Idempotency-Key`, and is the same on every retry and
+  redelivery.
+- **Retried** after 10s, 1m, 5m, 30m, 2h and 6h (`webhooks.backoff`), then marked failed. Any 2xx is
+  success. A subscription is disabled, with a reason, after 10 deliveries in a row fail
+  (`WEBHOOKS_DISABLE_AFTER`); re-enable it with `PATCH {"enabled": true}`.
+- **Recorded**: each attempt keeps its status, a response excerpt, its duration and any error. A
+  `null` status means no response arrived, as distinct from an error status.
+- **Safe to point at**: URLs must be https and must not resolve to a private, loopback or reserved
+  address, checked on subscribe and on every send. Loosen this locally with
+  `WEBHOOKS_REQUIRE_HTTPS=false` and `WEBHOOKS_ALLOW_PRIVATE_NETWORKS=true`.
+- **Pruned**: events and their deliveries are kept for 30 days (`WEBHOOKS_RETENTION_DAYS`), by a
+  daily `model:prune`, so run the scheduler (`php artisan schedule:work`) as well as a queue worker.
+
+Kit ships the machinery and the ping; [AGENTS.md](AGENTS.md#webhooks) shows how to add your own
+events.
+
 ## Deployment
 
 The `Dockerfile` builds a production image: Laravel Octane on FrankenPHP, PHP 8.5, running as a
@@ -355,6 +400,7 @@ non-root user on port 8000, with OPcache tuned for production and a health check
 docker build -t my-api .
 docker run -p 8000:8000 --env-file .env.production my-api                       # the API
 docker run --env-file .env.production my-api php artisan queue:work             # a queue worker
+docker run --env-file .env.production my-api php artisan schedule:work          # the scheduler
 ```
 
 At start the container caches config, routes and events from its environment. Production refuses
@@ -473,6 +519,7 @@ app/
     Requests/Auth/
     Resources/
   Notifications/     queued verification and reset emails
+  Webhooks/          webhook events, delivery and signing
   Support/
 routes/
   api/
@@ -484,6 +531,7 @@ stubs/endpoint/     templates for make:endpoint
 config/
   api-toolbox.php
   octane.php
+  webhooks.php
   sanctum.php
   scribe.php
   security.php
