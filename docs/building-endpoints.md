@@ -249,3 +249,6 @@ Route::post('/imports', CreateImportController::class)
     ->withoutMiddleware('consumes:application/json')
     ->middleware('consumes:multipart/form-data');
 ```
+
+A merge patch `PATCH` is the other common case. [HTTP standards](http-standards.md#partial-updates)
+shows the route.
