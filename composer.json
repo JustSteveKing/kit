@@ -1,16 +1,19 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "juststeveking/kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Opinionated Laravel API starter kit: token authentication, standards-compliant HTTP via api-toolbox, and contract-tested OpenAPI docs.",
     "keywords": [
         "laravel",
-        "framework"
+        "api",
+        "starter-kit",
+        "sanctum",
+        "rfc9457"
     ],
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^13.30",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
         "readalizer/readalizer": "^1.0"
@@ -18,8 +21,8 @@
     "require-dev": {
         "driftingly/rector-laravel": "^2.1",
         "fakerphp/faker": "^1.23",
-        "knuckleswtf/scribe": "^5.7",
-        "larastan/larastan": "3.x-dev",
+        "knuckleswtf/scribe": "^5.11",
+        "larastan/larastan": "^3.9",
         "laravel/boost": "^2.4",
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",
@@ -102,6 +105,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

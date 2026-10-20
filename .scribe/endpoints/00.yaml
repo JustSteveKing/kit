@@ -78,7 +78,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T09:17:41+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Registration succeeded.'
       -
@@ -157,7 +157,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"","type":"users","attributes":{"name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T09:17:41+00:00","created_at":null,"updated_at":null}},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Login succeeded.'
       -
@@ -446,7 +446,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The <code>id</code> of an existing record in the users table.'
+        description: 'Must match an existing stored value.'
         required: true
         example: architecto
         type: string
@@ -517,7 +517,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"","type":"users","attributes":{"name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-02-23T19:05:13+00:00","created_at":null,"updated_at":null}}}'
+        content: '{"data":{"id":"","type":"users","attributes":{"name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T09:17:41+00:00","created_at":null,"updated_at":null}}}'
         headers: []
         description: 'Authenticated user profile.'
       -
