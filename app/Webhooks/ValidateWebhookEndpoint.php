@@ -39,7 +39,11 @@ final class ValidateWebhookEndpoint implements ShouldQueue
             $host = (string) parse_url($url, PHP_URL_HOST);
             $port = parse_url($url, PHP_URL_PORT) ?? ('https' === parse_url($url, PHP_URL_SCHEME) ? 443 : 80);
 
-            $allowed = Http::withHeaders(['WebHook-Request-Origin' => $origin])
+            // The callback lets the target consent later instead, by GET or POST (section 4.1.3).
+            $allowed = Http::withHeaders([
+                'WebHook-Request-Origin' => $origin,
+                'WebHook-Request-Callback' => ConsentCallback::url($subscription),
+            ])
                 ->withOptions(['curl' => [CURLOPT_RESOLVE => ["{$host}:{$port}:{$address}"]]])
                 ->withoutRedirecting()
                 ->timeout(config()->integer('webhooks.timeout', 10))

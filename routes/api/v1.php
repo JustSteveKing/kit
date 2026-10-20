@@ -17,8 +17,10 @@ use App\Http\Controllers\Api\V1\Auth\ShowResetPasswordTokenController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Webhooks\CreateWebhookController;
 use App\Http\Controllers\Api\V1\Webhooks\DeleteWebhookController;
+use App\Http\Controllers\Api\V1\Webhooks\GrantWebhookConsentController;
 use App\Http\Controllers\Api\V1\Webhooks\ListWebhookDeliveriesController;
 use App\Http\Controllers\Api\V1\Webhooks\ListWebhooksController;
+use App\Http\Controllers\Api\V1\Webhooks\OpenWebhookConsentLinkController;
 use App\Http\Controllers\Api\V1\Webhooks\PingWebhookController;
 use App\Http\Controllers\Api\V1\Webhooks\RedeliverWebhookController;
 use App\Http\Controllers\Api\V1\Webhooks\RotateWebhookSecretController;
@@ -46,6 +48,17 @@ Route::get('/auth/email/verify/{id}/{hash}', VerifyEmailController::class)
     ->where('hash', '[0-9a-f]{40}')
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
+
+// The URL is the credential: it is signed, expires, and is sent only to the endpoint asked.
+// The CloudEvents webhook spec asks for both methods; each is its own documented operation.
+Route::get('/webhooks/{webhook}/consent', OpenWebhookConsentLinkController::class)
+    ->whereUlid('webhook')
+    ->middleware('throttle:6,1')
+    ->name('v1.webhooks.consent');
+Route::post('/webhooks/{webhook}/consent', GrantWebhookConsentController::class)
+    ->whereUlid('webhook')
+    ->middleware('throttle:6,1')
+    ->name('v1.webhooks.consent.grant');
 
 Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (): void {
     Route::get('/auth/me', MeController::class)

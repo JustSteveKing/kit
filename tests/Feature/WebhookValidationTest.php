@@ -117,6 +117,76 @@ it('delivers without consent when validation is off', function (): void {
     Http::assertNotSent(fn(ClientRequest $request): bool => 'OPTIONS' === $request->method());
 });
 
+/**
+ * The WebHook-Request-Callback URL sent with the subscription's validation request.
+ */
+function consentCallbackFor(WebhookSubscription $subscription): string
+{
+    $sent = Http::recorded(fn(ClientRequest $request): bool => 'OPTIONS' === $request->method() && $request->url() === $subscription->url);
+
+    expect($sent)->not->toBeEmpty();
+
+    return (string) $sent->last()[0]->header('WebHook-Request-Callback')[0];
+}
+
+it('sends a consent callback that validates the subscription by GET or POST', function (string $method): void {
+    consentingEndpoint(null);
+    $subscription = subscribe(User::factory()->create());
+    $callback = consentCallbackFor($subscription);
+
+    expect($callback)->toStartWith(route('v1.webhooks.consent', ['webhook' => $subscription->id]));
+    expect($subscription->validated_at)->toBeNull();
+
+    $this->json($method, $callback)
+        ->assertOk()
+        ->assertJsonPath('message', __('api.webhooks.consent_granted'));
+
+    expect($subscription->refresh()->validated_at)->not->toBeNull();
+
+    $this->json($method, $callback)->assertOk();
+})->with(['GET', 'POST']);
+
+it('refuses a consent link that was altered or has expired', function (): void {
+    consentingEndpoint(null);
+    $subscription = subscribe(User::factory()->create());
+    $callback = consentCallbackFor($subscription);
+
+    $this->getJson(str_replace('url_hash=', 'url_hash=0', $callback))
+        ->assertProblem(403)
+        ->assertJsonPath('detail', __('api.webhooks.invalid_consent_link'));
+
+    $this->travel(73)->hours();
+
+    $this->getJson($callback)->assertProblem(403);
+    expect($subscription->refresh()->validated_at)->toBeNull();
+});
+
+it('refuses consent given for a url the subscription no longer uses', function (): void {
+    consentingEndpoint(null);
+    $user = User::factory()->create();
+    $subscription = subscribe($user);
+    $callback = consentCallbackFor($subscription);
+
+    $this->withToken($user->createToken('t', ['webhooks:write'])->plainTextToken)
+        ->patchJson('/v1/webhooks/' . $subscription->id, ['url' => 'https://hooks.example.com/moved'])
+        ->assertOk();
+
+    $this->getJson($callback)
+        ->assertProblemType('https://apiguide.dev/errors/resource-conflict', 409)
+        ->assertJsonPath('detail', __('api.webhooks.consent_url_changed'));
+
+    expect($subscription->refresh()->validated_at)->toBeNull();
+});
+
+it('answers 404 to a consent link for a deleted subscription', function (): void {
+    consentingEndpoint(null);
+    $subscription = subscribe(User::factory()->create());
+    $callback = consentCallbackFor($subscription);
+    $subscription->delete();
+
+    $this->getJson($callback)->assertProblem(404);
+});
+
 final readonly class ProjectCreatedForValidation implements App\Webhooks\WebhookEvent
 {
     public function type(): string

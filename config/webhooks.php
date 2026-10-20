@@ -48,6 +48,9 @@ return [
 
     'validate_endpoints' => (bool) env('WEBHOOKS_VALIDATE_ENDPOINTS', false),
 
+    // Hours the WebHook-Request-Callback consent URL sent with each validation request stays valid.
+    'callback_hours' => (int) env('WEBHOOKS_CALLBACK_HOURS', 72),
+
     /*
     |--------------------------------------------------------------------------
     | Retry Schedule
