@@ -34,6 +34,10 @@ final class ValidateWebhookEndpoint implements ShouldQueue
         $origin = config()->string('webhooks.origin');
         $url = $subscription->url;
 
+        // Each request supersedes the last: only its answer or its callback may grant consent.
+        $request = bin2hex(random_bytes(16));
+        $subscription->forceFill(['validation_request' => $request])->save();
+
         try {
             $address = $targets->resolve($url);
             $host = (string) parse_url($url, PHP_URL_HOST);
@@ -42,7 +46,7 @@ final class ValidateWebhookEndpoint implements ShouldQueue
             // The callback lets the target consent later instead, by GET or POST (section 4.1.3).
             $response = Http::withHeaders(array_filter([
                 'WebHook-Request-Origin' => $origin,
-                'WebHook-Request-Callback' => ConsentCallback::url($subscription),
+                'WebHook-Request-Callback' => ConsentCallback::url($subscription, $request),
                 'WebHook-Request-Rate' => null === AllowedRate::requested() ? null : (string) AllowedRate::requested(),
             ]))
                 ->withOptions(['curl' => [CURLOPT_RESOLVE => ["{$host}:{$port}:{$address}"]]])
@@ -54,7 +58,9 @@ final class ValidateWebhookEndpoint implements ShouldQueue
         }
 
         // The URL may have changed while this was queued; consent was given to the URL asked.
-        if ($subscription->refresh()->url === $url && in_array(mb_trim($response->header('WebHook-Allowed-Origin')), [$origin, '*'], true)) {
+        $subscription->refresh();
+
+        if ($subscription->url === $url && $subscription->validation_request === $request && in_array(mb_trim($response->header('WebHook-Allowed-Origin')), [$origin, '*'], true)) {
             $subscription->forceFill([
                 'validated_at' => now(),
                 'allowed_rate' => AllowedRate::from($response->header('WebHook-Allowed-Rate')),

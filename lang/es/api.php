@@ -35,6 +35,7 @@ return [
         'not_validated' => 'El endpoint del webhook aun no ha aceptado recibir entregas.',
         'invalid_consent_link' => 'Este enlace de consentimiento no es valido o ha caducado. Valida el webhook de nuevo para obtener otro.',
         'consent_url_changed' => 'La URL del webhook ha cambiado desde que se envio este enlace de consentimiento.',
+        'consent_superseded' => 'Una solicitud de validacion mas reciente reemplazo la que envio este enlace de consentimiento.',
         'consent_granted' => 'Se permiten las entregas a este endpoint de webhook.',
     ],
     'sunset' => [

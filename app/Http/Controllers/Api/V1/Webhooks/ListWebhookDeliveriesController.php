@@ -16,6 +16,7 @@ use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\QueryParam;
 use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Knuckles\Scribe\Attributes\UrlParam;
 
 #[Group(name: 'Webhooks')]
@@ -71,6 +72,11 @@ use Knuckles\Scribe\Attributes\UrlParam;
     status: 403,
     description: 'Token is missing the webhooks:read ability.',
 )]
+#[ResponseField('[].next_attempt_at', 'string', 'When the next attempt is due, or null when none is.', nullable: true)]
+#[ResponseField('[].attempts[].response_status', 'integer', 'The endpoint\'s status code, or null when no response arrived.', nullable: true)]
+#[ResponseField('[].attempts[].response_body', 'string', 'The start of the response body, or null.', nullable: true)]
+#[ResponseField('[].attempts[].error', 'string', 'Why the attempt failed without a response, or null.', nullable: true)]
+#[ResponseField('[].attempts[].duration_ms', 'integer', 'How long the attempt took, or null.', nullable: true)]
 final class ListWebhookDeliveriesController
 {
     /**

@@ -145,15 +145,9 @@ final class DeliverWebhook implements ShouldQueue
             return false;
         }
 
-        $key = $this->rateKey($subscription);
-
-        if (RateLimiter::tooManyAttempts($key, $subscription->allowed_rate)) {
-            return true;
-        }
-
-        RateLimiter::hit($key, 60);
-
-        return false;
+        // Increment first, then compare: the increment is atomic, so two workers delivering to one
+        // subscription each claim their own slot. Checking before incrementing would let both pass.
+        return RateLimiter::hit($this->rateKey($subscription), 60) > $subscription->allowed_rate;
     }
 
     private function rateKey(WebhookSubscription $subscription): string

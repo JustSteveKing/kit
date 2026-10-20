@@ -96,6 +96,30 @@ it('takes the rate from a consent callback, or the requested rate without one', 
     'a browser GET-style callback without it' => [null, 20],
 ]);
 
+it('updates the rate when a callback answers a re-validation', function (): void {
+    Http::fake(fn() => Http::response('', 200));
+    $user = User::factory()->create();
+    $subscription = subscribeFor($user);
+    $first = (string) Http::recorded()->last()[0]->header('WebHook-Request-Callback')[0];
+
+    $this->withHeaders(['WebHook-Allowed-Rate' => '30'])->postJson($first)->assertOk();
+    expect($subscription->refresh()->allowed_rate)->toBe(30);
+
+    $this->withToken($user->createToken('t', ['webhooks:write'])->plainTextToken)
+        ->postJson('/v1/webhooks/' . $subscription->id . '/validate')
+        ->assertAccepted();
+    $second = (string) Http::recorded()->last()[0]->header('WebHook-Request-Callback')[0];
+
+    $this->withHeaders(['WebHook-Allowed-Rate' => '5'])->postJson($second)->assertOk();
+    expect($subscription->refresh()->allowed_rate)->toBe(5);
+
+    // The first request was superseded, so its callback cannot put the old rate back.
+    $this->withHeaders(['WebHook-Allowed-Rate' => '30'])->postJson($first)
+        ->assertProblemType('https://apiguide.dev/errors/resource-conflict', 409)
+        ->assertJsonPath('detail', __('api.webhooks.consent_superseded'));
+    expect($subscription->refresh()->allowed_rate)->toBe(5);
+});
+
 it('forgets the granted rate when the url changes', function (): void {
     endpointGranting('30');
     $user = User::factory()->create();

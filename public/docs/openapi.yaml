@@ -38,10 +38,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5chhcys9g822a4n04kp22h2
+                    id: 01m5cjb70r9fgm3p1vsa3t5kbd
                     name: 'Justina Gaylord'
                     email: lafayette.considine@example.com
-                    email_verified_at: '2026-10-20T11:35:53+00:00'
+                    email_verified_at: '2026-10-20T11:49:59+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -54,7 +54,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5chhcys9g822a4n04kp22h2
+                        example: 01m5cjb70r9fgm3p1vsa3t5kbd
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -63,7 +63,7 @@ paths:
                         example: lafayette.considine@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:35:53+00:00'
+                        example: '2026-10-20T11:49:59+00:00'
                       created_at:
                         type: string
                         example: null
@@ -166,10 +166,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5chhcz4dy2sqpba05mk7ahy
+                    id: 01m5cjb75mxp8226rd0k5yd7gz
                     name: 'Justina Gaylord'
                     email: cormier.nick@example.com
-                    email_verified_at: '2026-10-20T11:35:53+00:00'
+                    email_verified_at: '2026-10-20T11:49:59+00:00'
                     created_at: null
                     updated_at: null
                   meta:
@@ -182,7 +182,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5chhcz4dy2sqpba05mk7ahy
+                        example: 01m5cjb75mxp8226rd0k5yd7gz
                       name:
                         type: string
                         example: 'Justina Gaylord'
@@ -191,7 +191,7 @@ paths:
                         example: cormier.nick@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:35:53+00:00'
+                        example: '2026-10-20T11:49:59+00:00'
                       created_at:
                         type: string
                         example: null
@@ -615,10 +615,10 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 01m5chhd02mfbjj9883je9h803
+                    id: 01m5cjb7b0xwcwsjy7am2c6xm2
                     name: 'Morgan Hirthe'
                     email: dare.emelie@example.com
-                    email_verified_at: '2026-10-20T11:35:53+00:00'
+                    email_verified_at: '2026-10-20T11:49:59+00:00'
                     created_at: null
                     updated_at: null
                 properties:
@@ -627,7 +627,7 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: 01m5chhd02mfbjj9883je9h803
+                        example: 01m5cjb7b0xwcwsjy7am2c6xm2
                       name:
                         type: string
                         example: 'Morgan Hirthe'
@@ -636,7 +636,7 @@ paths:
                         example: dare.emelie@example.com
                       email_verified_at:
                         type: string
-                        example: '2026-10-20T11:35:53+00:00'
+                        example: '2026-10-20T11:49:59+00:00'
                       created_at:
                         type: string
                         example: null
@@ -1229,6 +1229,16 @@ paths:
             example: 3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b
         -
           in: query
+          name: request
+          description: 'The validation request this consent answers, from the callback URL.'
+          example: 9f86d081884c7d659a2feaa0c55ad015
+          required: true
+          schema:
+            type: string
+            description: 'The validation request this consent answers, from the callback URL.'
+            example: 9f86d081884c7d659a2feaa0c55ad015
+        -
+          in: query
           name: expires
           description: 'When the callback URL expires, from the callback URL.'
           example: 1761220800
@@ -1309,7 +1319,7 @@ paths:
                     type: string
                     example: 'The resource was not found.'
         409:
-          description: 'Consent was asked for a URL the subscription no longer uses.'
+          description: 'Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.'
           content:
             application/problem+json:
               schema:
@@ -1352,6 +1362,16 @@ paths:
             example: 3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b
         -
           in: query
+          name: request
+          description: 'The validation request this consent answers, from the callback URL.'
+          example: 9f86d081884c7d659a2feaa0c55ad015
+          required: true
+          schema:
+            type: string
+            description: 'The validation request this consent answers, from the callback URL.'
+            example: 9f86d081884c7d659a2feaa0c55ad015
+        -
+          in: query
           name: expires
           description: 'When the callback URL expires, from the callback URL.'
           example: 1761220800
@@ -1432,7 +1452,7 @@ paths:
                     type: string
                     example: 'The resource was not found.'
         409:
-          description: 'Consent was asked for a URL the subscription no longer uses.'
+          description: 'Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.'
           content:
             application/problem+json:
               schema:
@@ -1502,6 +1522,7 @@ paths:
                     description:
                       type: string
                       example: 'Production receiver'
+                      nullable: true
                     events:
                       type: array
                       example:
@@ -1514,8 +1535,9 @@ paths:
                     validated_at:
                       type: string
                       example: '2026-10-20T12:00:05+00:00'
+                      nullable: true
                     allowed_rate:
-                      type: string
+                      type: integer
                       example: null
                       nullable: true
                     disabled_at:
@@ -1637,6 +1659,8 @@ paths:
                       description:
                         type: string
                         example: 'Production receiver'
+                        description: 'The label given to the subscription.'
+                        nullable: true
                       events:
                         type: array
                         example:
@@ -1649,17 +1673,22 @@ paths:
                       validated_at:
                         type: string
                         example: '2026-10-20T12:00:05+00:00'
+                        description: 'When the endpoint consented to deliveries, or null if it has not.'
+                        nullable: true
                       allowed_rate:
-                        type: string
+                        type: integer
                         example: null
+                        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
                         nullable: true
                       disabled_at:
                         type: string
                         example: null
+                        description: 'When the subscription was disabled, or null while it is enabled.'
                         nullable: true
                       disabled_reason:
                         type: string
                         example: null
+                        description: 'Why it was disabled, or null.'
                         nullable: true
                       created_at:
                         type: string
@@ -1667,6 +1696,12 @@ paths:
                       updated_at:
                         type: string
                         example: '2026-10-20T12:00:00+00:00'
+                    required:
+                      - description
+                      - validated_at
+                      - allowed_rate
+                      - disabled_at
+                      - disabled_reason
                   meta:
                     type: object
                     properties:
@@ -1824,6 +1859,8 @@ paths:
                       description:
                         type: string
                         example: 'Production receiver'
+                        description: 'The label given to the subscription.'
+                        nullable: true
                       events:
                         type: array
                         example:
@@ -1836,17 +1873,22 @@ paths:
                       validated_at:
                         type: string
                         example: '2026-10-20T12:00:05+00:00'
+                        description: 'When the endpoint consented to deliveries, or null if it has not.'
+                        nullable: true
                       allowed_rate:
-                        type: string
+                        type: integer
                         example: null
+                        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
                         nullable: true
                       disabled_at:
                         type: string
                         example: null
+                        description: 'When the subscription was disabled, or null while it is enabled.'
                         nullable: true
                       disabled_reason:
                         type: string
                         example: null
+                        description: 'Why it was disabled, or null.'
                         nullable: true
                       created_at:
                         type: string
@@ -1854,6 +1896,12 @@ paths:
                       updated_at:
                         type: string
                         example: '2026-10-20T12:00:00+00:00'
+                    required:
+                      - description
+                      - validated_at
+                      - allowed_rate
+                      - disabled_at
+                      - disabled_reason
         401:
           description: 'Authentication failed.'
           content:
@@ -1967,6 +2015,8 @@ paths:
                       description:
                         type: string
                         example: 'Production receiver'
+                        description: 'The label given to the subscription.'
+                        nullable: true
                       events:
                         type: array
                         example:
@@ -1979,17 +2029,22 @@ paths:
                       validated_at:
                         type: string
                         example: '2026-10-20T12:00:05+00:00'
+                        description: 'When the endpoint consented to deliveries, or null if it has not.'
+                        nullable: true
                       allowed_rate:
-                        type: string
+                        type: integer
                         example: null
+                        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
                         nullable: true
                       disabled_at:
                         type: string
                         example: null
+                        description: 'When the subscription was disabled, or null while it is enabled.'
                         nullable: true
                       disabled_reason:
                         type: string
                         example: null
+                        description: 'Why it was disabled, or null.'
                         nullable: true
                       created_at:
                         type: string
@@ -1997,6 +2052,12 @@ paths:
                       updated_at:
                         type: string
                         example: '2026-10-20T12:00:00+00:00'
+                    required:
+                      - description
+                      - validated_at
+                      - allowed_rate
+                      - disabled_at
+                      - disabled_reason
         401:
           description: 'Authentication failed.'
           content:
@@ -2266,6 +2327,8 @@ paths:
                       description:
                         type: string
                         example: 'Production receiver'
+                        description: 'The label given to the subscription.'
+                        nullable: true
                       events:
                         type: array
                         example:
@@ -2278,17 +2341,22 @@ paths:
                       validated_at:
                         type: string
                         example: '2026-10-20T12:00:05+00:00'
+                        description: 'When the endpoint consented to deliveries, or null if it has not.'
+                        nullable: true
                       allowed_rate:
-                        type: string
+                        type: integer
                         example: null
+                        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
                         nullable: true
                       disabled_at:
                         type: string
                         example: null
+                        description: 'When the subscription was disabled, or null while it is enabled.'
                         nullable: true
                       disabled_reason:
                         type: string
                         example: null
+                        description: 'Why it was disabled, or null.'
                         nullable: true
                       created_at:
                         type: string
@@ -2296,6 +2364,12 @@ paths:
                       updated_at:
                         type: string
                         example: '2026-10-20T12:00:00+00:00'
+                    required:
+                      - description
+                      - validated_at
+                      - allowed_rate
+                      - disabled_at
+                      - disabled_reason
                   meta:
                     type: object
                     properties:
@@ -2425,6 +2499,8 @@ paths:
                       description:
                         type: string
                         example: 'Production receiver'
+                        description: 'The label given to the subscription.'
+                        nullable: true
                       events:
                         type: array
                         example:
@@ -2437,18 +2513,22 @@ paths:
                       validated_at:
                         type: string
                         example: null
+                        description: 'When the endpoint consented to deliveries, or null if it has not.'
                         nullable: true
                       allowed_rate:
-                        type: string
+                        type: integer
                         example: null
+                        description: 'Deliveries a minute the endpoint granted, or null for no limit.'
                         nullable: true
                       disabled_at:
                         type: string
                         example: null
+                        description: 'When the subscription was disabled, or null while it is enabled.'
                         nullable: true
                       disabled_reason:
                         type: string
                         example: null
+                        description: 'Why it was disabled, or null.'
                         nullable: true
                       created_at:
                         type: string
@@ -2456,6 +2536,12 @@ paths:
                       updated_at:
                         type: string
                         example: '2026-10-20T12:00:00+00:00'
+                    required:
+                      - description
+                      - validated_at
+                      - allowed_rate
+                      - disabled_at
+                      - disabled_reason
         401:
           description: 'Authentication failed.'
           content:
@@ -2591,6 +2677,8 @@ paths:
                       next_attempt_at:
                         type: string
                         example: '2026-10-20T12:01:10+00:00'
+                        description: 'When the next attempt is due, or null when none is.'
+                        nullable: true
                       created_at:
                         type: string
                         example: '2026-10-20T12:01:00+00:00'
@@ -2613,9 +2701,11 @@ paths:
                             response_status:
                               type: integer
                               example: 503
+                              nullable: true
                             response_body:
                               type: string
                               example: 'Service Unavailable'
+                              nullable: true
                             error:
                               type: string
                               example: null
@@ -2623,9 +2713,12 @@ paths:
                             duration_ms:
                               type: integer
                               example: 182
+                              nullable: true
                             attempted_at:
                               type: string
                               example: '2026-10-20T12:01:00+00:00'
+                    required:
+                      - next_attempt_at
         401:
           description: 'Authentication failed.'
           content:
@@ -2777,6 +2870,7 @@ paths:
                     next_attempt_at:
                       type: string
                       example: '2026-10-20T12:01:10+00:00'
+                      nullable: true
                     created_at:
                       type: string
                       example: '2026-10-20T12:01:00+00:00'
@@ -2799,9 +2893,11 @@ paths:
                           response_status:
                             type: integer
                             example: 503
+                            nullable: true
                           response_body:
                             type: string
                             example: 'Service Unavailable'
+                            nullable: true
                           error:
                             type: string
                             example: null
@@ -2809,6 +2905,7 @@ paths:
                           duration_ms:
                             type: integer
                             example: 182
+                            nullable: true
                           attempted_at:
                             type: string
                             example: '2026-10-20T12:01:00+00:00'
@@ -2964,6 +3061,8 @@ paths:
                       next_attempt_at:
                         type: string
                         example: '2026-10-20T12:01:10+00:00'
+                        description: 'When the next attempt is due, or null when none is.'
+                        nullable: true
                       created_at:
                         type: string
                         example: '2026-10-20T12:01:00+00:00'
@@ -2986,9 +3085,11 @@ paths:
                             response_status:
                               type: integer
                               example: 503
+                              nullable: true
                             response_body:
                               type: string
                               example: 'Service Unavailable'
+                              nullable: true
                             error:
                               type: string
                               example: null
@@ -2996,9 +3097,12 @@ paths:
                             duration_ms:
                               type: integer
                               example: 182
+                              nullable: true
                             attempted_at:
                               type: string
                               example: '2026-10-20T12:01:00+00:00'
+                    required:
+                      - next_attempt_at
         401:
           description: 'Authentication failed.'
           content:

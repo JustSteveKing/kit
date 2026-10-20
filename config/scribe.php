@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Support\NoContentOpenApiGenerator;
 use App\Support\ProblemDetailsOpenApiGenerator;
+use App\Support\ResponseFieldsOpenApiGenerator;
 use Knuckles\Scribe\Config\AuthIn;
 use Knuckles\Scribe\Config\Defaults;
 
@@ -182,6 +183,7 @@ return [
         'generators' => [
             ProblemDetailsOpenApiGenerator::class,
             NoContentOpenApiGenerator::class,
+            ResponseFieldsOpenApiGenerator::class,
         ],
     ],
 

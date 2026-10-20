@@ -14,6 +14,7 @@ use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
 use Knuckles\Scribe\Attributes\QueryParam;
 use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\ResponseField;
 
 #[Group(name: 'Webhooks')]
 #[Endpoint(
@@ -55,6 +56,11 @@ use Knuckles\Scribe\Attributes\Response;
     status: 403,
     description: 'Token is missing the webhooks:read ability.',
 )]
+#[ResponseField('[].description', 'string', 'The label given to the subscription.', nullable: true)]
+#[ResponseField('[].validated_at', 'string', 'When the endpoint consented to deliveries, or null if it has not.', nullable: true)]
+#[ResponseField('[].allowed_rate', 'integer', 'Deliveries a minute the endpoint granted, or null for no limit.', nullable: true)]
+#[ResponseField('[].disabled_at', 'string', 'When the subscription was disabled, or null while it is enabled.', nullable: true)]
+#[ResponseField('[].disabled_reason', 'string', 'Why it was disabled, or null.', nullable: true)]
 final class ListWebhooksController
 {
     /**

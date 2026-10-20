@@ -22,6 +22,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
 #[Unauthenticated]
 #[UrlParam('webhook', type: 'string', description: 'The webhook subscription ID, from the callback URL.', required: true, example: '01jb8x2m4k5n6p7q8r9s0t1v2w')]
 #[QueryParam('url_hash', type: 'string', description: 'SHA-256 of the URL consent was asked for, from the callback URL.', required: true, example: '3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b')]
+#[QueryParam('request', type: 'string', description: 'The validation request this consent answers, from the callback URL.', required: true, example: '9f86d081884c7d659a2feaa0c55ad015')]
 #[QueryParam('expires', type: 'integer', description: 'When the callback URL expires, from the callback URL.', required: true, example: 1761220800)]
 #[QueryParam('signature', type: 'string', description: 'The callback URL\'s signature, from the callback URL.', required: true, example: '0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f')]
 #[Response(content: ['message' => 'Deliveries to this webhook endpoint are allowed.'], status: 200, description: 'Consent recorded.')]
@@ -53,7 +54,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
         'detail' => 'The webhook\'s URL has changed since this consent link was sent.',
     ],
     status: 409,
-    description: 'Consent was asked for a URL the subscription no longer uses.',
+    description: 'Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one.',
 )]
 final class GrantWebhookConsentController
 {

@@ -27,6 +27,7 @@ use Override;
  * @property string|null $disabled_reason
  * @property Carbon|null $validated_at
  * @property int|null $allowed_rate
+ * @property string|null $validation_request
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user

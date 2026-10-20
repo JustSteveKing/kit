@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "22873b3d-fd41-4a63-a393-1938e5c086a8",
+        "_postman_id": "85480295-50a0-41c1-bdc1-878a79a97a85",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,7 +56,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"01m5chhcys9g822a4n04kp22h2\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:35:53+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cjb70r9fgm3p1vsa3t5kbd\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +100,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5chhcz4dy2sqpba05mk7ahy\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:35:53+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cjb75mxp8226rd0k5yd7gz\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -138,7 +138,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5chhd02mfbjj9883je9h803\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:35:53+00:00\",\"created_at\":null,\"updated_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cjb7b0xwcwsjy7am2c6xm2\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -676,6 +676,12 @@
                                     "disabled": false
                                 },
                                 {
+                                    "key": "request",
+                                    "value": "9f86d081884c7d659a2feaa0c55ad015",
+                                    "description": "The validation request this consent answers, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
                                     "key": "expires",
                                     "value": "1761220800",
                                     "description": "When the callback URL expires, from the callback URL.",
@@ -688,7 +694,7 @@
                                     "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&request=9f86d081884c7d659a2feaa0c55ad015&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
                             "variable": [
                                 {
                                     "id": "webhook",
@@ -738,7 +744,7 @@
                             "header": [],
                             "code": 409,
                             "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook's URL has changed since this consent link was sent.\"}",
-                            "name": "Consent was asked for a URL the subscription no longer uses."
+                            "name": "Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one."
                         }
                     ]
                 },
@@ -756,6 +762,12 @@
                                     "disabled": false
                                 },
                                 {
+                                    "key": "request",
+                                    "value": "9f86d081884c7d659a2feaa0c55ad015",
+                                    "description": "The validation request this consent answers, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
                                     "key": "expires",
                                     "value": "1761220800",
                                     "description": "When the callback URL expires, from the callback URL.",
@@ -768,7 +780,7 @@
                                     "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&request=9f86d081884c7d659a2feaa0c55ad015&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
                             "variable": [
                                 {
                                     "id": "webhook",
@@ -818,7 +830,7 @@
                             "header": [],
                             "code": 409,
                             "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook's URL has changed since this consent link was sent.\"}",
-                            "name": "Consent was asked for a URL the subscription no longer uses."
+                            "name": "Consent was asked for a URL the subscription no longer uses, or a newer validation request replaced this one."
                         }
                     ]
                 },
