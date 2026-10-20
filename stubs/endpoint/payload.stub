@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+
+final readonly class {{ class }}
+{
+    public function __construct(
+        // public string $name,
+    ) {}
+
+    public static function fromRequest(Request $request): self
+    {
+        $data = self::validatedData($request);
+
+        // Read with typed accessors, such as Arr::string($data, 'name'), and path parameters with
+        // App\Http\Payloads\RouteParameter.
+        return new self();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function validatedData(Request $request): array
+    {
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
+
+        return $data;
+    }
+}

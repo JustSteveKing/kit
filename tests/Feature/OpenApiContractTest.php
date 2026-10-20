@@ -254,6 +254,12 @@ it('generates openapi and documents every v1 route', function (): void {
     expect($extraInSpec)->toBe([]);
 });
 
+it('has no unfinished documentation', function (): void {
+    $spec = (string) json_encode(generateOpenApiSpec());
+
+    expect(mb_substr_count($spec, 'TODO'))->toBe(0, 'An endpoint is still documented with a TODO from make:endpoint.');
+});
+
 it('keeps runtime auth responses aligned with documented openapi responses', function (): void {
     $spec = generateOpenApiSpec();
     /** @var array<string, array<string, array<string, mixed>>> $paths */
