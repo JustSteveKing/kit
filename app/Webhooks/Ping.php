@@ -22,6 +22,11 @@ final readonly class Ping implements WebhookEvent
         return self::TYPE;
     }
 
+    public function subject(): string
+    {
+        return $this->subscription->id;
+    }
+
     /**
      * @return array{subscription_id: string}
      */

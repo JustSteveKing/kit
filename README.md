@@ -27,8 +27,8 @@ API design, HTTP standards, documentation, testing and security.
   [legible](https://github.com/JustSteveKing/legible) gate that keeps the spec agent-ready
 - `php artisan make:endpoint` scaffolds an endpoint the way the rest of Kit is built
 - A production image: Laravel Octane on FrankenPHP, with the same image as the queue worker
-- Outbound webhooks: consumers subscribe their own endpoints; deliveries are signed (RFC 9421),
-  retried on a published schedule, recorded attempt by attempt, and can be redelivered
+- Outbound webhooks: consumers subscribe their own endpoints; deliveries are CloudEvents, signed
+  (RFC 9421), retried on a published schedule, recorded attempt by attempt, and can be redelivered
 - GitHub Actions for style, static analysis, tests, security audits and weekly, Vet-audited dependency update PRs
 - An [`AGENTS.md`](AGENTS.md) that tells coding agents, and you, how to build on Kit the way it is built
 
@@ -362,14 +362,31 @@ API consumers subscribe their own https endpoints to events, behind the `webhook
 | DELETE | `/v1/webhooks/{webhook}` | Delete a subscription and its history |
 | POST | `/v1/webhooks/{webhook}/secret` | Rotate the signing secret |
 | POST | `/v1/webhooks/{webhook}/ping` | Send a `webhook.ping` to test the endpoint |
+| POST | `/v1/webhooks/{webhook}/validate` | Ask the endpoint for consent again (when validation is on) |
 | GET | `/v1/webhooks/{webhook}/deliveries` | Deliveries, each with every attempt |
 | POST | `/v1/webhooks/{webhook}/deliveries/{delivery}/redeliver` | Send an event again |
 
-Every delivery is a POST of:
+Every delivery is a [CloudEvents 1.0](https://github.com/cloudevents/spec) event in structured
+content mode, POSTed as `application/cloudevents+json`:
 
 ```json
-{"id": "01jb8x3a1b2c3d4e5f6g7h8j9k", "type": "project.created", "api_version": "v1", "created_at": "2026-10-20T12:01:00+00:00", "data": {}}
+{
+  "specversion": "1.0",
+  "id": "01jb8x3a1b2c3d4e5f6g7h8j9k",
+  "source": "https://api.example.com/v1",
+  "type": "project.created",
+  "subject": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+  "time": "2026-10-20T12:01:00+00:00",
+  "datacontenttype": "application/json",
+  "data": {}
+}
 ```
+
+`source` is `WEBHOOKS_SOURCE` (default `APP_URL/v1`), `subject` is what the event is about and is
+left out when there is none, and any CloudEvents SDK can parse the body. Delivery follows the
+[CloudEvents webhook specification](https://github.com/cloudevents/spec/blob/main/cloudevents/http-webhook.md):
+https only, redirects never followed, and every request carries `WebHook-Request-Origin`
+(`WEBHOOKS_ORIGIN`, default `APP_URL`'s host).
 
 - **Signed** with [RFC 9421](https://www.rfc-editor.org/rfc/rfc9421) HTTP Message Signatures
   (`Signature`, `Signature-Input`, with `keyid` set to the subscription ID), using HMAC-SHA256 and
@@ -378,8 +395,14 @@ Every delivery is a POST of:
 - **Deduplicable**: the event ID is sent as `Idempotency-Key`, and is the same on every retry and
   redelivery.
 - **Retried** after 10s, 1m, 5m, 30m, 2h and 6h (`webhooks.backoff`), then marked failed. Any 2xx is
-  success. A subscription is disabled, with a reason, after 10 deliveries in a row fail
+  success. A `429` is retried no sooner than its `Retry-After`; a `410 Gone` stops deliveries and
+  disables the subscription; a `415` fails without retrying, since the format will not change. A
+  subscription is disabled, with a reason, after 10 deliveries in a row fail
   (`WEBHOOKS_DISABLE_AFTER`); re-enable it with `PATCH {"enabled": true}`.
+- **Consented to**, when `WEBHOOKS_VALIDATE_ENDPOINTS=true`: a new or moved subscription receives
+  nothing until its endpoint answers an `OPTIONS` request carrying `WebHook-Request-Origin` with a
+  matching `WebHook-Allowed-Origin` (or `*`), the CloudEvents handshake. It proves the URL's owner
+  wants the events. Off by default, since every receiver then has to implement it.
 - **Recorded**: each attempt keeps its status, a response excerpt, its duration and any error. A
   `null` status means no response arrived, as distinct from an error status.
 - **Safe to point at**: URLs must be https and must not resolve to a private, loopback or reserved

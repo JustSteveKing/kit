@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\V1\Webhooks\RedeliverWebhookController;
 use App\Http\Controllers\Api\V1\Webhooks\RotateWebhookSecretController;
 use App\Http\Controllers\Api\V1\Webhooks\ShowWebhookController;
 use App\Http\Controllers\Api\V1\Webhooks\UpdateWebhookController;
+use App\Http\Controllers\Api\V1\Webhooks\ValidateWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', RegisterController::class)
@@ -92,6 +93,10 @@ Route::middleware(['auth:sanctum', 'throttle:auth-protected'])->group(function (
         ->whereUlid('webhook')
         ->middleware('abilities:webhooks:write')
         ->name('v1.webhooks.secret.rotate');
+    Route::post('/webhooks/{webhook}/validate', ValidateWebhookController::class)
+        ->whereUlid('webhook')
+        ->middleware(['abilities:webhooks:write', 'throttle:6,1'])
+        ->name('v1.webhooks.validate');
     Route::post('/webhooks/{webhook}/ping', PingWebhookController::class)
         ->whereUlid('webhook')
         ->middleware(['abilities:webhooks:write', 'throttle:6,1'])

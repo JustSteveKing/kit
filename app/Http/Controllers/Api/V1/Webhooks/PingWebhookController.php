@@ -70,11 +70,25 @@ use Knuckles\Scribe\Attributes\UrlParam;
     status: 403,
     description: 'Token is missing the webhooks:write ability.',
 )]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/resource-conflict',
+        'title' => 'Resource Conflict',
+        'status' => 409,
+        'detail' => 'The webhook endpoint has not consented to deliveries yet.',
+    ],
+    status: 409,
+    description: 'The subscription is disabled, or its endpoint has not been validated.',
+)]
 final class PingWebhookController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user, Webhooks $webhooks): JsonResponse
     {
         $subscription = $user->webhookSubscriptions()->findOrFail(RouteParameter::string($request, 'webhook'));
+        if ( ! $subscription->receivesDeliveries()) {
+            abort(409, __($subscription->isEnabled() ? 'api.webhooks.not_validated' : 'api.webhooks.disabled'));
+        }
+
         $delivery = $webhooks->deliverTo($subscription, new Ping($subscription));
 
         return WebhookDeliveryResource::make($delivery->load(['event', 'attempts']))->response()->setStatusCode(202);

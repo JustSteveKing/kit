@@ -507,6 +507,77 @@ endpoints:
     custom: []
     httpMethods:
       - POST
+    uri: 'v1/webhooks/{webhook}/validate'
+    metadata:
+      custom: []
+      groupName: Webhooks
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate Webhook Endpoint'
+      description: 'Ask the endpoint again for consent to deliveries, using the CloudEvents webhook handshake: an OPTIONS request carrying WebHook-Request-Origin, which the endpoint grants by answering with WebHook-Allowed-Origin. Use it after setting up the receiver when this API requires validated endpoints; until then the subscription receives nothing. Returns 202 with the subscription, whose validated_at is set once consent arrives.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      webhook:
+        custom: []
+        name: webhook
+        description: 'The webhook subscription ID.'
+        required: true
+        example: 01jb8x2m4k5n6p7q8r9s0t1v2w
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      webhook: 01jb8x2m4k5n6p7q8r9s0t1v2w
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 202
+        content: '{"data":{"id":"01jb8x2m4k5n6p7q8r9s0t1v2w","url":"https:\/\/hooks.example.com\/kit","description":"Production receiver","events":["*"],"enabled":true,"validated_at":null,"disabled_at":null,"disabled_reason":null,"created_at":"2026-10-20T12:00:00+00:00","updated_at":"2026-10-20T12:00:00+00:00"}}'
+        headers: []
+        description: 'Validation queued.'
+      -
+        custom: []
+        status: 401
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/unauthorized","title":"Unauthorized","status":401,"detail":"Unauthenticated."}'
+        headers: []
+        description: 'Authentication failed.'
+      -
+        custom: []
+        status: 403
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/forbidden","title":"Forbidden","status":403,"detail":"Forbidden."}'
+        headers: []
+        description: 'Token is missing the webhooks:write ability.'
+      -
+        custom: []
+        status: 404
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
+        headers: []
+        description: 'No webhook with this ID belongs to the authenticated user.'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
     uri: 'v1/webhooks/{webhook}/ping'
     metadata:
       custom: []
@@ -566,6 +637,12 @@ endpoints:
         content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-not-found","title":"Resource Not Found","status":404,"detail":"The resource was not found."}'
         headers: []
         description: 'No webhook with this ID belongs to the authenticated user.'
+      -
+        custom: []
+        status: 409
+        content: '{"type":"https:\/\/apiguide.dev\/errors\/resource-conflict","title":"Resource Conflict","status":409,"detail":"The webhook endpoint has not consented to deliveries yet."}'
+        headers: []
+        description: 'The subscription is disabled, or its endpoint has not been validated.'
     responseFields: []
     auth:
       - headers

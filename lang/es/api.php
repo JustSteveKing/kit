@@ -30,6 +30,9 @@ return [
         'target_unresolvable' => 'El host de la URL del webhook no se resuelve.',
         'target_private' => 'Las URL de webhook no deben apuntar a una direccion privada, de loopback o reservada.',
         'disabled_after_failures' => 'Desactivado tras fallar :count entregas seguidas.',
+        'disabled_gone' => 'Desactivado porque el endpoint respondio 410 Gone.',
+        'disabled' => 'La suscripcion de webhook esta desactivada.',
+        'not_validated' => 'El endpoint del webhook aun no ha aceptado recibir entregas.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'Este endpoint ha sido retirado y ya no esta disponible.',

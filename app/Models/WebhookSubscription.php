@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property int $consecutive_failures
  * @property Carbon|null $disabled_at
  * @property string|null $disabled_reason
+ * @property Carbon|null $validated_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
@@ -48,6 +49,11 @@ final class WebhookSubscription extends Model
         return 'whsec_' . bin2hex(random_bytes(32));
     }
 
+    public static function validationRequired(): bool
+    {
+        return config()->boolean('webhooks.validate_endpoints', false);
+    }
+
     /**
      * @return BelongsTo<User, $this>
      */
@@ -67,6 +73,14 @@ final class WebhookSubscription extends Model
     public function isEnabled(): bool
     {
         return null === $this->disabled_at;
+    }
+
+    /**
+     * Whether deliveries may go to it: enabled, and, when endpoint validation is on, consented.
+     */
+    public function receivesDeliveries(): bool
+    {
+        return $this->isEnabled() && ($this->validated_at instanceof Carbon || ! self::validationRequired());
     }
 
     public function wants(string $type): bool
@@ -89,6 +103,7 @@ final class WebhookSubscription extends Model
             'events' => 'array',
             'secret' => 'encrypted',
             'disabled_at' => 'datetime',
+            'validated_at' => 'datetime',
         ];
     }
 }

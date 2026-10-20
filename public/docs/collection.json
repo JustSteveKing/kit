@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "fbd6fc42-0dae-4852-9a76-ca181b355eab",
+        "_postman_id": "0c69f3f4-ae4e-4888-b2c5-445139c7a324",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,7 +56,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"01m5cfz0vq7h5x00rd9hr7mk8h\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:08:22+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cgghhj8n1xr73hnz44dxrg\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:17:56+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +100,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cfz0w2qh152qzhy96hxf37\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:08:22+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cgghhw5eq6wyq8a4sqys83\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:17:56+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -138,7 +138,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cfz0wpadw1nnc7k1n2a5p5\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:08:22+00:00\",\"created_at\":null,\"updated_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cgghjhw6dj7qr57wfaab2k\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:17:56+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -1008,6 +1008,64 @@
                     ]
                 },
                 {
+                    "name": "Validate Webhook Endpoint",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/validate",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/validate",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Ask the endpoint again for consent to deliveries, using the CloudEvents webhook handshake: an OPTIONS request carrying WebHook-Request-Origin, which the endpoint grants by answering with WebHook-Allowed-Origin. Use it after setting up the receiver when this API requires validated endpoints; until then the subscription receives nothing. Returns 202 with the subscription, whose validated_at is set once consent arrives."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 202,
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"validated_at\":null,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
+                            "name": "Validation queued."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        }
+                    ]
+                },
+                {
                     "name": "Ping Webhook",
                     "request": {
                         "url": {
@@ -1062,6 +1120,12 @@
                             "code": 404,
                             "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
                             "name": "No webhook with this ID belongs to the authenticated user."
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook endpoint has not consented to deliveries yet.\"}",
+                            "name": "The subscription is disabled, or its endpoint has not been validated."
                         }
                     ]
                 },
