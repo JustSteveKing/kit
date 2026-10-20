@@ -98,6 +98,13 @@ it('translates sunset enforcement responses from accept language header', functi
         ->assertJsonPath('detail', __('api.sunset.endpoint_unavailable', [], 'es'));
 });
 
+it('has a spanish line for every english api message', function (): void {
+    $english = require lang_path('en/api.php');
+    $spanish = require lang_path('es/api.php');
+
+    expect(array_keys(Arr::dot($spanish)))->toEqualCanonicalizing(array_keys(Arr::dot($english)));
+});
+
 it('translates every problem detail api-toolbox can raise', function (): void {
     $english = require base_path('vendor/juststeveking/api-toolbox/resources/lang/en/problems.php');
     $spanish = require lang_path('vendor/api-toolbox/es/problems.php');
