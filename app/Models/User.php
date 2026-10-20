@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Notifications\ResetPassword;
+use App\Notifications\VerifyEmail;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -11,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use SensitiveParameter;
 
 /**
  * @property \Illuminate\Support\Carbon|null $email_verified_at
@@ -34,6 +37,23 @@ final class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $hidden = ['password', 'remember_token'];
+
+    /**
+     * Queued, in the locale of the request that asked for it: a queued job otherwise runs in the
+     * application's default locale.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify((new VerifyEmail())->locale(app()->getLocale()));
+    }
+
+    /**
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification(#[SensitiveParameter] $token): void
+    {
+        $this->notify((new ResetPassword($token))->locale(app()->getLocale()));
+    }
 
     /** @return array<string,string> */
     protected function casts(): array

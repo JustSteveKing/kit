@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\ResetPassword;
+use App\Notifications\VerifyEmail;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -104,4 +105,26 @@ it('rejects password reset when the token is invalid', function (): void {
     ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['email']);
+});
+
+it('queues verification and reset emails in the language of the request', function (): void {
+    Notification::fake();
+
+    $this->withHeaders(['Accept-Language' => 'es'])
+        ->postJson('/v1/auth/register', [
+            'name' => 'Ana',
+            'email' => 'ana@example.com',
+            'password' => 'password123',
+            'device_name' => 'test-suite',
+        ])
+        ->assertCreated();
+
+    $this->withHeaders(['Accept-Language' => 'es'])
+        ->postJson('/v1/auth/password/forgot', ['email' => 'ana@example.com'])
+        ->assertOk();
+
+    $user = User::query()->where('email', 'ana@example.com')->firstOrFail();
+
+    Notification::assertSentTo($user, VerifyEmail::class, fn(VerifyEmail $mail): bool => $mail instanceof ShouldQueue && 'es' === $mail->locale);
+    Notification::assertSentTo($user, ResetPassword::class, fn(ResetPassword $mail): bool => $mail instanceof ShouldQueue && 'es' === $mail->locale);
 });
