@@ -90,6 +90,9 @@ jobs:
             http://127.0.0.1:8000/v1/auth/me | tee response.txt
           grep --quiet '^HTTP/1.1 401' response.txt
           grep --quiet --ignore-case '^content-type: application/problem+json' response.txt
+          # Under Octane each request is served from a sandbox; the problem must name this request.
+          request_id=$(grep --ignore-case '^x-request-id:' response.txt | cut -d' ' -f2 | tr -d '\r')
+          grep --quiet "\"instance\":\"urn:uuid:${request_id}\"" response.txt
 
       - name: Show the container log
         if: failure()
