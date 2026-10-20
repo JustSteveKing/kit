@@ -46,6 +46,11 @@ A new route's ability always goes in `available`. Only put it in `default` as we
 signed-in client should have it, and leave the rest to API keys. When a new endpoint answers `403`
 to everyone, check this first: an ability in neither list cannot be granted to anybody.
 
+The ability is checked before anything else looks at the request. A token without it gets `403`
+before the route's model is bound, so it learns nothing about whether the record exists, and
+before idempotency, so a retry with a token that does hold it runs instead of replaying the
+refusal.
+
 ## API keys
 
 Create a key from any token holding `auth:tokens:create`:
