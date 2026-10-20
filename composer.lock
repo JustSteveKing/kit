@@ -1060,16 +1060,16 @@
         },
         {
             "name": "juststeveking/api-toolbox",
-            "version": "v0.3.0",
+            "version": "v0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JustSteveKing/api-toolbox.git",
-                "reference": "7917bf194ff02829280b0a7e07aca3f5d8c3002a"
+                "reference": "3f92ba497a93274c2af7af7d64dc064349514013"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JustSteveKing/api-toolbox/zipball/7917bf194ff02829280b0a7e07aca3f5d8c3002a",
-                "reference": "7917bf194ff02829280b0a7e07aca3f5d8c3002a",
+                "url": "https://api.github.com/repos/JustSteveKing/api-toolbox/zipball/3f92ba497a93274c2af7af7d64dc064349514013",
+                "reference": "3f92ba497a93274c2af7af7d64dc064349514013",
                 "shasum": ""
             },
             "require": {
@@ -1120,9 +1120,9 @@
             ],
             "support": {
                 "issues": "https://github.com/JustSteveKing/api-toolbox/issues",
-                "source": "https://github.com/JustSteveKing/api-toolbox/tree/v0.3.0"
+                "source": "https://github.com/JustSteveKing/api-toolbox/tree/v0.3.1"
             },
-            "time": "2026-10-20T09:42:04+00:00"
+            "time": "2026-10-20T10:42:41+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
