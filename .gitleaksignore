@@ -1,0 +1,3 @@
+# Idempotency-Key fixtures in tests, not secrets.
+7659aa0276ef1b02f5fdb900f2353e64c59273b2:tests/Feature/IdempotencyKeyTest.php:generic-api-key:41
+7659aa0276ef1b02f5fdb900f2353e64c59273b2:tests/Feature/IdempotencyKeyTest.php:generic-api-key:45
