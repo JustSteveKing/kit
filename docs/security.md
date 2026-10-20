@@ -48,7 +48,10 @@ CORS applies to `v1/*`. The browser origins allowed to call the API come from
 frontend. Credentials are not supported; Kit authenticates with bearer tokens, not cookies.
 
 The headers a browser client needs are exposed, among them `Content-Language`, `Deprecation`,
-`Idempotency-Key`, `Link`, `Retry-After`, `Sunset` and `X-Request-Id`.
+`ETag`, `Idempotency-Key`, `Last-Modified`, `Link`, `Retry-After`, `Sunset` and `X-Request-Id`. A
+browser can also send `If-Match` and `If-None-Match`, so conditional requests work from a frontend
+as they do from a server: without them, a browser could neither revalidate with an ETag nor make
+a write that `preconditions.required` accepts.
 
 If no browser calls your API, set `CORS_ALLOWED_ORIGINS` to nothing. An empty list allows no
 origins, which production accepts; `*` is the one value it refuses.

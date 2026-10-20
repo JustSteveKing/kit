@@ -20,6 +20,9 @@ return [
         'Authorization',
         'Content-Type',
         'Idempotency-Key',
+        // Conditional requests: If-None-Match for cheap re-fetches, If-Match to stop lost updates.
+        'If-Match',
+        'If-None-Match',
         'Origin',
         'X-Request-Id',
         'X-Requested-With',
@@ -28,8 +31,11 @@ return [
     'exposed_headers' => [
         'Content-Language',
         'Deprecation',
+        // A browser client cannot send an ETag back unless it can read it.
+        'ETag',
         'Idempotency-Key',
         'Idempotency-Replayed',
+        'Last-Modified',
         'Link',
         'Retry-After',
         'Sunset',
