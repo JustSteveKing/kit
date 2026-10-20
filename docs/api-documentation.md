@@ -75,6 +75,9 @@ Scribe needs a little help with an API shaped like this one. `config/scribe.php`
 - `NoContentOpenApiGenerator` documents a `204` as having no body.
 - `ResponseFieldsOpenApiGenerator` applies each `#[ResponseField]`'s type and nullability, which
   Scribe would otherwise guess from the example.
+- `HeaderDescriptionsOpenApiGenerator` describes the standard headers an endpoint documents with
+  `#[Header]`: `Idempotency-Key`, `If-Match`, `If-None-Match`, `Prefer` and `Accept-Language`.
+  Scribe's attribute takes no description, and legible reports a header without one.
 
 Scribe has two limits worth knowing about. It only documents the first HTTP method of a route, so
 a `GET, POST` pair needs two routes, each with its own controller. And it cannot run twice in one

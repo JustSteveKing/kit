@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "85480295-50a0-41c1-bdc1-878a79a97a85",
+        "_postman_id": "170e4dde-52e5-4bf7-aa19-cc306885ed66",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -35,6 +35,10 @@
                                 "method": "POST",
                                 "header": [
                                     {
+                                        "key": "Idempotency-Key",
+                                        "value": "\"register-retry-1\""
+                                    },
+                                    {
                                         "key": "Content-Type",
                                         "value": "application\/json"
                                     },
@@ -56,7 +60,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"01m5cjb70r9fgm3p1vsa3t5kbd\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5dh89fbyy10h69b2psgbfh1\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T20:50:09+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +104,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cjb75mxp8226rd0k5yd7gz\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5dh89m4dznwkyje0vd5w1sv\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T20:50:09+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -123,6 +127,10 @@
                                 "method": "GET",
                                 "header": [
                                     {
+                                        "key": "If-None-Match",
+                                        "value": "\"a1b2c3d4e5f6\""
+                                    },
+                                    {
                                         "key": "Content-Type",
                                         "value": "application\/json"
                                     },
@@ -138,7 +146,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cjb7b0xwcwsjy7am2c6xm2\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:49:59+00:00\",\"created_at\":null,\"updated_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5dh89sek7p1cahxjv2z4a10\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T20:50:09+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -249,6 +257,10 @@
                                 },
                                 "method": "POST",
                                 "header": [
+                                    {
+                                        "key": "Idempotency-Key",
+                                        "value": "\"token-retry-1\""
+                                    },
                                     {
                                         "key": "Content-Type",
                                         "value": "application\/json"
@@ -410,6 +422,10 @@
                                 },
                                 "method": "POST",
                                 "header": [
+                                    {
+                                        "key": "Idempotency-Key",
+                                        "value": "\"forgot-retry-1\""
+                                    },
                                     {
                                         "key": "Content-Type",
                                         "value": "application\/json"
@@ -896,6 +912,10 @@
                         },
                         "method": "POST",
                         "header": [
+                            {
+                                "key": "Idempotency-Key",
+                                "value": "\"webhook-retry-1\""
+                            },
                             {
                                 "key": "Content-Type",
                                 "value": "application\/json"

@@ -17,6 +17,7 @@ use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\BodyParam;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Header;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\ResponseField;
 
@@ -26,6 +27,7 @@ use Knuckles\Scribe\Attributes\ResponseField;
     description: 'Subscribe an https endpoint to events. Use it once per receiving endpoint; send an Idempotency-Key so a retry does not create a second subscription. Returns the subscription with its signing secret in meta.secret, shown only this once: deliveries are signed with it using RFC 9421 HTTP Message Signatures.',
 )]
 #[Authenticated]
+#[Header('Idempotency-Key', '"webhook-retry-1"')]
 #[BodyParam('url', type: 'string', description: 'The https URL deliveries are POSTed to. It must not resolve to a private, loopback or reserved address.', required: true, example: 'https://hooks.example.com/kit')]
 #[BodyParam('description', type: 'string', description: 'A label for the subscription.', required: false, example: 'Production receiver')]
 #[BodyParam('events', type: 'string[]', description: 'Event types to receive, or ["*"] for all of them.', required: true, example: ['*'])]

@@ -17,6 +17,7 @@ endpoints:
       authenticated: false
       deprecated: false
     headers:
+      Idempotency-Key: '"register-retry-1"'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -78,7 +79,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":"01m5cjb70r9fgm3p1vsa3t5kbd","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T11:49:59+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5dh89fbyy10h69b2psgbfh1","name":"Justina Gaylord","email":"lafayette.considine@example.com","email_verified_at":"2026-10-20T20:50:09+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Registration succeeded.'
       -
@@ -157,7 +158,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01m5cjb75mxp8226rd0k5yd7gz","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T11:49:59+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
+        content: '{"data":{"id":"01m5dh89m4dznwkyje0vd5w1sv","name":"Justina Gaylord","email":"cormier.nick@example.com","email_verified_at":"2026-10-20T20:50:09+00:00","created_at":null,"updated_at":null},"meta":{"token":"1|example-token","token_type":"Bearer","expires_at":null}}'
         headers: []
         description: 'Login succeeded.'
       -
@@ -187,6 +188,7 @@ endpoints:
       authenticated: false
       deprecated: false
     headers:
+      Idempotency-Key: '"forgot-retry-1"'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -474,6 +476,7 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      If-None-Match: '"a1b2c3d4e5f6"'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -487,7 +490,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":"01m5cjb7b0xwcwsjy7am2c6xm2","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T11:49:59+00:00","created_at":null,"updated_at":null}}'
+        content: '{"data":{"id":"01m5dh89sek7p1cahxjv2z4a10","name":"Morgan Hirthe","email":"dare.emelie@example.com","email_verified_at":"2026-10-20T20:50:09+00:00","created_at":null,"updated_at":null}}'
         headers: []
         description: 'Authenticated user profile.'
       -
@@ -633,6 +636,7 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_BEARER_TOKEN}'
+      Idempotency-Key: '"token-retry-1"'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []

@@ -78,7 +78,10 @@ TODO before calling the endpoint done. The pieces, and what to put in each:
 4. **Controller** in `app/Http/Controllers/Api/V1/{Domain}/`: final, invokable, no base class.
    Document it with Scribe attributes, not docblocks: `#[Group]`, `#[Endpoint]`, a `#[BodyParam]` or
    `#[QueryParam]` per input, `#[ResponseFromApiResource]` for success, and a `#[Response]` per error
-   status written as problem details (see `LoginController` for the shape).
+   status written as problem details (see `LoginController` for the shape). Document the standard
+   headers the route reads with `#[Header]` (`Idempotency-Key`, `If-Match`, `If-None-Match`);
+   `HeaderDescriptionsOpenApiGenerator` supplies their descriptions. A header it does not know needs
+   a description added there, or legible fails the build.
 
 5. **Resource** in `app/Http/Resources/`: a plain `JsonResource`. Read the model through
    `/** @var Model $model */ $model = $this->resource;`, list every field explicitly, send IDs as

@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Knuckles\Scribe\Attributes\Authenticated;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Header;
 use Knuckles\Scribe\Attributes\Response;
 use Knuckles\Scribe\Attributes\Unauthenticated;
 use Knuckles\Scribe\Attributes\UrlParam;
@@ -180,6 +181,12 @@ final class MakeEndpointCommand extends Command implements PromptsForMissingInpu
             $attributes[] = '#[Authenticated]';
             $attributes[] = $this->problemAttribute(401, 'unauthorized', 'Unauthorized', 'Unauthenticated.', 'Authentication failed.');
             $attributes[] = $this->problemAttribute(403, 'forbidden', 'Forbidden', 'Forbidden.', "Token is missing the {$endpoint->ability} ability.");
+        }
+
+        // The route takes the idempotent middleware, so the documentation says what the header does.
+        if ('POST' === $endpoint->method) {
+            $imports[] = Header::class;
+            $attributes[] = "#[Header('Idempotency-Key', '\"request-retry-1\"')]";
         }
 
         if ($endpoint->hasRequest) {
