@@ -34,7 +34,7 @@ API design, HTTP standards, documentation, testing and security.
 - HTTP standards: `juststeveking/api-toolbox`
 - Docs/OpenAPI: `knuckleswtf/scribe` (attributes, not docblocks)
 - Test Runner: Pest + Laravel test tooling
-- Static Analysis / Quality: PHPStan (Larastan, level 10), Pint, Rector
+- Static Analysis / Quality: PHPStan (Larastan, level 10), Pint
 
 ## Quick Start
 
