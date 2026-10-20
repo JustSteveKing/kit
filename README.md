@@ -23,7 +23,8 @@ API design, HTTP standards, documentation, testing and security.
 - API localization via `Accept-Language` + `Content-Language`
 - Scribe (attribute-based) API docs + OpenAPI generation
 - OpenAPI contract tests to keep docs and runtime behaviour in sync
-- GitHub Actions for style, static analysis, tests, security audits and daily dependency update PRs
+- GitHub Actions for style, static analysis, tests, security audits and weekly, Vet-audited dependency update PRs
+- An [`AGENTS.md`](AGENTS.md) that tells coding agents, and you, how to build on Kit the way it is built
 
 ## Tech Stack
 
@@ -37,13 +38,23 @@ API design, HTTP standards, documentation, testing and security.
 
 ## Quick Start
 
-### 1) Install dependencies
+### 1) Start your project
+
+Kit is a starting point rather than a package, so take a copy and give it its own history:
+
+```bash
+git clone https://github.com/JustSteveKing/kit.git my-api
+cd my-api
+rm -rf .git && git init
+```
+
+### 2) Install dependencies
 
 ```bash
 composer install
 ```
 
-### 2) Bootstrap environment
+### 3) Bootstrap environment
 
 ```bash
 cp .env.example .env
@@ -58,7 +69,7 @@ Or run the bundled setup script:
 composer run setup
 ```
 
-### 3) Run the API
+### 4) Run the API
 
 ```bash
 php artisan serve
@@ -192,11 +203,16 @@ Relevant config/env:
 
 ## Architecture Conventions
 
-- Controllers are invokable and do not extend a base controller
-- Request validation lives in `app/Http/Requests/Auth`
+- Controllers are invokable, final, and do not extend a base controller
+  (`app/Http/Controllers/Api/V1/{Domain}`)
+- Request validation lives in Form Requests (`app/Http/Requests/{Domain}`)
 - DTO payload objects live in `app/Http/Payloads/V1` (final, readonly)
-- Entity output lives in API resources (`app/Http/Resources`)
+- Entity output lives in plain API resources (`app/Http/Resources`)
 - HTTP standards are switched on in `config/api-toolbox.php`, one feature per standard
+
+[AGENTS.md](AGENTS.md#adding-an-endpoint) walks through adding an endpoint end to end: route,
+ability and rate limit, Form Request, payload, controller with its Scribe attributes, resource,
+tests, and regenerated docs.
 
 ## Security Defaults
 
@@ -336,16 +352,24 @@ Feature tests include:
 - Security and unhappy-path scenarios
 - Localization behaviour
 - Idempotency, deprecation, pagination and conditional requests
-- OpenAPI generation and contract verification, including each response's media type
+- OpenAPI generation and contract verification: every `v1/` route must be in the spec, and each
+  runtime check's status, body and media type must match it
 
 api-toolbox's assertions (`assertProblem`, `assertIdempotentReplay`, `assertDeprecated`,
 `assertLinkHeader` and others) are available on every test response.
 
 ## AI Agents
 
-Kit ships [Laravel Boost](https://laravel.com/docs/boost) guidelines in `CLAUDE.md`, with
+[`AGENTS.md`](AGENTS.md) is the guide to building on Kit: the checks that must pass, the recipe for
+an endpoint, how errors, the HTTP standards, localization, security and dependencies work here, and
+which files are generated. Coding agents that follow the AGENTS.md convention read it directly;
+`CLAUDE.md` imports it for Claude Code.
+
+Below that, `CLAUDE.md` carries the [Laravel Boost](https://laravel.com/docs/boost) guidelines, with
 api-toolbox's guideline and `api-toolbox-development` skill opted in through `boost.json`. Run
-`php artisan boost:update` after upgrading packages.
+`php artisan boost:update` after upgrading packages; it rewrites only its tagged block. To add Boost
+for another agent, run `php artisan boost:install` and pick it: agents that read `AGENTS.md` get
+Boost's block appended below Kit's guide, which it leaves alone.
 
 ## CI & Dependency Automation
 
@@ -367,6 +391,8 @@ GitHub Actions workflows:
 ## Project Structure
 
 ```text
+AGENTS.md          how to build on Kit, for agents and people
+vet.json           packages trusted by Laravel Vet
 app/
   Http/
     Controllers/Api/V1/Auth/
@@ -386,6 +412,9 @@ config/
   sanctum.php
   scribe.php
   security.php
+lang/
+  en/, es/                   Kit's messages and validation
+  vendor/api-toolbox/es/     Spanish for api-toolbox's problems
 .github/
   workflows/
 ```
