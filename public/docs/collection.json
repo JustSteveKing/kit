@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "3a3b7138-0565-4302-8613-83b81be02853",
+        "_postman_id": "fbd6fc42-0dae-4852-9a76-ca181b355eab",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,7 +56,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"01m5cdfjnp16kbfqq3s4xsnvb5\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T10:24:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cfz0vq7h5x00rd9hr7mk8h\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:08:22+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +100,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cdfjp0cmx0zgvvy8a4z5zj\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T10:24:59+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cfz0w2qh152qzhy96hxf37\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:08:22+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -138,7 +138,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cdfjpm8vqdmrdwtq6fqe98\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T10:24:59+00:00\",\"created_at\":null,\"updated_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5cfz0wpadw1nnc7k1n2a5p5\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:08:22+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -653,6 +653,544 @@
                                     "name": "Authentication failed."
                                 }
                             ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Webhooks",
+            "description": "",
+            "item": [
+                {
+                    "name": "List Webhooks",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks",
+                            "query": [
+                                {
+                                    "key": "cursor",
+                                    "value": "architecto",
+                                    "description": "Opaque cursor from a Link header. Omit it for the first page.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/v1\/webhooks?cursor=architecto"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "List the authenticated user's webhook subscriptions, newest first, 25 to a page. Use it to see where events are sent and which subscriptions were disabled after failing. Returns an array of subscriptions; follow the Link header's rel=\"next\" for the next page."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}]",
+                            "name": "One page of subscriptions."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:read ability."
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"]}"
+                        },
+                        "description": "Subscribe an https endpoint to events. Use it once per receiving endpoint; send an Idempotency-Key so a retry does not create a second subscription. Returns the subscription with its signing secret in meta.secret, shown only this once: deliveries are signed with it using RFC 9421 HTTP Message Signatures."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"},\"meta\":{\"secret\":\"whsec_8f3c...\"}}",
+                            "name": "Subscription created. meta.secret is the only time the secret is returned."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/validation-failed\",\"title\":\"Validation Failed\",\"status\":422,\"detail\":\"Webhook URLs must use https.\",\"errors\":{\"url\":[\"Webhook URLs must use https.\"]}}",
+                            "name": "The URL is not https, resolves to a private address, or an event type is unknown."
+                        }
+                    ]
+                },
+                {
+                    "name": "Show Webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Return one of the authenticated user's webhook subscriptions. Use it to check whether a subscription is still enabled and, if it was disabled after failing, why. Returns the subscription without its secret."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
+                            "name": "The subscription."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:read ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        }
+                    ]
+                },
+                {
+                    "name": "Update Webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit-v2\",\"description\":\"Staging receiver\",\"events\":[\"*\"],\"enabled\":true}"
+                        },
+                        "description": "Change a webhook subscription's URL, description or events, or enable or disable it; fields left out stay as they are. Use enabled: true to resume a subscription disabled after failing, which also resets its failure count. Returns the updated subscription."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"}}",
+                            "name": "The updated subscription."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/validation-failed\",\"title\":\"Validation Failed\",\"status\":422,\"detail\":\"Webhook URLs must use https.\",\"errors\":{\"url\":[\"Webhook URLs must use https.\"]}}",
+                            "name": "The URL is not https, resolves to a private address, or an event type is unknown."
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete Webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Delete a webhook subscription and its delivery history. Use it when an endpoint is retired; to pause deliveries instead, update it with enabled: false. Returns 204 with no body."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 204,
+                            "body": null,
+                            "name": "Subscription deleted."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        }
+                    ]
+                },
+                {
+                    "name": "Rotate Webhook Secret",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/secret",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/secret",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Replace a webhook subscription's signing secret. Use it when the secret may have leaked; deliveries are signed with the new secret from the next attempt, so update the receiver straight away. Returns the subscription with the new secret in meta.secret, shown only this once."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":\"01jb8x2m4k5n6p7q8r9s0t1v2w\",\"url\":\"https:\\\/\\\/hooks.example.com\\\/kit\",\"description\":\"Production receiver\",\"events\":[\"*\"],\"enabled\":true,\"disabled_at\":null,\"disabled_reason\":null,\"created_at\":\"2026-10-20T12:00:00+00:00\",\"updated_at\":\"2026-10-20T12:00:00+00:00\"},\"meta\":{\"secret\":\"whsec_2b9e...\"}}",
+                            "name": "Secret rotated. meta.secret is the only time the new secret is returned."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        }
+                    ]
+                },
+                {
+                    "name": "Ping Webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/ping",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/ping",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Send a webhook.ping event to a subscription, whatever events it asked for. Use it to check a new receiver gets and verifies deliveries; it is limited to six a minute. Returns 202 with the queued delivery, whose progress List Webhook Deliveries shows."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 202,
+                            "body": "{\"data\":{\"id\":\"01jb8x3a4b5c6d7e8f9g0h1j2k\",\"event\":{\"id\":\"01jb8x3a1b2c3d4e5f6g7h8j9k\",\"type\":\"webhook.ping\"},\"state\":\"retrying\",\"next_attempt_at\":\"2026-10-20T12:01:10+00:00\",\"created_at\":\"2026-10-20T12:01:00+00:00\",\"attempts\":[{\"attempt\":1,\"response_status\":503,\"response_body\":\"Service Unavailable\",\"error\":null,\"duration_ms\":182,\"attempted_at\":\"2026-10-20T12:01:00+00:00\"}]}}",
+                            "name": "Ping queued."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        }
+                    ]
+                },
+                {
+                    "name": "List Webhook Deliveries",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/deliveries",
+                            "query": [
+                                {
+                                    "key": "cursor",
+                                    "value": "architecto",
+                                    "description": "Opaque cursor from a Link header. Omit it for the first page.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/deliveries?cursor=architecto",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "List a webhook subscription's deliveries, newest first, 25 to a page, each with every attempt made. Use it to see why a receiver missed an event: a null response_status means no response arrived, as distinct from an error status. Returns an array of deliveries; follow the Link header's rel=\"next\" for the next page."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[{\"id\":\"01jb8x3a4b5c6d7e8f9g0h1j2k\",\"event\":{\"id\":\"01jb8x3a1b2c3d4e5f6g7h8j9k\",\"type\":\"webhook.ping\"},\"state\":\"retrying\",\"next_attempt_at\":\"2026-10-20T12:01:10+00:00\",\"created_at\":\"2026-10-20T12:01:00+00:00\",\"attempts\":[{\"attempt\":1,\"response_status\":503,\"response_body\":\"Service Unavailable\",\"error\":null,\"duration_ms\":182,\"attempted_at\":\"2026-10-20T12:01:00+00:00\"}]}]",
+                            "name": "One page of deliveries."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:read ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
+                        }
+                    ]
+                },
+                {
+                    "name": "Redeliver Webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/deliveries\/:delivery\/redeliver",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/deliveries\/:delivery\/redeliver",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID."
+                                },
+                                {
+                                    "id": "delivery",
+                                    "key": "delivery",
+                                    "value": "01jb8x3a4b5c6d7e8f9g0h1j2k",
+                                    "description": "The delivery to send again."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Send an event again to the subscription it was delivered to, as a new delivery with the same body and event ID. Use it once a receiver is fixed; receivers that deduplicate on the Idempotency-Key header will ignore an event they already processed. Returns 202 with the new delivery."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 202,
+                            "body": "{\"data\":{\"id\":\"01jb8x3a4b5c6d7e8f9g0h1j2k\",\"event\":{\"id\":\"01jb8x3a1b2c3d4e5f6g7h8j9k\",\"type\":\"webhook.ping\"},\"state\":\"retrying\",\"next_attempt_at\":\"2026-10-20T12:01:10+00:00\",\"created_at\":\"2026-10-20T12:01:00+00:00\",\"attempts\":[{\"attempt\":1,\"response_status\":503,\"response_body\":\"Service Unavailable\",\"error\":null,\"duration_ms\":182,\"attempted_at\":\"2026-10-20T12:01:00+00:00\"}]}}",
+                            "name": "Redelivery queued."
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/unauthorized\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"Unauthenticated.\"}",
+                            "name": "Authentication failed."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"Forbidden.\"}",
+                            "name": "Token is missing the webhooks:write ability."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "No webhook with this ID belongs to the authenticated user."
                         }
                     ]
                 }

@@ -324,6 +324,21 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
             'response' => $this->getJson($verificationUrl),
         ],
         [
+            'method' => 'GET',
+            'path' => '/v1/webhooks',
+            'response' => $this->getJson('/v1/webhooks'),
+        ],
+        [
+            'method' => 'POST',
+            'path' => '/v1/webhooks',
+            'response' => $this->postJson('/v1/webhooks', ['url' => 'https://hooks.example.com/kit', 'events' => ['*']]),
+        ],
+        [
+            'method' => 'GET',
+            'path' => '/v1/webhooks/{webhook}/deliveries',
+            'response' => $this->getJson('/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/deliveries'),
+        ],
+        [
             'method' => 'POST',
             'path' => '/v1/auth/tokens',
             'response' => $this->postJson('/v1/auth/tokens', [

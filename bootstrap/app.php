@@ -9,6 +9,7 @@ use App\Http\Middleware\SetRequestLocale;
 use App\Support\SecurityAudit;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -68,6 +70,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->map(InvalidSignatureException::class, static fn(InvalidSignatureException $exception): AccessDeniedHttpException => new AccessDeniedHttpException(
             __('api.auth.invalid_verification_link'),
+            $exception,
+        ));
+
+        // Laravel's message names the model class; a client only needs to know it was not found.
+        $exceptions->map(ModelNotFoundException::class, static fn(ModelNotFoundException $exception): NotFoundHttpException => new NotFoundHttpException(
+            __('api.errors.not_found'),
             $exception,
         ));
 

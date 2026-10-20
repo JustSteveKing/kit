@@ -87,6 +87,8 @@ return [
             'auth:tokens:read',
             'auth:tokens:create',
             'auth:tokens:delete',
+            'webhooks:read',
+            'webhooks:write',
         ],
         'default' => [
             'auth:me',
@@ -95,6 +97,8 @@ return [
             'auth:tokens:read',
             'auth:tokens:create',
             'auth:tokens:delete',
+            'webhooks:read',
+            'webhooks:write',
         ],
     ],
 

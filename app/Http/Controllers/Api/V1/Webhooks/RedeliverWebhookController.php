@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api\V1\Webhooks;
+
+use App\Http\Payloads\RouteParameter;
+use App\Http\Resources\WebhookDeliveryResource;
+use App\Models\User;
+use App\Webhooks\Webhooks;
+use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Knuckles\Scribe\Attributes\Authenticated;
+use Knuckles\Scribe\Attributes\Endpoint;
+use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Response;
+use Knuckles\Scribe\Attributes\UrlParam;
+
+#[Group(name: 'Webhooks')]
+#[Endpoint(
+    title: 'Redeliver Webhook',
+    description: 'Send an event again to the subscription it was delivered to, as a new delivery with the same body and event ID. Use it once a receiver is fixed; receivers that deduplicate on the Idempotency-Key header will ignore an event they already processed. Returns 202 with the new delivery.',
+)]
+#[Authenticated]
+#[UrlParam('webhook', type: 'string', description: 'The webhook subscription ID.', required: true, example: '01jb8x2m4k5n6p7q8r9s0t1v2w')]
+#[UrlParam('delivery', type: 'string', description: 'The delivery to send again.', required: true, example: '01jb8x3a4b5c6d7e8f9g0h1j2k')]
+#[Response(content: ['data' => [
+    'id' => '01jb8x3a4b5c6d7e8f9g0h1j2k',
+    'event' => ['id' => '01jb8x3a1b2c3d4e5f6g7h8j9k', 'type' => 'webhook.ping'],
+    'state' => 'retrying',
+    'next_attempt_at' => '2026-10-20T12:01:10+00:00',
+    'created_at' => '2026-10-20T12:01:00+00:00',
+    'attempts' => [[
+        'attempt' => 1,
+        'response_status' => 503,
+        'response_body' => 'Service Unavailable',
+        'error' => null,
+        'duration_ms' => 182,
+        'attempted_at' => '2026-10-20T12:01:00+00:00',
+    ]],
+]], status: 202, description: 'Redelivery queued.')]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/resource-not-found',
+        'title' => 'Resource Not Found',
+        'status' => 404,
+        'detail' => 'The resource was not found.',
+    ],
+    status: 404,
+    description: 'No webhook with this ID belongs to the authenticated user.',
+)]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/unauthorized',
+        'title' => 'Unauthorized',
+        'status' => 401,
+        'detail' => 'Unauthenticated.',
+    ],
+    status: 401,
+    description: 'Authentication failed.',
+)]
+#[Response(
+    content: [
+        'type' => 'https://apiguide.dev/errors/forbidden',
+        'title' => 'Forbidden',
+        'status' => 403,
+        'detail' => 'Forbidden.',
+    ],
+    status: 403,
+    description: 'Token is missing the webhooks:write ability.',
+)]
+final class RedeliverWebhookController
+{
+    public function __invoke(Request $request, #[CurrentUser] User $user, Webhooks $webhooks): JsonResponse
+    {
+        $subscription = $user->webhookSubscriptions()->findOrFail(RouteParameter::string($request, 'webhook'));
+        $delivery = $subscription->deliveries()->findOrFail(RouteParameter::string($request, 'delivery'));
+
+        return WebhookDeliveryResource::make($webhooks->redeliver($delivery)->load(['event', 'attempts']))
+            ->response()
+            ->setStatusCode(202);
+    }
+}

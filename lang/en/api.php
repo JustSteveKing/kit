@@ -19,10 +19,17 @@ return [
         'ability_not_grantable' => 'You can only grant abilities your current token holds.',
     ],
     'errors' => [
+        'not_found' => 'The resource was not found.',
         'unauthenticated' => 'Unauthenticated.',
         'forbidden' => 'Forbidden.',
         'too_many_requests' => 'Too many requests. Please try again later.',
         'https_required' => 'HTTPS is required for this endpoint.',
+    ],
+    'webhooks' => [
+        'target_not_https' => 'Webhook URLs must use https.',
+        'target_unresolvable' => 'The webhook URL\'s host does not resolve.',
+        'target_private' => 'Webhook URLs must not point at a private, loopback or reserved address.',
+        'disabled_after_failures' => 'Disabled after :count deliveries in a row failed.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'This endpoint has been sunset and is no longer available.',

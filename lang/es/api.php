@@ -19,10 +19,17 @@ return [
         'ability_not_grantable' => 'Solo puedes conceder habilidades que tiene tu token actual.',
     ],
     'errors' => [
+        'not_found' => 'No se encontro el recurso.',
         'unauthenticated' => 'No autenticado.',
         'forbidden' => 'Prohibido.',
         'too_many_requests' => 'Demasiadas solicitudes. Intentalo de nuevo mas tarde.',
         'https_required' => 'HTTPS es obligatorio para este endpoint.',
+    ],
+    'webhooks' => [
+        'target_not_https' => 'Las URL de webhook deben usar https.',
+        'target_unresolvable' => 'El host de la URL del webhook no se resuelve.',
+        'target_private' => 'Las URL de webhook no deben apuntar a una direccion privada, de loopback o reservada.',
+        'disabled_after_failures' => 'Desactivado tras fallar :count entregas seguidas.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'Este endpoint ha sido retirado y ya no esta disponible.',
