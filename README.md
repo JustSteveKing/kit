@@ -7,7 +7,8 @@ API design, HTTP standards, documentation, testing and security.
 
 - PHP `8.5` + Laravel `13`
 - SQLite-first local development (`DB_CONNECTION=sqlite`)
-- Sanctum personal access token authentication
+- Sanctum token authentication: session tokens on sign-in, and scoped, long-lived API keys for
+  scripts, integrations and agents
 - Versioned API routes with no `/api` prefix (`/v1/...`)
 - Invokable controllers only
 - Form Request validation + DTO-style request payload objects
@@ -22,7 +23,10 @@ API design, HTTP standards, documentation, testing and security.
   - An RFC 9727 API catalog at `/.well-known/api-catalog`
 - API localization via `Accept-Language` + `Content-Language`
 - Scribe (attribute-based) API docs + OpenAPI generation
-- OpenAPI contract tests to keep docs and runtime behaviour in sync
+- OpenAPI contract tests to keep docs and runtime behaviour in sync, and a
+  [legible](https://github.com/JustSteveKing/legible) gate that keeps the spec agent-ready
+- `php artisan make:endpoint` scaffolds an endpoint the way the rest of Kit is built
+- A production image: Laravel Octane on FrankenPHP, with the same image as the queue worker
 - GitHub Actions for style, static analysis, tests, security audits and weekly, Vet-audited dependency update PRs
 - An [`AGENTS.md`](AGENTS.md) that tells coding agents, and you, how to build on Kit the way it is built
 
@@ -73,7 +77,10 @@ composer run setup
 
 ```bash
 php artisan serve
+php artisan queue:work   # in a second terminal: verification and reset emails are queued
 ```
+
+Mail goes to the log (`MAIL_MAILER=log`) until you configure a mailer.
 
 API base path is versioned and has no global `/api` prefix:
 
@@ -97,6 +104,7 @@ Framework routing is configured with `apiPrefix: ''` in `bootstrap/app.php`, so 
 | GET | `/v1/auth/me` | Bearer | Current authenticated user |
 | POST | `/v1/auth/logout` | Bearer | Revoke current token |
 | GET | `/v1/auth/tokens` | Bearer | List the user's tokens, cursor paginated |
+| POST | `/v1/auth/tokens` | Bearer | Create an API key with chosen abilities |
 | DELETE | `/v1/auth/tokens` | Bearer | Revoke every token |
 | DELETE | `/v1/auth/tokens/{token_id}` | Bearer | Revoke one token |
 | POST | `/v1/auth/email/verification-notification` | Bearer | Send/resend verification email |
@@ -199,7 +207,8 @@ Relevant config/env:
 - `APP_LOCALE`
 - `APP_FALLBACK_LOCALE`
 - `APP_SUPPORTED_LOCALES` (default: `en,es`)
-- `SANCTUM_EXPIRATION` (default: `120` minutes)
+- `SANCTUM_EXPIRATION`: session token lifetime (default: `120` minutes)
+- `API_KEY_DEFAULT_DAYS` / `API_KEY_MAX_DAYS`: API key lifetime (defaults: `90` / `365` days)
 
 ## Architecture Conventions
 
@@ -210,15 +219,46 @@ Relevant config/env:
 - Entity output lives in plain API resources (`app/Http/Resources`)
 - HTTP standards are switched on in `config/api-toolbox.php`, one feature per standard
 
-[AGENTS.md](AGENTS.md#adding-an-endpoint) walks through adding an endpoint end to end: route,
-ability and rate limit, Form Request, payload, controller with its Scribe attributes, resource,
-tests, and regenerated docs.
+## Adding Endpoints
+
+```bash
+php artisan make:endpoint Projects/CreateProject --method=POST --uri=/projects
+```
+
+The generator writes the controller with its Scribe attributes and documented problems, the Form
+Request, the payload, a Pest test whose authentication and ability cases pass straight away, and
+the route with auth, rate limit, ability and name (plus `idempotent` on a POST). It leaves what it
+cannot know as TODO: the controller answers `501`, and CI fails while the documentation still says
+TODO, so an endpoint cannot ship half written. Change what it generates in `stubs/endpoint/`.
+
+[AGENTS.md](AGENTS.md#adding-an-endpoint) covers each piece and the steps the generator prints for
+you: the ability in `config/sanctum.php`, the contract test's runtime check, and the docs.
+
+## API Keys
+
+Sign-in gives a session token with the default abilities. For a script, an integration or an
+agent, create an API key instead, from any token that holds `auth:tokens:create`:
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/auth/tokens \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "deploy-bot", "abilities": ["auth:me"], "expires_at": "2027-01-01T00:00:00Z"}'
+```
+
+- A key can only hold abilities the token creating it holds, out of those a route checks
+  (`sanctum.abilities.available`), so a narrow key can never mint a broader one.
+- It expires on `expires_at`, at most `API_KEY_MAX_DAYS` away, or after `API_KEY_DEFAULT_DAYS`.
+- `meta.token` in the response is the only time its value is returned. Revoke it like any token.
+- Send an `Idempotency-Key` and a retried request returns the same key rather than a second one.
 
 ## Security Defaults
 
 - ULID primary keys for users
 - Password hashing via model casts
 - Email verification required model contract (`MustVerifyEmail`)
+- Every token carries its own expiry: session tokens after `SANCTUM_EXPIRATION` minutes, API keys
+  on the date they were given
 - Rate limits configured in `AppServiceProvider`:
   - `auth-register`: 10/minute per IP
   - `auth-login`: 10/minute per IP + email
@@ -250,6 +290,10 @@ After `composer update`, review what changed and record what you trust:
 ```bash
 ./vendor/bin/vet        # in a terminal: read each change, or hand them to your coding agent
 ```
+
+Laravel's own packages (`laravel/*`) are trusted by policy: they skip the 7-day hold, and when
+they are the only packages an update changed, `./vendor/bin/vet --fresh` records them without a
+review. The weekly bot does this itself, so a Laravel-only update PR needs no review.
 
 Commit `vet.json` with `composer.lock`. If you build your own project from Kit, `vet.json` is the
 trust Kit recorded; run `./vendor/bin/vet --fresh` to take it over as your own, or remove
@@ -302,13 +346,32 @@ Behaviour:
 - `GET /v1/auth/me` sends an `ETag`; repeat the request with `If-None-Match` and an unchanged user
   gets `304 Not Modified`
 
+## Deployment
+
+The `Dockerfile` builds a production image: Laravel Octane on FrankenPHP, PHP 8.5, running as a
+non-root user on port 8000, with OPcache tuned for production and a health check on `/up`.
+
+```bash
+docker build -t my-api .
+docker run -p 8000:8000 --env-file .env.production my-api                       # the API
+docker run --env-file .env.production my-api php artisan queue:work             # a queue worker
+```
+
+At start the container caches config, routes and events from its environment. Production refuses
+to boot without `APP_KEY`, an `https://` `APP_URL`, `SECURITY_FORCE_HTTPS=true`, `TRUSTED_HOSTS`
+and explicit `CORS_ALLOWED_ORIGINS`; put TLS in front of it and forward `X-Forwarded-Proto`. Run
+migrations as a release step (`php artisan migrate --force`). CI builds the image and boots it on
+every push.
+
 ## API Documentation (Scribe + OpenAPI)
 
 Scribe is configured for this no-prefix API shape:
 
 - Route matching uses `v1/*` prefixes (`config/scribe.php`)
 - Endpoints are documented via PHP attributes
-- Error responses are documented as `application/problem+json` (`App\Support\ProblemDetailsOpenApiGenerator`)
+- Error responses are documented as `application/problem+json` (`App\Support\ProblemDetailsOpenApiGenerator`),
+  and `204`s with no content (`App\Support\NoContentOpenApiGenerator`)
+- Path parameters keep the names the routes give them, rather than Scribe's guessed `{id}`
 - OpenAPI output is generated to `public/docs/openapi.yaml`, and advertised from the API catalog at
   `/.well-known/api-catalog`
 
@@ -317,6 +380,10 @@ Generate docs/spec:
 ```bash
 php artisan scribe:generate --no-interaction
 ```
+
+[legible](https://github.com/JustSteveKing/legible) scores the spec for agent readiness: what will
+trip up an LLM calling the API as tools. `.legible.yaml` fails CI on any warning or a score under
+95, and lists the findings accepted on purpose with the reason.
 
 Generated artifacts:
 
@@ -376,12 +443,14 @@ Boost's block appended below Kit's guide, which it leaves alone.
 GitHub Actions workflows:
 
 - `.github/workflows/ci-tests.yml`
-  - Runs Pint, PHPStan and the test suite on every push and pull request
+  - Runs Pint, PHPStan, the test suite and legible on every push and pull request
+  - Builds the production image, boots it with production settings and makes requests to it
 - `.github/workflows/dependency-updates.yml`
   - Runs weekly, Mondays at `03:00 UTC`
   - Executes `composer update`, holding back releases younger than 7 days
   - Opens/updates PR titled `bot: dependency updates` with Vet's report of what needs review
-  - The PR cannot pass CI until `vet.json` is updated on its branch: check it out, run
+  - When only `laravel/*` packages changed, it records their trust itself and the PR needs no review
+  - Otherwise the PR cannot pass CI until `vet.json` is updated on its branch: check it out, run
     `composer install --no-plugins`, then `./vendor/bin/vet`, and commit `vet.json`
 - `.github/workflows/security-gate.yml`
   - Runs Composer security audit
@@ -392,14 +461,18 @@ GitHub Actions workflows:
 
 ```text
 AGENTS.md          how to build on Kit, for agents and people
+Dockerfile         the production image (Octane on FrankenPHP), with docker/
 vet.json           packages trusted by Laravel Vet
+.legible.yaml      the agent-readiness gate
 app/
+  Console/Commands/  make:endpoint
   Http/
     Controllers/Api/V1/Auth/
     Middleware/
     Payloads/V1/
     Requests/Auth/
     Resources/
+  Notifications/     queued verification and reset emails
   Support/
 routes/
   api/
@@ -407,8 +480,10 @@ routes/
     v1.php
 tests/
   Feature/
+stubs/endpoint/     templates for make:endpoint
 config/
   api-toolbox.php
+  octane.php
   sanctum.php
   scribe.php
   security.php
