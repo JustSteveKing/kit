@@ -96,7 +96,6 @@ function resolveOpenApiSchema(array $spec, array $schema): array
 /**
  * @param  array<string, mixed>  $spec
  * @param  array<string, mixed>  $schema
- * @param  mixed  $value
  */
 function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, string $path = '$'): void
 {
@@ -161,7 +160,6 @@ function assertMatchesOpenApiSchema(array $spec, array $schema, mixed $value, st
 /**
  * @param  array<string, mixed>  $spec
  * @param  array<string, mixed>  $schema
- * @param  mixed  $value
  */
 function assertOpenApiObject(array $spec, array $schema, mixed $value, string $path): void
 {
@@ -199,7 +197,6 @@ function assertOpenApiObject(array $spec, array $schema, mixed $value, string $p
 /**
  * @param  array<string, mixed>  $spec
  * @param  array<string, mixed>  $schema
- * @param  mixed  $value
  */
 function assertOpenApiArray(array $spec, array $schema, mixed $value, string $path): void
 {
@@ -227,21 +224,21 @@ it('generates openapi and documents every v1 route', function (): void {
         ->flatMap(
             fn(array $operations, string $path) => collect($operations)
                 ->keys()
-                ->filter(fn(string $method) => in_array(mb_strtoupper($method), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'], true))
-                ->reject(fn(string $method) => 'HEAD' === mb_strtoupper($method))
-                ->map(fn(string $method) => mb_strtoupper($method) . ' ' . $path),
+                ->filter(fn(string $method): bool => in_array(mb_strtoupper($method), ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'], true))
+                ->reject(fn(string $method): bool => 'HEAD' === mb_strtoupper($method))
+                ->map(fn(string $method): string => mb_strtoupper($method) . ' ' . $path),
         )
         ->sort()
         ->values();
 
     $routeOperations = collect(Route::getRoutes()->getRoutes())
-        ->filter(fn(Illuminate\Routing\Route $route) => str_starts_with($route->uri(), 'v1/'))
+        ->filter(fn(Illuminate\Routing\Route $route): bool => str_starts_with($route->uri(), 'v1/'))
         ->flatMap(function (Illuminate\Routing\Route $route) {
             $uri = '/' . $route->uri();
 
             return collect($route->methods())
-                ->reject(fn(string $method) => 'HEAD' === $method)
-                ->map(fn(string $method) => mb_strtoupper($method) . ' ' . $uri);
+                ->reject(fn(string $method): bool => 'HEAD' === $method)
+                ->map(fn(string $method): string => mb_strtoupper($method) . ' ' . $uri);
         })
         ->unique()
         ->sort()
@@ -375,7 +372,7 @@ it('keeps runtime auth responses aligned with documented openapi responses', fun
         $path = $check['path'];
         $response = $check['response'];
         $actualStatus = $response->status();
-        $documentedResponses = array_map('intval', array_keys($paths[$path][$method]['responses'] ?? []));
+        $documentedResponses = array_map(intval(...), array_keys($paths[$path][$method]['responses'] ?? []));
 
         $this->assertContains(
             $actualStatus,

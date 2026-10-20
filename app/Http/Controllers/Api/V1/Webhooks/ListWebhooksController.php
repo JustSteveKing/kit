@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\Webhooks;
 
 use App\Http\Resources\WebhookSubscriptionResource;
 use App\Models\User;
+use App\Models\WebhookSubscription;
 use Illuminate\Container\Attributes\CurrentUser;
 use JustSteveKing\Toolbox\Pagination\CursorPage;
 use Knuckles\Scribe\Attributes\Authenticated;
@@ -57,7 +58,7 @@ use Knuckles\Scribe\Attributes\Response;
 final class ListWebhooksController
 {
     /**
-     * @return CursorPage<int, \App\Models\WebhookSubscription>
+     * @return CursorPage<int, WebhookSubscription>
      */
     public function __invoke(#[CurrentUser] User $user): CursorPage
     {

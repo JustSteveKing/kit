@@ -40,7 +40,7 @@ API design, HTTP standards, documentation, testing and security.
 - HTTP standards: `juststeveking/api-toolbox`
 - Docs/OpenAPI: `knuckleswtf/scribe` (attributes, not docblocks)
 - Test Runner: Pest + Laravel test tooling
-- Static Analysis / Quality: PHPStan (Larastan, level 10), Pint
+- Static Analysis / Quality: PHPStan (Larastan, level 10), Pint, Rector
 
 ## Quick Start
 
@@ -487,9 +487,15 @@ composer test
 Other quality commands:
 
 ```bash
-composer lint
-composer stan
+composer lint           # Pint, PER preset, in check mode
+composer rector:check   # Rector, in check mode
+composer stan           # PHPStan, level 10
 ```
+
+To apply them, run `composer rector` and then `composer pint`, in that order. Rector changes code
+(PHP and Laravel upgrades, dead code, type declarations) and never formatting: Pint's PER preset
+owns style, so Rector's coding-style set is off, and Pint has the last word on anything Rector
+writes. `rector.php` lists the rules skipped on purpose, with the reasons.
 
 Feature tests include:
 
@@ -522,7 +528,7 @@ Boost's block appended below Kit's guide, which it leaves alone.
 GitHub Actions workflows:
 
 - `.github/workflows/ci-tests.yml`
-  - Runs Pint, PHPStan, the test suite and legible on every push and pull request
+  - Runs Pint, Rector, PHPStan, the test suite and legible on every push and pull request
   - Builds the production image, boots it with production settings and makes requests to it
 - `.github/workflows/dependency-updates.yml`
   - Runs weekly, Mondays at `03:00 UTC`

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\User;
 use App\Models\WebhookSubscription;
 use App\Webhooks\HostResolver;
+use App\Webhooks\WebhookEvent;
 use App\Webhooks\Webhooks;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request as ClientRequest;
@@ -187,7 +188,7 @@ it('answers 404 to a consent link for a deleted subscription', function (): void
     $this->getJson($callback)->assertProblem(404);
 });
 
-final readonly class ProjectCreatedForValidation implements App\Webhooks\WebhookEvent
+final readonly class ProjectCreatedForValidation implements WebhookEvent
 {
     public function type(): string
     {

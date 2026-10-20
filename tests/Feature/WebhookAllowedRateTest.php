@@ -118,7 +118,7 @@ it('postpones a delivery over the granted rate without spending an attempt', fun
 
     foreach (['1', '2', '3'] as $id) {
         [$delivery] = app(Webhooks::class)->dispatch($user, new RateLimitedEvent($id));
-        (new DeliverWebhook($delivery->id))->handle(app(WebhookTargets::class));
+        new DeliverWebhook($delivery->id)->handle(app(WebhookTargets::class));
         $deliveries[] = $delivery->refresh();
     }
 

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Webhooks;
 use App\Http\Payloads\RouteParameter;
 use App\Http\Resources\WebhookDeliveryResource;
 use App\Models\User;
+use App\Models\WebhookDelivery;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
 use JustSteveKing\Toolbox\Pagination\CursorPage;
@@ -73,7 +74,7 @@ use Knuckles\Scribe\Attributes\UrlParam;
 final class ListWebhookDeliveriesController
 {
     /**
-     * @return CursorPage<int, \App\Models\WebhookDelivery>
+     * @return CursorPage<int, WebhookDelivery>
      */
     public function __invoke(Request $request, #[CurrentUser] User $user): CursorPage
     {

@@ -33,7 +33,7 @@ final readonly class RetireSunsetEndpoints
         if ($route instanceof Route) {
             $sunsetAt = $this->deprecations->forRoute($route)?->sunsetAt;
 
-            if (null !== $sunsetAt && $sunsetAt <= new DateTimeImmutable('now')) {
+            if ($sunsetAt instanceof DateTimeImmutable && $sunsetAt <= new DateTimeImmutable('now')) {
                 abort(Response::HTTP_GONE, __('api.sunset.endpoint_unavailable'));
             }
         }
