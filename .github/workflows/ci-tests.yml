@@ -55,3 +55,42 @@ jobs:
           curl -fsSL "${base}/checksums.txt" | grep " ${archive}\$" | sha256sum -c -
           tar xzf "${archive}" legible
           ./legible check public/docs/openapi.yaml
+
+  image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build the production image
+        run: docker build --tag kit:ci .
+
+      # Boots with production settings, so ProductionSecurityChecks runs, then asks Octane for a
+      # health check and an API problem through a TLS-terminating proxy's headers.
+      - name: Boot it and make requests
+        run: |
+          docker run --detach --name kit --publish 8000:8000 \
+            --env APP_KEY="base64:$(openssl rand -base64 32)" \
+            --env APP_URL=https://api.example.test \
+            --env SECURITY_FORCE_HTTPS=true \
+            --env TRUSTED_HOSTS=api.example.test \
+            --env CORS_ALLOWED_ORIGINS=https://app.example.test \
+            --env DB_CONNECTION=sqlite \
+            --env DB_DATABASE=/tmp/kit.sqlite \
+            kit:ci
+          for attempt in $(seq 1 30); do
+            curl --silent --fail --header 'Host: api.example.test' --header 'X-Forwarded-Proto: https' \
+              http://127.0.0.1:8000/up > /dev/null && break
+            sleep 1
+          done
+          curl --silent --fail --header 'Host: api.example.test' --header 'X-Forwarded-Proto: https' \
+            http://127.0.0.1:8000/up > /dev/null
+          curl --silent --include --header 'Host: api.example.test' --header 'X-Forwarded-Proto: https' \
+            http://127.0.0.1:8000/v1/auth/me | tee response.txt
+          grep --quiet '^HTTP/1.1 401' response.txt
+          grep --quiet --ignore-case '^content-type: application/problem+json' response.txt
+
+      - name: Show the container log
+        if: failure()
+        run: docker logs kit

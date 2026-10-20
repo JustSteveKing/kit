@@ -56,9 +56,17 @@
             "version": "v0.3.0",
             "hash": "tree-v2:170dbefcc470a823490926a602216b6f1c5ba5f258a4ba16528a199269bd610c"
         },
+        "laminas/laminas-diactoros": {
+            "version": "3.9.0",
+            "hash": "tree-v2:a96235360b43645eb30bed80af9e8b1e4f60b80fefd1eb980e1e33f1549a7c6e"
+        },
         "laravel/framework": {
             "version": "v13.35.0",
             "hash": "tree-v2:862428a89369e09b33dee255707d3c5d05dfffdc5bf880ce97418d0e7853d24b"
+        },
+        "laravel/octane": {
+            "version": "v2.22.0",
+            "hash": "tree-v2:67290079ce12d4269b4cdf8fc872859fad8443f71c80f889298b53e8ed9e208a"
         },
         "laravel/prompts": {
             "version": "v0.3.26",
@@ -275,6 +283,10 @@
         "symfony/process": {
             "version": "v8.1.9",
             "hash": "tree-v2:0088281cac46a3378736e4db93df87bd462c17b193ffa95622e72670427bd3e1"
+        },
+        "symfony/psr-http-message-bridge": {
+            "version": "v8.1.9",
+            "hash": "tree-v2:a29d81f0b30177b80606a6e88dcb64fc8dab6b536afc1c620fe9ce024be56641"
         },
         "symfony/routing": {
             "version": "v8.1.9",
@@ -594,6 +606,7 @@
     "minimum-release-age": 7,
     "minimum-release-age-exclude": [
         "juststeveking/*",
+        "laravel/*",
         "roave/security-advisories"
     ]
 }
