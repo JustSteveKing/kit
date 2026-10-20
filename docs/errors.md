@@ -1,8 +1,8 @@
 # Errors
 
 Every error Kit returns is an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
-document, served as `application/problem+json`. api-toolbox renders them, for every path under
-`v1/`, whatever the request's `Accept` header says.
+document, served as `application/problem+json`. api-toolbox renders them for every path under
+`v1/`, whatever the request's `Accept` header asked for.
 
 ```json
 {
@@ -22,11 +22,11 @@ document, served as `application/problem+json`. api-toolbox renders them, for ev
 | `detail` | What went wrong this time, in the request's language | A person |
 | `instance` | The request ID, the same value as the `X-Request-Id` header | Whoever is debugging it |
 
-Tell your API's clients to branch on `type` and never on the text in `detail`. The text is
-translated and can be reworded; the type is the contract.
+Tell your API's clients to branch on `type`, and never to match the text in `detail`. That text is
+translated, and you will reword it one day. The type is the contract.
 
-Validation failures are a `422` of type `https://apiguide.dev/errors/validation-failed`, and keep
-Laravel's field messages under `errors`:
+A validation failure is a `422` of type `https://apiguide.dev/errors/validation-failed`, with
+Laravel's field messages kept under `errors`:
 
 ```json
 {
@@ -43,19 +43,19 @@ Laravel's field messages under `errors`:
 
 ## Raising errors
 
-You never build error JSON yourself. Throw, and api-toolbox renders it.
+You never build error JSON yourself. Throw an exception and api-toolbox renders it.
 
-A plain HTTP error takes its type from the status:
+For a plain HTTP error, the status picks the type:
 
 ```php
 abort(404, __('api.auth.token_not_found'));
 ```
 
-The message becomes `detail`, so pass it through `__()` and give it a key in both
-`lang/en/api.php` and `lang/es/api.php`.
+The message becomes `detail`. Pass it through `__()`, with a key in both `lang/en/api.php` and
+`lang/es/api.php`.
 
-For validation, let the Form Request fail, or throw from the controller when the rule needs
-something the Form Request cannot see:
+Most validation belongs in the Form Request. When a rule needs something the Form Request cannot
+see, throw from the controller instead:
 
 ```php
 throw ValidationException::withMessages([
@@ -63,14 +63,14 @@ throw ValidationException::withMessages([
 ]);
 ```
 
-Authentication and authorisation failures, a missing model, a bad signed URL and throttling are
-already problems with translated messages: `bootstrap/app.php` maps each one to a message from
-`lang/*/api.php` and leaves the rendering to api-toolbox. There is nothing to do for those.
+You do not need to do anything for authentication and authorisation failures, a missing model, a
+bad signed URL or throttling. `bootstrap/app.php` maps each of them to a translated message from
+`lang/*/api.php`, and api-toolbox renders the problem.
 
 ## Errors of your own
 
-When a client needs to tell one failure apart from others with the same status, give it its own
-type. api-toolbox generates the class:
+Sometimes a client has to tell one failure apart from others with the same status. Give that
+failure its own type, and let api-toolbox generate the class:
 
 ```bash
 php artisan make:api-problem OutOfCredit --title="You do not have enough credit." --status=403 --no-interaction
@@ -92,22 +92,22 @@ throw new OutOfCredit(
 );
 ```
 
-The title belongs to the class and does not change per occurrence. Extension keys cannot reuse a
-standard member name such as `type` or `status`; api-toolbox throws if you try.
+The title belongs to the class, so it reads the same every time. Extension keys cannot reuse a
+standard member name such as `type` or `status`, and api-toolbox throws if you try.
 
-Types you define resolve under `/problems` (`type_base_uri` in `config/api-toolbox.php`). Point that
-at the page in your own documentation that describes them.
+Types you define resolve under `/problems`, set by `type_base_uri` in `config/api-toolbox.php`. Point
+it at the part of your own documentation that describes them.
 
 ## Documenting errors
 
-Each error status an endpoint can return needs a `#[Response]` attribute on its controller, written
-as a problem. Scribe documents them as `application/problem+json`, and legible fails the build when
-an endpoint has an error status with no documented response. `make:endpoint` writes the common
-ones for you. See [API documentation](api-documentation.md).
+Each error status an endpoint can return needs a `#[Response]` attribute on its controller,
+written as a problem. Kit documents those as `application/problem+json`, and legible fails the
+build when an error status has no documented response. `make:endpoint` writes the common ones for
+you, and [API documentation](api-documentation.md) has the rest.
 
 ## Testing errors
 
-api-toolbox's assertions check the media type and the members, not just the status:
+api-toolbox's assertions check the media type and the members as well as the status:
 
 ```php
 $this->getJson('/v1/auth/me')
@@ -119,12 +119,14 @@ $response->assertProblemType('https://apiguide.dev/errors/idempotency-key-confli
 
 ## Things not to do
 
-- Do not return `response()->json(['message' => ...], 400)`. It is not a problem, and clients
-  cannot tell it apart from a success body.
-- Do not add render callbacks to `bootstrap/app.php` that return responses. The ones there only
-  write the security audit log and return `null`, so api-toolbox still renders the problem. To
-  change a framework exception's message, add a `map()` beside the existing ones.
-- Do not put user input or internals in `detail` without thinking about who reads it. It is shown
-  to clients.
+Do not return `response()->json(['message' => ...], 400)`. It is not a problem document, and a
+client has no reliable way to tell it from a success body.
+
+Do not add render callbacks to `bootstrap/app.php` that return responses either. The callbacks
+already there only write the security audit log and return `null`, which leaves the rendering to
+api-toolbox. To change a framework exception's message, add a `map()` next to the existing ones.
+
+And remember that `detail` goes to clients. Keep internals out of it, and think twice before
+echoing user input back.
 
 Translating `detail` is covered in [Localization](localization.md).

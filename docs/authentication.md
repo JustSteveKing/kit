@@ -1,16 +1,13 @@
 # Authentication
 
-Kit authenticates with Sanctum bearer tokens. There are two kinds, and they differ in who asks
-for them and how long they live:
+Kit authenticates with Sanctum bearer tokens, and there are two kinds. A session token comes from
+registering or signing in. It carries the default abilities and expires after `SANCTUM_EXPIRATION`
+minutes, two hours unless you change it. An API key is something a signed-in client creates for a
+script, an integration or an agent: it holds only the abilities it was given, and lasts for days.
 
-- **Session tokens** come from registering or signing in, carry the default abilities, and expire
-  after `SANCTUM_EXPIRATION` minutes (120 by default).
-- **API keys** are created by a signed-in client for a script, an integration or an agent. They
-  hold only the abilities asked for, and live for days rather than minutes.
-
-Both are ordinary personal access tokens, sent as `Authorization: Bearer <token>`, and every token
-carries its own `expires_at`. Sanctum's global `expiration` is off on purpose: it would cap every
-token, and no API key could outlive a session.
+Under the hood both are ordinary personal access tokens, sent as `Authorization: Bearer <token>`,
+and each one carries its own `expires_at`. Sanctum's global `expiration` is switched off on purpose.
+It caps every token, so with it on no API key could outlive a session.
 
 ## Endpoints
 
@@ -31,7 +28,7 @@ token, and no API key could outlive a session.
 | POST | `/v1/auth/password/reset` | None | Set a new password |
 
 Register and login return the user, with the token in `meta.token` and its expiry in
-`meta.expires_at`. Name the client in `device_name`; it is how a user tells their tokens apart in
+`meta.expires_at`. Name the client in `device_name`. That is how a user tells their tokens apart in
 `GET /v1/auth/tokens`, where `is_current` marks the one making the request.
 
 ## Abilities
@@ -45,10 +42,9 @@ Out of the box both lists hold the same eight: `auth:me`, `auth:logout`, `auth:v
 `auth:tokens:read`, `auth:tokens:create`, `auth:tokens:delete`, `webhooks:read` and
 `webhooks:write`.
 
-When you add an ability for a new route, add it to `available`. Add it to `default` as well only if
-every signed-in client should have it; otherwise clients reach it through an API key. A route with
-an ability that is in neither list cannot be called by anyone, which is the first thing to check
-when a new endpoint answers `403`.
+A new route's ability always goes in `available`. Only put it in `default` as well if every
+signed-in client should have it, and leave the rest to API keys. When a new endpoint answers `403`
+to everyone, check this first: an ability in neither list cannot be granted to anybody.
 
 ## API keys
 
@@ -62,28 +58,30 @@ curl -X POST http://127.0.0.1:8000/v1/auth/tokens \
   -d '{"name": "deploy-bot", "abilities": ["auth:me"], "expires_at": "2027-01-01T00:00:00Z"}'
 ```
 
-- `abilities` must be a subset of what the calling token holds, out of `abilities.available`. A
-  narrow key can never mint a broader one, so handing an agent a key with `webhooks:read` is a
-  real limit.
-- `expires_at` is optional. Leave it out and the key lasts `API_KEY_DEFAULT_DAYS` (90); it cannot
-  be later than `API_KEY_MAX_DAYS` (365) away.
-- The key's value is in `meta.token`, and that response is the only time you will see it.
-- With an `Idempotency-Key`, a retried request returns the same key rather than a second one.
+The `abilities` have to be a subset of what the calling token holds, out of
+`abilities.available`. A narrow key can never mint a broader one, which is what makes it safe to
+hand an agent a key that can only read webhooks.
+
+`expires_at` is optional. Without it the key lasts `API_KEY_DEFAULT_DAYS`, 90 by default, and it
+can never be more than `API_KEY_MAX_DAYS` (a year) away.
+
+The key itself comes back in `meta.token`, once. Store it then, because no endpoint returns it
+again. Send an `Idempotency-Key` and a retried request gets the same key back, so a dropped
+connection does not leave a stray key behind.
 
 Revoke a key like any other token, with `DELETE /v1/auth/tokens/{token_id}`.
 
-Tokens are issued through `App\Support\AccessTokens`, which sets each one's expiry. If you add
-another way to issue tokens, go through it too, or the new tokens will never expire.
+Every token is issued through `App\Support\AccessTokens`, which is what sets its expiry. Any new
+way of issuing tokens has to go through it as well, or those tokens will never expire.
 
 ## Email verification
 
-The `User` model implements `MustVerifyEmail`, so registering queues a verification email. The link
-in it is signed, expires, and points at `GET /v1/auth/email/verify/{id}/{hash}`; following it
-verifies the address. A signed-in user can ask for another with
-`POST /v1/auth/email/verification-notification`, limited to six a minute.
+The `User` model implements `MustVerifyEmail`, so registering queues a verification email. Its link
+points at `GET /v1/auth/email/verify/{id}/{hash}`, is signed, and expires. A signed-in user can ask
+for a fresh one with `POST /v1/auth/email/verification-notification`, up to six times a minute.
 
-Kit records verification but does not require it anywhere. To keep unverified users out of a
-route, add Laravel's `verified` middleware to it.
+Kit records whether an address is verified, but nothing requires it. If a route should be closed to
+unverified users, add Laravel's `verified` middleware to it.
 
 ## Password reset
 
@@ -106,16 +104,16 @@ The limiters are defined in `AppServiceProvider::boot()`:
 | `auth-password` | 5 a minute | IP and email | forgot and reset |
 | `auth-protected` | 60 a minute | User | every authenticated route |
 
-Verification, consent links and a few webhook actions add `throttle:6,1` on top. Going over a
-limit is a `429` problem with `Retry-After`.
+Verification, consent links and a few of the webhook actions add `throttle:6,1` on top. Going over
+any limit is a `429` problem with `Retry-After`.
 
-Give a new group of routes its own named limiter beside these, rather than reusing one that was
-sized for something else.
+When you add a group of routes, give it its own named limiter here. Borrowing one sized for sign-in
+traffic means guessing at two sets of numbers instead of one.
 
 ## Testing authentication
 
-Give the test's token only the abilities the route needs, so it proves the ability check as well
-as the happy path:
+Give the test's token only the abilities the route needs. That way the test proves the ability
+check works, as well as the happy path:
 
 ```php
 $token = User::factory()->create()->createToken('test', ['auth:me'])->plainTextToken;

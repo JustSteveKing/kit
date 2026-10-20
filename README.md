@@ -1,14 +1,13 @@
 # Kit
 
-A Laravel API starter kit for token-authenticated APIs that follow the HTTP standards rather than
-inventing their own. You get versioned routes, Sanctum session tokens and scoped API keys, RFC 9457
-problem details for every error, idempotency, cursor pagination, ETags, signed CloudEvents
-webhooks, Scribe documentation checked against the running API, and a production image on Octane
-and FrankenPHP.
+A Laravel starter kit for token-authenticated APIs, built on the published HTTP standards. Every
+error is RFC 9457 problem details, creating things takes an `Idempotency-Key`, lists page through `Link`
+headers, webhooks go out as signed CloudEvents, and the OpenAPI spec is checked against the running
+API on every build. It ships with a production image on Octane and FrankenPHP.
 
-Most of the standards come from [api-toolbox](https://github.com/JustSteveKing/api-toolbox). Kit is
-the application around it: the conventions, the tests that hold them in place, and the CI that
-refuses to ship anything that breaks them.
+The standards themselves come from [api-toolbox](https://github.com/JustSteveKing/api-toolbox).
+Kit is the application around it, with the conventions already in place and a CI pipeline that
+fails when something breaks them.
 
 ## Install
 
@@ -17,16 +16,16 @@ laravel new my-api --using=juststeveking/kit
 cd my-api
 ```
 
-The installer copies `.env.example`, generates a key, creates the SQLite database and migrates it.
-Then run the API and a queue worker, since verification and reset emails are queued:
+The installer sets up `.env`, the key and a migrated SQLite database. Emails are queued, so run a
+worker beside the API:
 
 ```bash
 php artisan serve
 php artisan queue:work
 ```
 
-The API lives at `http://127.0.0.1:8000/v1/...`, with no `/api` prefix. Mail goes to the log until
-you configure a mailer. Register a user to check it works:
+Routes live under `http://127.0.0.1:8000/v1/`, with no `/api` prefix, and mail goes to the log
+until you configure a mailer. Registering a user is a quick check that it all works:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/v1/auth/register \

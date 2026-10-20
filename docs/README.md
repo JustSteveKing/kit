@@ -1,6 +1,7 @@
 # Kit documentation
 
-Start with [Getting started](getting-started.md), then read the page for whatever you are doing.
+If you are new to Kit, read [Getting started](getting-started.md) first. After that, each page
+stands on its own.
 
 ## Using Kit
 
@@ -27,5 +28,6 @@ Start with [Getting started](getting-started.md), then read the page for whateve
 
 ## For coding agents
 
-[`AGENTS.md`](../AGENTS.md) is the same rules written as instructions for an agent working in the
-codebase. These pages explain; that file directs.
+[`AGENTS.md`](../AGENTS.md) holds the same rules, written as instructions for an agent working in
+the codebase. These pages explain why things are the way they are; that file tells the agent what
+to do.

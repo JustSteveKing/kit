@@ -1,12 +1,12 @@
 # HTTP standards
 
-Kit uses the published standard wherever one exists, rather than a header or parameter of its own.
-Clients that already speak HTTP well then need very little documentation, and an agent calling
-the API has seen these patterns before.
+Wherever a published standard covers something, Kit uses it instead of a header or parameter of
+its own. A client that already speaks HTTP well needs very little documentation as a result, and an
+agent calling the API has seen these patterns many times before.
 
-The standards come from [api-toolbox](https://github.com/JustSteveKing/api-toolbox), one feature
-per standard, switched on in `config/api-toolbox.php`. A feature that is switched off registers
-nothing: no middleware alias, no route and no test assertion.
+Each standard is one feature of [api-toolbox](https://github.com/JustSteveKing/api-toolbox),
+switched on in `config/api-toolbox.php`. Switching one off removes everything it registers,
+including its middleware alias, its routes and its test assertions.
 
 | Need | Standard | How Kit does it |
 | --- | --- | --- |
@@ -24,9 +24,9 @@ nothing: no middleware alias, no route and no test assertion.
 
 ## Idempotency
 
-A client that sends a POST and loses the connection cannot tell whether it worked. With an
-`Idempotency-Key`, it can send the same request again and get the first response back, without the
-write happening twice.
+When a client sends a POST and the connection drops, it has no way of knowing whether the write
+happened. With an `Idempotency-Key` it can simply send the request again. If the first one worked,
+it gets the original response back and nothing is written twice.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/v1/auth/register \
@@ -42,13 +42,13 @@ curl -X POST http://127.0.0.1:8000/v1/auth/register \
 | Retry while the first is still running | `409` with `Retry-After` |
 | Malformed key | `400` |
 
-Keys are scoped to the user, or to the client address before sign-in, and kept for
-`IDEMPOTENCY_TTL` seconds (a day). Register, forgot password, creating an API key and creating a
-webhook subscription all honour them, and `make:endpoint` adds `idempotent` to every POST it
-generates.
+Keys belong to the user, or to the client's address before sign-in, and last for
+`IDEMPOTENCY_TTL` seconds, a day by default. Register, forgot password, creating an API key and
+creating a webhook subscription all honour them, and `make:endpoint` adds `idempotent` to every POST
+it generates.
 
-Add it to any write where a duplicate would hurt. Use `idempotent:required` to refuse requests
-without a key:
+Put it on any write where a duplicate would hurt. Where a duplicate would hurt a lot, use
+`idempotent:required` and refuse requests that come without a key:
 
 ```php
 Route::post('/payments', CreatePaymentController::class)
@@ -57,8 +57,8 @@ Route::post('/payments', CreatePaymentController::class)
 
 ## Pagination
 
-Lists are cursor paginated. The body is the array of items, and navigation is in RFC 8288 `Link`
-headers:
+Lists are cursor paginated. The body is just the array of items, and navigation lives in RFC 8288
+`Link` headers:
 
 ```http
 HTTP/1.1 200 OK
@@ -77,14 +77,14 @@ return CursorPage::of(
 );
 ```
 
-Cursors are opaque to clients, which is what makes this cheaper than offset pages: the database
-seeks to the cursor rather than counting past every row before it. Sort on a unique, indexed
-column.
+On a large table this is far cheaper than offset pages. The database seeks straight to the cursor
+instead of counting past every row in front of it. Sort on a unique, indexed column, and treat the
+cursor as opaque on the client side.
 
 ## ETags and conditional requests
 
-`GET /v1/auth/me` sends an `ETag`. Repeat the request with `If-None-Match` and, if the user has not
-changed, the answer is `304 Not Modified` with no body:
+`GET /v1/auth/me` sends an `ETag`. Send it back in `If-None-Match` and, as long as the user has not
+changed, the answer is a `304 Not Modified` with no body:
 
 ```bash
 curl -i http://127.0.0.1:8000/v1/auth/me \
@@ -92,22 +92,21 @@ curl -i http://127.0.0.1:8000/v1/auth/me \
   -H 'If-None-Match: "a1b2c3"'
 ```
 
-Add the `conditional` middleware to any GET whose response a client might fetch again.
+Add the `conditional` middleware to any GET a client is likely to fetch more than once.
 
-To stop two clients overwriting each other's changes, have the model implement api-toolbox's
-`HasValidators` contract (the `HasModelValidators` trait does the work) and add
+The same headers stop two clients overwriting each other's changes. Have the model implement
+api-toolbox's `HasValidators` contract (the `HasModelValidators` trait does the work) and add
 `preconditions.required` to the write route. A write without `If-Match` is then a `428`, and one
-whose ETag is stale is a `412`. This is the standard alternative to a
-`version` field in the body.
+with a stale ETag is a `412`. Reach for this before you add a `version` field to the body.
 
 ## Partial updates
 
-For a `PATCH` that takes a partial document, use JSON Merge Patch: the `merge-patch` middleware and
-the `application/merge-patch+json` media type. Validate the merged document, not the patch, so a
-field set to `null` is checked the same way as one sent in full.
+For a `PATCH` that takes a partial document, use JSON Merge Patch, with the `merge-patch`
+middleware and the `application/merge-patch+json` media type. Validate the merged document instead
+of the patch, so a field set to `null` goes through the same rules as one sent in full.
 
-Kit's own `PATCH /v1/webhooks/{webhook}` takes plain JSON with only the fields that change, which
-is enough for a resource that small.
+Kit's own `PATCH /v1/webhooks/{webhook}` takes plain JSON containing only the fields that change.
+For a resource that small, that is enough.
 
 ## Deprecation and sunset
 
@@ -125,53 +124,54 @@ final class ListProjectsController
 }
 ```
 
-Every response from it then carries `Deprecation` (RFC 9745) and `Sunset` (RFC 8594) headers, with
-`Link` headers pointing at the pages you named. Clients and their tooling can warn on those
-without reading your changelog.
+From then on, every response carries `Deprecation` (RFC 9745) and `Sunset` (RFC 8594) headers,
+plus `Link` headers pointing at the pages you named. Client tooling can warn on those, and nobody
+has to read your changelog to find out.
 
-Once the sunset date passes, `RetireSunsetEndpoints` answers `410 Gone` as a problem, still with
-both headers, so you do not have to remember to delete the route on the day.
+When the sunset date passes, `RetireSunsetEndpoints` starts answering `410 Gone` as a problem,
+still carrying both headers. You do not have to remember to delete the route on the day.
 
-The attributes are read from controller classes, so they do not work on closure routes. They can
-go on the class or on its `__invoke` method.
+The attributes go on the controller class or its `__invoke` method. Closure routes have nowhere to
+put them, so they cannot be deprecated this way.
 
 ## Request IDs and tracing
 
-Every response has an `X-Request-Id`. Kit keeps one a proxy or client sent when it is well formed,
-and otherwise generates a UUIDv7. It is also the `instance` of any problem, so an error a client
-reports leads straight to the log lines for that request.
+Every response has an `X-Request-Id`. If a proxy or client sent a well-formed one, Kit keeps it;
+otherwise it generates a UUIDv7. The same ID is the `instance` of any problem, so an error a client
+reports takes you straight to that request's log lines.
 
-Requests join a W3C trace when they arrive with a `traceparent` header, or start one when they do
-not, and outgoing HTTP client requests carry it on. Both the request ID and the trace ID are in the
-log context.
+A request that arrives with a `traceparent` header joins that W3C trace, and one without starts a
+new trace. Outgoing HTTP client requests carry it on. The request ID and the trace ID both go into
+the log context.
 
 ## Media types
 
-Every route in `v1` sits behind `consumes:application/json`, so a write with any other
-`Content-Type` is a `415` that names the type it accepts. [Building endpoints](building-endpoints.md#taking-a-type-other-than-json)
-shows how to accept an upload.
+The whole `v1` group sits behind `consumes:application/json`. A write with any other
+`Content-Type` gets a `415` that names the type it accepts.
+[Building endpoints](building-endpoints.md#taking-a-type-other-than-json) shows how to accept an
+upload.
 
 ## Preferences
 
-The `prefer` middleware and the `Preferences` class read the RFC 7240 `Prefer` header. Use it for
-options such as `return=minimal` rather than inventing a query parameter.
+The `prefer` middleware and the `Preferences` class read the RFC 7240 `Prefer` header. When an
+endpoint needs an option such as `return=minimal`, use this before inventing a query parameter.
 
 ## Long-running work
 
-Async operations, a `202 Accepted` with a status monitor, are switched off. Turning them on in
-`config/api-toolbox.php` adds a route under `v1/operations`, which then needs documenting like any
-other.
+Async operations (a `202 Accepted` with a status monitor) are switched off. Turning them on in
+`config/api-toolbox.php` adds a route under `v1/operations`, and that route needs documenting like
+any other.
 
 ## API catalog
 
-`GET /.well-known/api-catalog` returns an RFC 9727 catalog that points at the API, its OpenAPI spec
-and its documentation, so tools can discover the API from its host alone. Edit `apis` in
+`GET /.well-known/api-catalog` returns an RFC 9727 catalog pointing at the API, its OpenAPI spec and
+its documentation, so a tool that only knows your host name can find the lot. Edit `apis` in
 `config/api-toolbox.php` when you add a version or move the docs.
 
 ## Testing
 
-api-toolbox adds an assertion for each feature to every test response, and they check the exact
-header syntax:
+api-toolbox adds an assertion for each feature to every test response, and each one checks the
+exact header syntax:
 
 ```php
 $replay->assertIdempotentReplay($original);
@@ -181,5 +181,5 @@ $response->assertDeprecated();
 $response->assertProblemType('https://apiguide.dev/errors/idempotency-key-conflict', 422);
 ```
 
-The `api-toolbox-development` skill, installed through Laravel Boost, has the detail on each
-feature.
+For the detail on any feature, the `api-toolbox-development` skill is installed through Laravel
+Boost.

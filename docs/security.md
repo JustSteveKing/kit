@@ -1,8 +1,7 @@
 # Security
 
-Kit's defaults are safe for local development and refuse to run in production until the parts that
-depend on where you deploy are configured. This page covers what is on by default, what you must
-set, and how to keep it that way as you build.
+Kit's defaults are safe for local development, and it will not run in production until you have
+configured the parts that depend on where you deploy.
 
 ## What production requires
 
@@ -17,39 +16,39 @@ message naming the problem unless:
 | `CORS_ALLOWED_ORIGINS` | Does not contain `*` |
 | `TRUSTED_HOSTS` | At least one host |
 
-A misconfigured deploy fails at once, rather than running quietly without the protection. Configure
-the settings; do not remove the check. Set `APP_KEY` as well, which Laravel needs for signed URLs
-and encryption.
+A misconfigured deploy fails on boot, instead of running quietly without the protection. Fix the
+settings, and leave the check alone. Set `APP_KEY` too: the check does not look for it, but Laravel
+needs it for signed URLs and encryption.
 
 ## Transport
 
 `EnforceTransportSecurity` runs on every API request.
 
-- With `SECURITY_FORCE_HTTPS=true`, a request that did not arrive over HTTPS is a `400` problem.
-  It does not redirect: a client that sent a token over plain HTTP has already leaked it, and a
-  redirect would hide that.
-- On HTTPS responses it sends `Strict-Transport-Security`, with a year's `max-age` and
-  `includeSubDomains`. `preload` is off until you opt in with `SECURITY_HSTS_PRELOAD=true`; only do
-  that once every subdomain serves HTTPS, since browsers cache the preload list for months.
+With `SECURITY_FORCE_HTTPS=true`, a request that did not arrive over HTTPS gets a `400` problem.
+It deliberately does not redirect. A client that sent a token over plain HTTP has already leaked
+it, and a redirect would hide that from whoever wrote the client.
 
-TLS usually ends at a load balancer or proxy in front of Kit. It has to forward
-`X-Forwarded-Proto`, and Kit has to trust it:
+On HTTPS responses it sends `Strict-Transport-Security`, with a year's `max-age` and
+`includeSubDomains`. `preload` stays off until you opt in with `SECURITY_HSTS_PRELOAD=true`. Only do
+that once every subdomain serves HTTPS, because browsers hold on to the preload list for months.
 
-- `TRUSTED_PROXIES` is `*` by default, which trusts whatever connects directly. That is right when
-  only your load balancer can reach the application. When anything else can, list the proxies'
-  addresses or ranges instead.
-- `TRUSTED_HOSTS` is a comma-separated list of the host names the API answers to, exactly; a
-  request for any other `Host` is refused. It stops host header injection in generated URLs such as
-  reset and verification links.
+TLS usually ends at a load balancer or proxy in front of Kit, which has to forward
+`X-Forwarded-Proto`, and Kit has to believe it. `TRUSTED_PROXIES` is `*` by default, trusting
+whatever connects directly. That is fine when your load balancer is the only thing that can reach
+the application. If anything else can, list the proxies' addresses or ranges.
+
+`TRUSTED_HOSTS` is a comma-separated list of the exact host names the API answers to, and a request
+for any other `Host` is refused. Without it, a forged `Host` header could end up inside the reset
+and verification links Kit generates.
 
 ## CORS
 
-CORS applies to `v1/*`. Browser origins allowed to call the API come from `CORS_ALLOWED_ORIGINS`, a
-comma-separated list, which defaults to `http://localhost:3000` for a local frontend. Credentials
-are not supported, because Kit authenticates with bearer tokens rather than cookies.
+CORS applies to `v1/*`. The browser origins allowed to call the API come from
+`CORS_ALLOWED_ORIGINS`, a comma-separated list that defaults to `http://localhost:3000` for a local
+frontend. Credentials are not supported; Kit authenticates with bearer tokens, not cookies.
 
-The headers a browser client needs are exposed: `Content-Language`, `Deprecation`,
-`Idempotency-Key`, `Link`, `Retry-After`, `Sunset` and `X-Request-Id` among them.
+The headers a browser client needs are exposed, among them `Content-Language`, `Deprecation`,
+`Idempotency-Key`, `Link`, `Retry-After`, `Sunset` and `X-Request-Id`.
 
 If no browser calls your API, set `CORS_ALLOWED_ORIGINS` to nothing. An empty list allows no
 origins, which production accepts; `*` is the one value it refuses.
@@ -64,8 +63,8 @@ X-Frame-Options: DENY
 Referrer-Policy: no-referrer
 ```
 
-A JSON API has no reason to be sniffed, framed or to leak its URLs, which can carry signed tokens,
-in a `Referer`.
+A JSON API has no business being sniffed as another type or framed in a page. Its URLs can carry
+signed tokens, too, so they should never leak out in a `Referer`.
 
 ## Tokens and abilities
 
@@ -79,10 +78,10 @@ in a `Referer`.
 
 ## Rate limiting
 
-Sign-up, sign-in and password routes are limited per IP, and per IP and email where there is one;
-every authenticated route is limited per user. The table is in
-[Authentication](authentication.md#rate-limits). Behind a proxy, limits per IP only work when
-`TRUSTED_PROXIES` is right, or every request appears to come from the proxy.
+Sign-up, sign-in and password routes are limited per IP (and per email, where there is one), and
+every authenticated route is limited per user. [Authentication](authentication.md#rate-limits) has
+the numbers. Behind a proxy, the per-IP limits depend on `TRUSTED_PROXIES` being right. Get it
+wrong and every request seems to come from the proxy, so one noisy client locks everybody out.
 
 ## Accounts
 
@@ -100,7 +99,7 @@ own context. Kit logs sign-ups, sign-ins and failures, sign-outs, token creation
 verification, password resets, authorisation failures, validation failures, rate limiting and
 changes to webhook subscriptions.
 
-Log your own actions the same way, for anything that changes access or destroys data:
+Log your own actions the same way, for anything that changes who can do what or destroys data:
 
 ```php
 SecurityAudit::log('projects.deleted', [
@@ -109,20 +108,18 @@ SecurityAudit::log('projects.deleted', [
 ]);
 ```
 
-Name events `domain.action.outcome`. Log IDs, and `SecurityAudit::hashEmail()` where you need to
-correlate by email. Never log raw emails, passwords or tokens.
+Name events `domain.action.outcome`. Log IDs, and use `SecurityAudit::hashEmail()` where you need
+to correlate by email. Raw emails, passwords and tokens never go in the log.
 
-Send the log channel somewhere you can search and alert on; a `security.audit` entry nobody reads
-protects nothing.
+Send the log channel somewhere you can search it and set alerts on it.
 
 ## Webhook targets
 
-Subscription URLs are checked so a consumer cannot make your server call its own network: https
-only, no private, loopback or reserved addresses, checked again on every send, and no redirects.
-See [Webhooks](webhooks.md#where-subscriptions-can-point).
+Subscription URLs are checked so a consumer cannot make your server call into its own network.
+[Webhooks](webhooks.md#where-subscriptions-can-point) explains the rules.
 
 ## Dependencies
 
-`composer audit` runs in CI and fails on high and critical advisories, Gitleaks scans for committed
-secrets, and [Laravel Vet](https://github.com/laravel/vet) refuses to install any package nobody has
-reviewed. See [Quality and CI](quality-and-ci.md#dependencies-and-vet).
+In CI, `composer audit` fails on high and critical advisories and Gitleaks scans for committed
+secrets. [Laravel Vet](https://github.com/laravel/vet) refuses to install any package nobody has
+reviewed, which [Quality and CI](quality-and-ci.md#dependencies-and-vet) covers in full.

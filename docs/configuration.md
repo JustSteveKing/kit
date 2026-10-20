@@ -1,10 +1,10 @@
 # Configuration
 
-These are the environment variables Kit adds or gives a meaning of its own. Laravel's standard ones
-(`DB_*`, `MAIL_*`, `CACHE_STORE` and the rest) work as they do in any Laravel application.
+These are the environment variables Kit adds, or gives a meaning of its own. Laravel's standard
+ones (`DB_*`, `MAIL_*`, `CACHE_STORE` and the rest) behave as they do in any Laravel application.
 
-"Default" is the value when the variable is not set at all. `.env.example` sets some differently
-for local development, and those are noted.
+"Default" means the value when the variable is not set at all. Where `.env.example` sets something
+different for local development, the table says so.
 
 ## Application
 
@@ -72,7 +72,7 @@ The image sets `APP_ENV=production`, `APP_DEBUG=false` and `LOG_CHANNEL=stderr` 
 
 ## Configuration files
 
-Some settings have no variable because they belong in code review rather than in an environment:
+Some settings deliberately have no variable, because changing them should go through code review:
 
 | File | What it holds |
 | --- | --- |

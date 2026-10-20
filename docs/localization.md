@@ -1,7 +1,7 @@
 # Localization
 
-Kit picks each response's language from the request's `Accept-Language` header and says which one
-it used in `Content-Language`. It ships English and Spanish.
+Kit answers in the language the request asks for in `Accept-Language`, and says which one it used
+in `Content-Language`. English and Spanish ship with it.
 
 ```bash
 curl -i http://127.0.0.1:8000/v1/auth/me -H "Accept-Language: es"
@@ -16,32 +16,36 @@ Content-Language: es
 ## How the language is chosen
 
 `SetRequestLocale` runs first in the `api` middleware group. It compares `Accept-Language` with
-`APP_SUPPORTED_LOCALES` (`en,es`), honouring the client's quality values, and uses the best match.
-A regional tag matches its language, so `es-MX` gets `es`.
+`APP_SUPPORTED_LOCALES` (`en,es`), takes the client's quality values into account, and uses the best
+match. A regional tag matches its language, so `es-MX` gets `es`.
 
-A request with no `Accept-Language`, or none that Kit supports, gets the **first** locale in
-`APP_SUPPORTED_LOCALES`. That list's order is your default, so keep your main language first.
-`APP_FALLBACK_LOCALE` still matters, but only for a translation key a locale is missing.
+A request with no `Accept-Language`, or with only languages Kit
+does not support, gets the **first** locale in `APP_SUPPORTED_LOCALES`, not `APP_FALLBACK_LOCALE`.
+The order of that list is your default, so keep your main language at the front. The fallback
+locale only comes into play when a translation key is missing.
 
 `Content-Language` is exposed through CORS, so browser clients can read it.
 
 ## What gets translated
 
-Anything a client reads as prose, and nothing a client branches on.
+The rule is that anything a person reads gets translated, and anything a client branches on does
+not. A problem's `detail` is translated, while its `type` and `title` stay the same in every
+language, which is why clients should key on `type`.
 
-- **Problem `detail`** is translated. **`type` and `title`** never change with the language, which
-  is why clients should key on `type`.
-- **Validation messages** come from `lang/{locale}/validation.php`, as in any Laravel app.
-- **Kit's own messages**, such as "The provided credentials are incorrect.", are in
-  `lang/{locale}/api.php`.
-- **Problems api-toolbox raises**, such as an idempotency conflict or an unsupported media type,
-  ship in English with the package. The Spanish is in `lang/vendor/api-toolbox/es/problems.php`.
-- **Emails** are sent in the language of the request that caused them, even though they are
-  queued.
+The text comes from a few places:
 
-Two tests keep the translations whole: one fails when `lang/es/api.php` is missing a key that
-`lang/en/api.php` has, and another fails when an api-toolbox upgrade adds a problem with no Spanish
-line.
+| Messages | Where they live |
+| --- | --- |
+| Validation | `lang/{locale}/validation.php`, as in any Laravel app |
+| Kit's own, such as "The provided credentials are incorrect." | `lang/{locale}/api.php` |
+| Problems api-toolbox raises, such as an idempotency conflict | English ships with the package; Spanish is in `lang/vendor/api-toolbox/es/problems.php` |
+
+Emails go out in the language of the request that triggered them, even though they are sent from
+the queue.
+
+Two tests keep the translations complete. One fails when `lang/es/api.php` is missing a key that
+`lang/en/api.php` has. The other fails when an api-toolbox upgrade adds a problem without a Spanish
+line, which is how you find out about new messages before a client does.
 
 ## Writing translatable code
 
@@ -63,9 +67,9 @@ abort(404, __('api.projects.not_found'));
 ],
 ```
 
-Field names and data stay as they are. Translate the messages around them.
+Field names and data stay as they are. Only the messages around them are translated.
 
-In tests, assert the message through `__()` too, so the test does not care which language it ran
+In tests, assert the message through `__()` as well, so the test passes whichever language it runs
 in:
 
 ```php
@@ -82,10 +86,10 @@ To add French:
    `lang/en/validation.php` and translate it.
 4. Create `lang/vendor/api-toolbox/fr/problems.php`, using the Spanish file as the list of keys.
 
-The completeness tests check Spanish by name. Extend them to the new locale so a missing line
-fails CI rather than showing English to a French client.
+The completeness tests check Spanish by name. Extend them to cover French too, or a missing line
+will show up as English in front of a French client instead of failing CI.
 
 ## Removing a language
 
-Take it out of `APP_SUPPORTED_LOCALES` and delete its files, along with the tests that check it.
-Kit works with a single locale.
+Take it out of `APP_SUPPORTED_LOCALES`, then delete its files and the tests that check them. Kit is
+happy with a single locale.

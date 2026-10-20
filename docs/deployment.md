@@ -1,13 +1,13 @@
 # Deployment
 
 Kit ships a `Dockerfile` for a production image: Laravel Octane on
-[FrankenPHP](https://frankenphp.dev), PHP 8.5, running as a non-root user on port 8000. CI builds it
-and boots it with production settings on every push, so a change that breaks the image fails
-before it reaches you.
+[FrankenPHP](https://frankenphp.dev), running as a non-root user on port 8000. CI builds it and
+boots it with production settings on every push, so a change that breaks the image fails before it
+reaches you.
 
-You do not have to use it. Kit is a Laravel application and deploys anywhere Laravel does, Laravel
-Cloud and Forge included. The rest of this page still applies: you need the same three processes,
-the same environment and the same release step.
+You do not have to use it. Kit is a Laravel application and deploys anywhere Laravel does,
+including Laravel Cloud and Forge. Most of this page applies either way, since you still need the
+same processes, environment and release step.
 
 ## What runs
 
@@ -27,21 +27,19 @@ docker run --env-file .env.production my-api php artisan queue:work
 docker run --env-file .env.production my-api php artisan schedule:work
 ```
 
-Without a worker, nobody receives a verification email and no webhook is delivered, and nothing
-errors to tell you. Run one.
+Forget the worker and nobody receives a verification email or a webhook. Nothing errors either,
+which makes it an easy one to miss.
 
 ## The image
 
-- **Dependencies** are installed without dev packages, from the `composer.lock` that Vet audited in
-  CI. Autoloading is classmap authoritative.
-- **OPcache** is tuned for production in `docker/php.ini`: timestamps are not checked, since the
-  code never changes inside a running container.
-- **Logs** go to `stderr` (`LOG_CHANNEL=stderr`), for your platform to collect.
-- **The health check** requests `/up` every 30 seconds.
+Dependencies are installed without dev packages, from the same `composer.lock` Vet audited in CI,
+with a classmap-authoritative autoloader. `docker/php.ini` tunes OPcache for production and turns
+off timestamp checks, since the code never changes inside a running container. Logs go to `stderr`
+for your platform to collect, and the health check hits `/up` every 30 seconds.
 
-On start, `docker/entrypoint.sh` runs `php artisan optimize`, caching config, routes and events
-from the environment the container was given, then starts Octane. Pass a command, as with the
-worker, and it runs that instead.
+On start, `docker/entrypoint.sh` runs `php artisan optimize`, which caches config, routes and
+events from the environment the container was given, and then starts Octane. Pass a command, as
+the worker does, and it runs that instead.
 
 These variables tune Octane:
 
@@ -75,11 +73,13 @@ QUEUE_CONNECTION=database
 MAIL_MAILER=smtp
 ```
 
-The image has the MySQL and PostgreSQL drivers as well as SQLite. [Security](security.md#what-production-requires)
-explains each check, and [Configuration](configuration.md) lists every variable.
+The image has the MySQL and PostgreSQL drivers as well as SQLite.
+[Security](security.md#what-production-requires) explains each check, and
+[Configuration](configuration.md) lists every variable.
 
 Put TLS in front of the container, at a load balancer or proxy, and forward `X-Forwarded-Proto`.
-Review `TRUSTED_PROXIES` for your network; the default trusts whatever connects directly.
+Check `TRUSTED_PROXIES` against your network too, because the default trusts whatever connects
+directly.
 
 ## Releasing
 
@@ -89,13 +89,13 @@ Run migrations as a release step, once, before the new containers take traffic:
 docker run --env-file .env.production my-api php artisan migrate --force
 ```
 
-Then replace the web, worker and scheduler containers. Restart workers on every release, or they
-keep running the old code.
+Then replace the web, worker and scheduler containers. Workers in particular have to be restarted
+on every release, or they carry on running the old code.
 
 ## Writing code that is safe under Octane
 
-Octane keeps the application in memory between requests, which is where its speed comes from. It
-also means state can leak from one request into the next, so:
+Octane keeps the application in memory between requests. That is where its speed comes from, and
+it is also how state leaks from one request into the next. Three rules keep that from happening:
 
 - Keep request state out of singletons and static properties. Use `scoped()` bindings, which Octane
   resets for each request; api-toolbox binds its request ID and trace context that way.
@@ -106,5 +106,5 @@ also means state can leak from one request into the next, so:
 - Dev packages are not in the image. Config that refers to one, as `config/scribe.php` does, must
   return early when the package is missing, or the image fails to boot. CI catches this.
 
-`php artisan serve` does not run Octane, so a leak will not show up locally. Run the image when
-you change anything that holds state.
+`php artisan serve` does not run Octane, so a leak will not show up locally. When you change
+anything that holds state, build and run the image.

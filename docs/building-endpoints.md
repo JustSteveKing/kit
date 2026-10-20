@@ -1,8 +1,8 @@
 # Building endpoints
 
 Every endpoint in Kit is built from the same six pieces: a route, a Form Request, a payload, an
-invokable controller, a resource and a test. `make:endpoint` writes all of them, so start there
-rather than with a blank file.
+invokable controller, a resource and a test. `make:endpoint` writes all of them, so that is where
+every new endpoint starts.
 
 The examples on this page add a `projects` domain. Kit has no `Project` model, so make one first
 (`php artisan make:model Project -mf`) if you are following along.
@@ -24,17 +24,18 @@ The name is `{Domain}/{Action}`. The options:
 | `--guest` | | Leaves the route public, with no token or ability |
 | `--force` | | Overwrites files that already exist |
 
-It writes the controller, the Form Request (not for a DELETE), the payload and a Pest test, appends
-the route to `routes/api/v1.php`, runs Pint over what it wrote, and prints the steps it leaves to
-you. The templates are in `stubs/endpoint/`; change them and every later endpoint follows.
+It writes the controller, the payload, a Pest test and, for anything but a DELETE, a Form Request.
+Then it appends the route to `routes/api/v1.php`, runs Pint over the new files and prints what is
+left for you to do. The templates live in `stubs/endpoint/`, and every endpoint you generate after
+changing them follows suit.
 
-What it cannot know, it leaves visible. The controller answers `501`, path parameters carry a TODO
-asking for a constraint, and the description is three TODO sentences. The contract tests and
-legible both fail while any of that documentation remains, so a half-written endpoint cannot get
-through CI.
+Anything the generator cannot know stays visible. The controller answers `501`, each path parameter
+has a TODO asking for a constraint, and the description is three TODO sentences. Both the contract
+tests and legible fail while that documentation is still there, so a half-written endpoint does not
+get through CI.
 
-Finish the endpoint before you run `composer rector`. Rector treats the generator's placeholders,
-an unused payload or an empty constructor, as dead code and removes them.
+Finish the endpoint before you run `composer rector`. To Rector, the generator's placeholders (an
+unused payload, an empty constructor) are dead code, and it deletes them.
 
 ## The route
 
@@ -57,10 +58,10 @@ Route::post('/projects', CreateProjectController::class)
 
 Then do the two things the generator prints:
 
-1. **Add the ability** to `abilities.available` in `config/sanctum.php`, and to `abilities.default`
-   if every signed-in client should hold it. Until you do, nobody can call the route. See
+1. Add the ability to `abilities.available` in `config/sanctum.php`, and to `abilities.default` if
+   every signed-in client should hold it. Until you do, nobody can call the route. See
    [Authentication](authentication.md#abilities).
-2. **Constrain path parameters** on the route, never in the Form Request:
+2. Constrain path parameters on the route itself, never in the Form Request:
 
    ```php
    Route::get('/projects/{project}', ShowProjectController::class)
@@ -117,8 +118,9 @@ final readonly class CreateProjectPayload
 }
 ```
 
-PHPStan runs at level 10, so read values with typed accessors (`Arr::string()`, `Arr::integer()`)
-rather than casting `mixed`. Path parameters come from `App\Http\Payloads\RouteParameter`:
+PHPStan runs at level 10 and will not let you cast `mixed`, so read each value with a typed
+accessor such as `Arr::string()` or `Arr::integer()`. Path parameters come from
+`App\Http\Payloads\RouteParameter`:
 
 ```php
 $projectId = RouteParameter::string($request, 'project');
@@ -143,12 +145,14 @@ public function __invoke(CreateProjectRequest $request, #[CurrentUser] User $use
 }
 ```
 
-The generated Scribe attributes are the endpoint's documentation, and they are checked. Fill in
-the `#[Endpoint]` description with three things: what it does, when a client should call it, and
-what it returns. Add a `#[BodyParam]` or `#[QueryParam]` for each input, a success response
-(`#[ResponseFromApiResource]` once you have a resource), and keep a `#[Response]` for each error
-status the endpoint can return. The generator writes the `401` and `403` ones as problem details
-already, and a `422` with a TODO example when there is a Form Request. `LoginController` is a complete example.
+The Scribe attributes on the class are the endpoint's documentation, and CI checks them. The
+`#[Endpoint]` description wants three sentences: what it does, when a client should call it, and
+what it returns. Then add a `#[BodyParam]` or `#[QueryParam]` for each input, and a
+`#[ResponseFromApiResource]` for the success response once the resource exists.
+
+Each error status the endpoint can return needs a `#[Response]` written as a problem. The generator
+has already written the `401` and `403`, plus a `422` with a TODO example when there is a Form
+Request. `LoginController` is a finished example of the whole set.
 
 Errors are thrown, never returned as JSON. See [Errors](errors.md).
 
@@ -175,10 +179,11 @@ final class ProjectResource extends JsonResource
 }
 ```
 
-IDs are strings and dates are ISO 8601. Listing the fields rather than returning the model means a
-new column never leaks into the API by accident.
+IDs are strings and dates are ISO 8601. Because every field is listed by hand, a column you add to
+the table later never ends up in the API by accident.
 
-For a list endpoint, return a cursor page rather than Laravel's paginator:
+A list endpoint returns a `CursorPage`. Laravel's paginated resources put navigation in the body,
+and Kit puts it in `Link` headers:
 
 ```php
 return CursorPage::of($user->projects()->latest('id')->cursorPaginate(25), ProjectResource::class);
@@ -218,9 +223,9 @@ api-toolbox adds assertions such as `assertProblem()`, `assertProblemType()`,
 
 1. Add a runtime check for the endpoint to `OpenApiContractTest`, so its real responses are
    validated against the spec.
-2. If the endpoint has a Form Request, add it to the `error-shape` ignore in `.legible.yaml`. Its
-   validation problems carry an `errors` member that other problems do not, and the reason given
-   there covers it.
+2. If the endpoint has a Form Request, add it to the `error-shape` ignore in `.legible.yaml`.
+   Validation problems carry an `errors` member the other problems do not, and the reason in that
+   file explains why that is fine.
 3. Regenerate the docs and run the checks:
 
    ```bash
@@ -235,9 +240,9 @@ api-toolbox adds assertions such as `assertProblem()`, `assertProblemType()`,
 
 ## Taking a type other than JSON
 
-Every write route in `v1` accepts `application/json` only, because `consumes:application/json`
-sits on the whole group. An upload has to lift that as well as declare its own type, or the group
-refuses the request before the route sees it:
+`consumes:application/json` sits on the whole `v1` group, so every write route accepts JSON and
+nothing else. An upload route has to lift the group's declaration as well as add its own, or the
+group refuses the request before the route ever sees it:
 
 ```php
 Route::post('/imports', CreateImportController::class)

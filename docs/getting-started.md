@@ -2,8 +2,8 @@
 
 ## Install
 
-Kit is a starting point rather than a package you update, so it becomes your project's first
-commit. The Laravel installer does that for you:
+Kit is not a package you keep updating. It becomes your project's first commit, and the Laravel
+installer sets that up for you:
 
 ```bash
 laravel new my-api --using=juststeveking/kit
@@ -14,8 +14,8 @@ That runs `composer create-project`, which copies `.env.example` to `.env`, gene
 creates `database/database.sqlite` and runs the migrations. If you cloned the repository instead,
 `composer run setup` does the same.
 
-Local development uses SQLite. Switch `DB_CONNECTION` when you want something else; nothing in Kit
-depends on SQLite.
+Local development uses SQLite, but nothing in Kit depends on it. Change `DB_CONNECTION` whenever
+you like.
 
 ## Run it
 
@@ -27,9 +27,9 @@ php artisan queue:work    # emails and webhook deliveries are queued
 php artisan schedule:work # prunes old webhook events daily
 ```
 
-`QUEUE_CONNECTION` is `database`, so jobs wait in the `jobs` table until a worker picks them up.
-Mail goes to `storage/logs/laravel.log` (`MAIL_MAILER=log`) until you configure a mailer, which is
-where you will find the verification link after registering.
+Jobs wait in the `jobs` table until a worker picks them up (`QUEUE_CONNECTION=database`). Until you
+configure a mailer, mail is written to `storage/logs/laravel.log`, so that is where the verification
+link turns up after you register.
 
 ## Your first requests
 
@@ -64,7 +64,7 @@ curl http://127.0.0.1:8000/v1/auth/me \
   -H "Authorization: Bearer <TOKEN>"
 ```
 
-Leave the token off and ask for Spanish, and you see how every error comes back:
+Now leave the token off and ask for Spanish. This is the shape every error takes:
 
 ```bash
 curl -i http://127.0.0.1:8000/v1/auth/me -H "Accept-Language: es"
@@ -79,12 +79,12 @@ WWW-Authenticate: Bearer
 {"type":"https://apiguide.dev/errors/unauthorized","title":"Unauthorized","status":401,"detail":"No autenticado.","instance":"urn:uuid:0199e7f4-5d2a-7c3e-9b1a-4f2d8e6c1a07"}
 ```
 
-The `type` tells a client what went wrong, the `detail` is for a person and follows their language,
-and the `instance` is the request ID, so a reported error leads straight to its log lines.
-[Errors](errors.md) has the rest.
+Clients branch on `type`. The `detail` is written for a person, in their language, and `instance`
+is the request ID, so when someone reports an error you can go straight to its log lines.
+[Errors](errors.md) covers the rest.
 
-The generated API reference is at `http://127.0.0.1:8000/docs/index.html`, with the OpenAPI spec beside it at
-`/docs/openapi.yaml`.
+The generated API reference is at `http://127.0.0.1:8000/docs/index.html`, and the OpenAPI spec
+sits beside it at `/docs/openapi.yaml`.
 
 ## Where things live
 
@@ -120,6 +120,5 @@ tests/Feature/
 
 ## Next
 
-[Building endpoints](building-endpoints.md) walks through adding your first endpoint. Read
-[`AGENTS.md`](../AGENTS.md) too if you work with a coding agent: it is the same rules, written as
-instructions.
+[Building endpoints](building-endpoints.md) takes you through adding your first endpoint. If you
+work with a coding agent, point it at [`AGENTS.md`](../AGENTS.md).
