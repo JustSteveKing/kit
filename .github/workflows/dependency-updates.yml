@@ -25,7 +25,9 @@ jobs:
           coverage: none
 
       - name: Install current dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist --no-scripts
+          cp composer.lock "${RUNNER_TEMP}/composer.lock.before"
 
       # Vet's plugin keeps every release younger than vet.json's minimum-release-age out of the
       # update. It then refuses to install what nobody has trusted yet and exits 1, after the lock
@@ -40,19 +42,37 @@ jobs:
       - name: Install the updated lock without Vet
         run: composer install --no-plugins --no-interaction --no-progress --prefer-dist --no-scripts
 
+      # Laravel's own packages are trusted by policy (AGENTS.md, Dependencies). When they are the
+      # only packages the update changed, their trust is recorded here and the PR needs no review.
+      - name: Trust Laravel's own packages
+        run: |
+          decision=$(jq -rn --slurpfile old "${RUNNER_TEMP}/composer.lock.before" --slurpfile new composer.lock '
+            def index(lock): [lock.packages[], lock["packages-dev"][]] | map({key: .name, value: (.version + "@" + (.dist.reference // .source.reference // ""))}) | from_entries;
+            (index($old[0])) as $before
+            | [index($new[0]) | to_entries[] | select($before[.key] != .value) | .key]
+            | if length > 0 and all(startswith("laravel/")) then "trust" else "review" end')
+          if [ "${decision}" = 'trust' ]; then
+            ./vendor/bin/vet --fresh --no-interaction --no-ansi
+            echo 'LARAVEL_ONLY=true' >> "${GITHUB_ENV}"
+          fi
+
       - name: Audit with Vet
         run: |
           ./vendor/bin/vet --no-interaction --no-ansi > vet-report.txt 2>&1 || true
           {
             echo 'Automated weekly dependency refresh: `composer update`, holding back every release younger than `minimum-release-age` in `vet.json`.'
             echo
+            if [ "${LARAVEL_ONLY:-}" = 'true' ]; then
+              echo 'Every changed package is `laravel/*`, trusted by policy, so `vet.json` is updated in this PR and it needs no review.'
+              echo
+            fi
             echo '## Vet'
             echo
             echo '```'
             cat vet-report.txt
             echo '```'
             echo
-            echo 'Untrusted packages fail `composer install` in CI. To review, check out this branch, run `composer install --no-plugins`, then `./vendor/bin/vet` in a terminal: read each change, or hand them to your coding agent, and pick the packages you trust. Commit `vet.json` to this branch; that push runs CI.'
+            echo 'Otherwise, untrusted packages fail `composer install` in CI. To review, check out this branch, run `composer install --no-plugins`, then `./vendor/bin/vet` in a terminal: read each change, or hand them to your coding agent, and pick the packages you trust. Commit `vet.json` to this branch; that push runs CI.'
           } > pr-body.md
           rm update.log vet-report.txt
 
@@ -65,5 +85,6 @@ jobs:
           add-paths: |
             composer.json
             composer.lock
+            vet.json
           branch: bot/dependency-updates
           delete-branch: true
