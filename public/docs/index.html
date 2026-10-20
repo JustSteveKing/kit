@@ -132,7 +132,13 @@
                     <a href="#webhooks">Webhooks</a>
                 </li>
                                     <ul id="tocify-subheader-webhooks" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="webhooks-GETv1-webhooks">
+                                                    <li class="tocify-item level-2" data-unique="webhooks-GETv1-webhooks--webhook--consent">
+                                <a href="#webhooks-GETv1-webhooks--webhook--consent">Open Webhook Consent Link</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="webhooks-POSTv1-webhooks--webhook--consent">
+                                <a href="#webhooks-POSTv1-webhooks--webhook--consent">Grant Webhook Consent</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="webhooks-GETv1-webhooks">
                                 <a href="#webhooks-GETv1-webhooks">List Webhooks</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="webhooks-POSTv1-webhooks">
@@ -257,10 +263,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5cgghhj8n1xr73hnz44dxrg&quot;,
+        &quot;id&quot;: &quot;01m5ch3jt5tj2t77hs3f321nbt&quot;,
         &quot;name&quot;: &quot;Justina Gaylord&quot;,
         &quot;email&quot;: &quot;lafayette.considine@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:17:56+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T11:28:20+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     },
@@ -467,10 +473,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5cgghhw5eq6wyq8a4sqys83&quot;,
+        &quot;id&quot;: &quot;01m5ch3jtc6tvn4etrg4aczmpe&quot;,
         &quot;name&quot;: &quot;Justina Gaylord&quot;,
         &quot;email&quot;: &quot;cormier.nick@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:17:56+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T11:28:20+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     },
@@ -655,10 +661,10 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: &quot;01m5cgghjhw6dj7qr57wfaab2k&quot;,
+        &quot;id&quot;: &quot;01m5ch3jv63p5b5s19wrecwsk5&quot;,
         &quot;name&quot;: &quot;Morgan Hirthe&quot;,
         &quot;email&quot;: &quot;dare.emelie@example.com&quot;,
-        &quot;email_verified_at&quot;: &quot;2026-10-20T11:17:56+00:00&quot;,
+        &quot;email_verified_at&quot;: &quot;2026-10-20T11:28:20+00:00&quot;,
         &quot;created_at&quot;: null,
         &quot;updated_at&quot;: null
     }
@@ -2534,7 +2540,433 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="webhooks-GETv1-webhooks">List Webhooks</h2>
+                                <h2 id="webhooks-GETv1-webhooks--webhook--consent">Open Webhook Consent Link</h2>
+
+<p>
+</p>
+
+<p>Consent to deliveries for a webhook endpoint by opening the WebHook-Request-Callback URL sent with its validation request, which the CloudEvents webhook specification requires to work by GET (section 4.1.3). Use it when an administrator finds the URL in the receiver's logs and opens it in a browser. Returns a confirmation message; a link that is invalid or expired is a 403, and one issued before the subscription's URL changed is a 409.</p>
+
+<span id="example-requests-GETv1-webhooks--webhook--consent">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&amp;expires=1761220800&amp;signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent"
+);
+
+const params = {
+    "url_hash": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+    "expires": "1761220800",
+    "signature": "0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETv1-webhooks--webhook--consent">
+            <blockquote>
+            <p>Example response (200, Consent recorded.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Deliveries to this webhook endpoint are allowed.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403, The callback URL was altered or has expired.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;type&quot;: &quot;https://apiguide.dev/errors/forbidden&quot;,
+    &quot;title&quot;: &quot;Forbidden&quot;,
+    &quot;status&quot;: 403,
+    &quot;detail&quot;: &quot;This consent link is invalid or has expired. Validate the webhook again for a new one.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404, The subscription has been deleted.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;type&quot;: &quot;https://apiguide.dev/errors/resource-not-found&quot;,
+    &quot;title&quot;: &quot;Resource Not Found&quot;,
+    &quot;status&quot;: 404,
+    &quot;detail&quot;: &quot;The resource was not found.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (409, Consent was asked for a URL the subscription no longer uses.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;type&quot;: &quot;https://apiguide.dev/errors/resource-conflict&quot;,
+    &quot;title&quot;: &quot;Resource Conflict&quot;,
+    &quot;status&quot;: 409,
+    &quot;detail&quot;: &quot;The webhook&#039;s URL has changed since this consent link was sent.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETv1-webhooks--webhook--consent" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETv1-webhooks--webhook--consent"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETv1-webhooks--webhook--consent"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETv1-webhooks--webhook--consent" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETv1-webhooks--webhook--consent">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETv1-webhooks--webhook--consent" data-method="GET"
+      data-path="v1/webhooks/{webhook}/consent"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETv1-webhooks--webhook--consent', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETv1-webhooks--webhook--consent"
+                    onclick="tryItOut('GETv1-webhooks--webhook--consent');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETv1-webhooks--webhook--consent"
+                    onclick="cancelTryOut('GETv1-webhooks--webhook--consent');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETv1-webhooks--webhook--consent"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>v1/webhooks/{webhook}/consent</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>webhook</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="webhook"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="01jb8x2m4k5n6p7q8r9s0t1v2w"
+               data-component="url">
+    <br>
+<p>The webhook subscription ID, from the callback URL. Example: <code>01jb8x2m4k5n6p7q8r9s0t1v2w</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>url_hash</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="url_hash"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"
+               data-component="query">
+    <br>
+<p>SHA-256 of the URL consent was asked for, from the callback URL. Example: <code>3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>expires</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="expires"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="1761220800"
+               data-component="query">
+    <br>
+<p>When the callback URL expires, from the callback URL. Example: <code>1761220800</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>signature</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="signature"                data-endpoint="GETv1-webhooks--webhook--consent"
+               value="0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f"
+               data-component="query">
+    <br>
+<p>The callback URL's signature, from the callback URL. Example: <code>0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f</code></p>
+            </div>
+                </form>
+
+                    <h2 id="webhooks-POSTv1-webhooks--webhook--consent">Grant Webhook Consent</h2>
+
+<p>
+</p>
+
+<p>Consent to deliveries for a webhook endpoint by POSTing to the WebHook-Request-Callback URL sent with its validation request (CloudEvents webhook specification, section 4.1.3), with no body. Use it from a delivery target that grants consent after the OPTIONS request rather than in its response; nobody builds this URL by hand. Returns a confirmation message; a link that is invalid or expired is a 403, and one issued before the subscription's URL changed is a 409.</p>
+
+<span id="example-requests-POSTv1-webhooks--webhook--consent">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&amp;expires=1761220800&amp;signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/v1/webhooks/01jb8x2m4k5n6p7q8r9s0t1v2w/consent"
+);
+
+const params = {
+    "url_hash": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+    "expires": "1761220800",
+    "signature": "0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTv1-webhooks--webhook--consent">
+            <blockquote>
+            <p>Example response (200, Consent recorded.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Deliveries to this webhook endpoint are allowed.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403, The callback URL was altered or has expired.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;type&quot;: &quot;https://apiguide.dev/errors/forbidden&quot;,
+    &quot;title&quot;: &quot;Forbidden&quot;,
+    &quot;status&quot;: 403,
+    &quot;detail&quot;: &quot;This consent link is invalid or has expired. Validate the webhook again for a new one.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404, The subscription has been deleted.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;type&quot;: &quot;https://apiguide.dev/errors/resource-not-found&quot;,
+    &quot;title&quot;: &quot;Resource Not Found&quot;,
+    &quot;status&quot;: 404,
+    &quot;detail&quot;: &quot;The resource was not found.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (409, Consent was asked for a URL the subscription no longer uses.):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;type&quot;: &quot;https://apiguide.dev/errors/resource-conflict&quot;,
+    &quot;title&quot;: &quot;Resource Conflict&quot;,
+    &quot;status&quot;: 409,
+    &quot;detail&quot;: &quot;The webhook&#039;s URL has changed since this consent link was sent.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTv1-webhooks--webhook--consent" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTv1-webhooks--webhook--consent"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTv1-webhooks--webhook--consent"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTv1-webhooks--webhook--consent" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTv1-webhooks--webhook--consent">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTv1-webhooks--webhook--consent" data-method="POST"
+      data-path="v1/webhooks/{webhook}/consent"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTv1-webhooks--webhook--consent', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTv1-webhooks--webhook--consent"
+                    onclick="tryItOut('POSTv1-webhooks--webhook--consent');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTv1-webhooks--webhook--consent"
+                    onclick="cancelTryOut('POSTv1-webhooks--webhook--consent');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTv1-webhooks--webhook--consent"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>v1/webhooks/{webhook}/consent</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>webhook</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="webhook"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="01jb8x2m4k5n6p7q8r9s0t1v2w"
+               data-component="url">
+    <br>
+<p>The webhook subscription ID, from the callback URL. Example: <code>01jb8x2m4k5n6p7q8r9s0t1v2w</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>url_hash</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="url_hash"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"
+               data-component="query">
+    <br>
+<p>SHA-256 of the URL consent was asked for, from the callback URL. Example: <code>3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>expires</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="expires"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="1761220800"
+               data-component="query">
+    <br>
+<p>When the callback URL expires, from the callback URL. Example: <code>1761220800</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>signature</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="signature"                data-endpoint="POSTv1-webhooks--webhook--consent"
+               value="0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f"
+               data-component="query">
+    <br>
+<p>The callback URL's signature, from the callback URL. Example: <code>0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f</code></p>
+            </div>
+                </form>
+
+                    <h2 id="webhooks-GETv1-webhooks">List Webhooks</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>

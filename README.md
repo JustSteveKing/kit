@@ -363,6 +363,7 @@ API consumers subscribe their own https endpoints to events, behind the `webhook
 | POST | `/v1/webhooks/{webhook}/secret` | Rotate the signing secret |
 | POST | `/v1/webhooks/{webhook}/ping` | Send a `webhook.ping` to test the endpoint |
 | POST | `/v1/webhooks/{webhook}/validate` | Ask the endpoint for consent again (when validation is on) |
+| GET, POST | `/v1/webhooks/{webhook}/consent` | The signed consent link sent to the endpoint; no token needed |
 | GET | `/v1/webhooks/{webhook}/deliveries` | Deliveries, each with every attempt |
 | POST | `/v1/webhooks/{webhook}/deliveries/{delivery}/redeliver` | Send an event again |
 
@@ -402,7 +403,11 @@ https only, redirects never followed, and every request carries `WebHook-Request
 - **Consented to**, when `WEBHOOKS_VALIDATE_ENDPOINTS=true`: a new or moved subscription receives
   nothing until its endpoint answers an `OPTIONS` request carrying `WebHook-Request-Origin` with a
   matching `WebHook-Allowed-Origin` (or `*`), the CloudEvents handshake. It proves the URL's owner
-  wants the events. Off by default, since every receiver then has to implement it.
+  wants the events. Off by default, since every receiver then has to implement it. A receiver that
+  cannot answer straight away, or whose administrator finds the request in a log, consents later
+  through the `WebHook-Request-Callback` URL sent with it: a signed link, valid for
+  `WEBHOOKS_CALLBACK_HOURS` (72), opened with GET or POSTed to, and refused if the subscription's URL
+  has changed since.
 - **Recorded**: each attempt keeps its status, a response excerpt, its duration and any error. A
   `null` status means no response arrived, as distinct from an error status.
 - **Safe to point at**: URLs must be https and must not resolve to a private, loopback or reserved

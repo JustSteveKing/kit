@@ -33,6 +33,9 @@ return [
         'disabled_gone' => 'Desactivado porque el endpoint respondio 410 Gone.',
         'disabled' => 'La suscripcion de webhook esta desactivada.',
         'not_validated' => 'El endpoint del webhook aun no ha aceptado recibir entregas.',
+        'invalid_consent_link' => 'Este enlace de consentimiento no es valido o ha caducado. Valida el webhook de nuevo para obtener otro.',
+        'consent_url_changed' => 'La URL del webhook ha cambiado desde que se envio este enlace de consentimiento.',
+        'consent_granted' => 'Se permiten las entregas a este endpoint de webhook.',
     ],
     'sunset' => [
         'endpoint_unavailable' => 'Este endpoint ha sido retirado y ya no esta disponible.',

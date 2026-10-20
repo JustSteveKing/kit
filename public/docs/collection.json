@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Laravel API Documentation",
-        "_postman_id": "0c69f3f4-ae4e-4888-b2c5-445139c7a324",
+        "_postman_id": "e16ac1f8-a662-4567-8b4a-41cfda5bf45d",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,7 +56,7 @@
                                 {
                                     "header": [],
                                     "code": 201,
-                                    "body": "{\"data\":{\"id\":\"01m5cgghhj8n1xr73hnz44dxrg\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:17:56+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5ch3jt5tj2t77hs3f321nbt\",\"name\":\"Justina Gaylord\",\"email\":\"lafayette.considine@example.com\",\"email_verified_at\":\"2026-10-20T11:28:20+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Registration succeeded."
                                 },
                                 {
@@ -100,7 +100,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cgghhw5eq6wyq8a4sqys83\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:17:56+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5ch3jtc6tvn4etrg4aczmpe\",\"name\":\"Justina Gaylord\",\"email\":\"cormier.nick@example.com\",\"email_verified_at\":\"2026-10-20T11:28:20+00:00\",\"created_at\":null,\"updated_at\":null},\"meta\":{\"token\":\"1|example-token\",\"token_type\":\"Bearer\",\"expires_at\":null}}",
                                     "name": "Login succeeded."
                                 },
                                 {
@@ -138,7 +138,7 @@
                                 {
                                     "header": [],
                                     "code": 200,
-                                    "body": "{\"data\":{\"id\":\"01m5cgghjhw6dj7qr57wfaab2k\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:17:56+00:00\",\"created_at\":null,\"updated_at\":null}}",
+                                    "body": "{\"data\":{\"id\":\"01m5ch3jv63p5b5s19wrecwsk5\",\"name\":\"Morgan Hirthe\",\"email\":\"dare.emelie@example.com\",\"email_verified_at\":\"2026-10-20T11:28:20+00:00\",\"created_at\":null,\"updated_at\":null}}",
                                     "name": "Authenticated user profile."
                                 },
                                 {
@@ -662,6 +662,166 @@
             "name": "Webhooks",
             "description": "",
             "item": [
+                {
+                    "name": "Open Webhook Consent Link",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/consent",
+                            "query": [
+                                {
+                                    "key": "url_hash",
+                                    "value": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+                                    "description": "SHA-256 of the URL consent was asked for, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "expires",
+                                    "value": "1761220800",
+                                    "description": "When the callback URL expires, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "signature",
+                                    "value": "0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                                    "description": "The callback URL's signature, from the callback URL.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID, from the callback URL."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Consent to deliveries for a webhook endpoint by opening the WebHook-Request-Callback URL sent with its validation request, which the CloudEvents webhook specification requires to work by GET (section 4.1.3). Use it when an administrator finds the URL in the receiver's logs and opens it in a browser. Returns a confirmation message; a link that is invalid or expired is a 403, and one issued before the subscription's URL changed is a 409.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"message\":\"Deliveries to this webhook endpoint are allowed.\"}",
+                            "name": "Consent recorded."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"This consent link is invalid or has expired. Validate the webhook again for a new one.\"}",
+                            "name": "The callback URL was altered or has expired."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "The subscription has been deleted."
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook's URL has changed since this consent link was sent.\"}",
+                            "name": "Consent was asked for a URL the subscription no longer uses."
+                        }
+                    ]
+                },
+                {
+                    "name": "Grant Webhook Consent",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "v1\/webhooks\/:webhook\/consent",
+                            "query": [
+                                {
+                                    "key": "url_hash",
+                                    "value": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
+                                    "description": "SHA-256 of the URL consent was asked for, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "expires",
+                                    "value": "1761220800",
+                                    "description": "When the callback URL expires, from the callback URL.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "signature",
+                                    "value": "0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                                    "description": "The callback URL's signature, from the callback URL.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/v1\/webhooks\/:webhook\/consent?url_hash=3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b&expires=1761220800&signature=0c7f4e0b2d6a9e1f5b3c8d7a6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9d8e7f",
+                            "variable": [
+                                {
+                                    "id": "webhook",
+                                    "key": "webhook",
+                                    "value": "01jb8x2m4k5n6p7q8r9s0t1v2w",
+                                    "description": "The webhook subscription ID, from the callback URL."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Consent to deliveries for a webhook endpoint by POSTing to the WebHook-Request-Callback URL sent with its validation request (CloudEvents webhook specification, section 4.1.3), with no body. Use it from a delivery target that grants consent after the OPTIONS request rather than in its response; nobody builds this URL by hand. Returns a confirmation message; a link that is invalid or expired is a 403, and one issued before the subscription's URL changed is a 409.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"message\":\"Deliveries to this webhook endpoint are allowed.\"}",
+                            "name": "Consent recorded."
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/forbidden\",\"title\":\"Forbidden\",\"status\":403,\"detail\":\"This consent link is invalid or has expired. Validate the webhook again for a new one.\"}",
+                            "name": "The callback URL was altered or has expired."
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-not-found\",\"title\":\"Resource Not Found\",\"status\":404,\"detail\":\"The resource was not found.\"}",
+                            "name": "The subscription has been deleted."
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"type\":\"https:\\\/\\\/apiguide.dev\\\/errors\\\/resource-conflict\",\"title\":\"Resource Conflict\",\"status\":409,\"detail\":\"The webhook's URL has changed since this consent link was sent.\"}",
+                            "name": "Consent was asked for a URL the subscription no longer uses."
+                        }
+                    ]
+                },
                 {
                     "name": "List Webhooks",
                     "request": {
