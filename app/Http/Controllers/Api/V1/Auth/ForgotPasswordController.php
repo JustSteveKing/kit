@@ -24,13 +24,13 @@ use Knuckles\Scribe\Attributes\Unauthenticated;
 #[Response(
     content: ['message' => 'If the account exists, a password reset link has been sent.'],
     status: 200,
-    description: 'Password reset request accepted.'
+    description: 'Password reset request accepted.',
 )]
 final class ForgotPasswordController
 {
     public function __invoke(ForgotPasswordRequest $request): JsonResponse
     {
-        $payload = ForgotPasswordPayload::fromReqest($request);
+        $payload = ForgotPasswordPayload::fromRequest($request);
 
         $status = Password::broker()->sendResetLink([
             'email' => $payload->email,

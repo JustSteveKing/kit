@@ -27,11 +27,17 @@ final class ProblemDetailsOpenApiGenerator extends OpenApiGenerator
         }
 
         foreach ($pathItem['responses'] as $status => $response) {
-            if ((int) $status < 400 || ! is_array($response) || ! is_array($response['content']['application/json'] ?? null)) {
+            if ((int) $status < 400 || ! is_array($response) || ! is_array($response['content'] ?? null)) {
                 continue;
             }
 
-            $response['content'] = [self::MEDIA_TYPE => $response['content']['application/json']];
+            $schema = $response['content']['application/json'] ?? null;
+
+            if ( ! is_array($schema)) {
+                continue;
+            }
+
+            $response['content'] = [self::MEDIA_TYPE => $schema];
             $pathItem['responses'][$status] = $response;
         }
 

@@ -67,10 +67,13 @@ final class ListTokensController
             ->cursorPaginate(self::PER_PAGE);
 
         SecurityAudit::log('auth.tokens.listed', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => $user->id,
             'count' => count($tokens->items()),
         ]);
 
+        // CursorPage::of() asks for CursorPaginator<array-key, mixed>, which no paginator with int
+        // keys can satisfy because TKey is invariant. Remove once api-toolbox widens the type.
+        // @phpstan-ignore argument.type
         return CursorPage::of($tokens, PersonalAccessTokenResource::class);
     }
 }

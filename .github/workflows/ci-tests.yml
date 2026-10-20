@@ -31,5 +31,11 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
+      - name: Check code style
+        run: composer lint
+
+      - name: Run static analysis
+        run: composer stan
+
       - name: Run test suite
         run: php artisan test

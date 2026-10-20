@@ -7,7 +7,7 @@ use App\Support\ProductionSecurityChecks;
 it('skips checks outside production environment', function (): void {
     config()->set('app.debug', true);
 
-    expect(fn (): null => ProductionSecurityChecks::assertForEnvironment('testing'))->not->toThrow(RuntimeException::class);
+    expect(fn(): null => ProductionSecurityChecks::assertForEnvironment('testing'))->not->toThrow(RuntimeException::class);
 });
 
 it('fails in production when debug is enabled', function (): void {
@@ -17,7 +17,7 @@ it('fails in production when debug is enabled', function (): void {
     config()->set('cors.allowed_origins', ['https://app.example.com']);
     config()->set('security.trusted_hosts', ['api.example.com']);
 
-    expect(fn (): null => ProductionSecurityChecks::assertForEnvironment('production'))
+    expect(fn(): null => ProductionSecurityChecks::assertForEnvironment('production'))
         ->toThrow(RuntimeException::class, 'APP_DEBUG must be false');
 });
 
@@ -28,7 +28,7 @@ it('fails in production when https requirements are not secure enough', function
     config()->set('cors.allowed_origins', ['https://app.example.com']);
     config()->set('security.trusted_hosts', ['api.example.com']);
 
-    expect(fn (): null => ProductionSecurityChecks::assertForEnvironment('production'))
+    expect(fn(): null => ProductionSecurityChecks::assertForEnvironment('production'))
         ->toThrow(RuntimeException::class, 'SECURITY_FORCE_HTTPS must be enabled');
 });
 
@@ -39,7 +39,7 @@ it('fails in production when cors or trusted hosts are unsafe', function (): voi
     config()->set('cors.allowed_origins', ['*']);
     config()->set('security.trusted_hosts', []);
 
-    expect(fn (): null => ProductionSecurityChecks::assertForEnvironment('production'))
+    expect(fn(): null => ProductionSecurityChecks::assertForEnvironment('production'))
         ->toThrow(RuntimeException::class, 'CORS allowed origins must not use wildcard');
 });
 
@@ -50,6 +50,6 @@ it('passes with safe production security settings', function (): void {
     config()->set('cors.allowed_origins', ['https://app.example.com']);
     config()->set('security.trusted_hosts', ['api.example.com']);
 
-    expect(fn (): null => ProductionSecurityChecks::assertForEnvironment('production'))
+    expect(fn(): null => ProductionSecurityChecks::assertForEnvironment('production'))
         ->not->toThrow(RuntimeException::class);
 });

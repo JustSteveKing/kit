@@ -26,7 +26,7 @@ final class ShowResetPasswordTokenController
 {
     public function __invoke(ShowResetPasswordTokenRequest $request): JsonResponse
     {
-        $payload = ShowResetPasswordTokenPayload::fromReqest($request);
+        $payload = ShowResetPasswordTokenPayload::fromRequest($request);
 
         return new JsonResponse([
             'token' => $payload->token,

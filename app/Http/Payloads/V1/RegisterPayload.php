@@ -6,6 +6,7 @@ namespace App\Http\Payloads\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 final readonly class RegisterPayload
 {
@@ -16,16 +17,16 @@ final readonly class RegisterPayload
         public string $deviceName,
     ) {}
 
-    public static function fromReqest(Request $request): self
+    public static function fromRequest(Request $request): self
     {
         $data = self::validatedData($request);
 
         return new self(
-            name: (string) $data['name'],
-            email: (string) $data['email'],
-            password: (string) $data['password'],
-            deviceName: isset($data['device_name']) && $data['device_name'] !== ''
-                ? (string) $data['device_name']
+            name: Arr::string($data, 'name'),
+            email: Arr::string($data, 'email'),
+            password: Arr::string($data, 'password'),
+            deviceName: isset($data['device_name']) && '' !== $data['device_name']
+                ? Arr::string($data, 'device_name')
                 : 'api-client',
         );
     }
@@ -35,10 +36,9 @@ final readonly class RegisterPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

@@ -29,8 +29,11 @@ final class ShowResetPasswordTokenRequest extends FormRequest
      */
     public function validationData(): array
     {
-        return array_merge($this->all(), [
+        /** @var array<string, mixed> $data */
+        $data = array_merge($this->all(), [
             'token' => $this->route('token'),
         ]);
+
+        return $data;
     }
 }

@@ -6,6 +6,7 @@ namespace App\Http\Payloads\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 final readonly class DeleteTokenPayload
 {
@@ -13,12 +14,12 @@ final readonly class DeleteTokenPayload
         public int $tokenId,
     ) {}
 
-    public static function fromReqest(Request $request): self
+    public static function fromRequest(Request $request): self
     {
         $data = self::validatedData($request);
 
         return new self(
-            tokenId: (int) $data['token_id'],
+            tokenId: (int) Arr::string($data, 'token_id'),
         );
     }
 
@@ -27,10 +28,9 @@ final readonly class DeleteTokenPayload
      */
     private static function validatedData(Request $request): array
     {
-        if ($request instanceof FormRequest) {
-            return $request->validated();
-        }
+        /** @var array<string, mixed> $data */
+        $data = $request instanceof FormRequest ? $request->validated() : $request->all();
 
-        return $request->all();
+        return $data;
     }
 }

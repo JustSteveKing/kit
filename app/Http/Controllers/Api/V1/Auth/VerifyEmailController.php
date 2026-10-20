@@ -38,13 +38,13 @@ final class VerifyEmailController
 {
     public function __invoke(VerifyEmailRequest $request): JsonResponse
     {
-        $payload = VerifyEmailPayload::fromReqest($request);
+        $payload = VerifyEmailPayload::fromRequest($request);
 
         $user = User::query()->findOrFail($payload->id);
 
         if ( ! hash_equals(sha1($user->getEmailForVerification()), $payload->hash)) {
             SecurityAudit::log('auth.email_verification.failed', [
-                'user_id' => (string) $user->getKey(),
+                'user_id' => $user->id,
                 'reason' => 'hash_mismatch',
             ]);
 
@@ -58,7 +58,7 @@ final class VerifyEmailController
         }
 
         SecurityAudit::log('auth.email_verification.succeeded', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => $user->id,
             'already_verified' => $wasAlreadyVerified,
         ]);
 

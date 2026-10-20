@@ -44,7 +44,7 @@ final class ResetPasswordController
 {
     public function __invoke(ResetPasswordRequest $request): JsonResponse
     {
-        $payload = ResetPasswordPayload::fromReqest($request);
+        $payload = ResetPasswordPayload::fromRequest($request);
         $resetUserId = null;
 
         $status = Password::broker()->reset(
@@ -60,13 +60,15 @@ final class ResetPasswordController
                     'remember_token' => Str::random(60),
                 ])->save();
 
-                $resetUserId = (string) $user->getKey();
+                $resetUserId = $user->id;
 
                 event(new PasswordReset($user));
             },
         );
 
         if (Password::PASSWORD_RESET !== $status) {
+            $status = is_string($status) ? $status : 'unknown';
+
             SecurityAudit::log('auth.password_reset.failed', [
                 'email_hash' => SecurityAudit::hashEmail($payload->email),
                 'status' => $status,

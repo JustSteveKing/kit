@@ -26,19 +26,21 @@ final class LogoutController
 {
     public function __invoke(Request $request, #[CurrentUser] User $user): Response
     {
-        /** @var PersonalAccessToken $token */
         $token = $user->currentAccessToken();
 
-        if ($token) {
+        // Sanctum types this as the token model, but a session-authenticated request gets a
+        // TransientToken, which has nothing to revoke.
+        // @phpstan-ignore instanceof.alwaysTrue
+        if ($token instanceof PersonalAccessToken) {
             SecurityAudit::log('auth.logout.succeeded', [
-                'user_id' => (string) $user->getKey(),
-                'token_id' => (string) $token->getKey(),
+                'user_id' => $user->id,
+                'token_id' => (string) $token->id,
             ]);
 
             $token->delete();
         } else {
             SecurityAudit::log('auth.logout.succeeded', [
-                'user_id' => (string) $user->getKey(),
+                'user_id' => $user->id,
                 'token_id' => null,
             ]);
         }

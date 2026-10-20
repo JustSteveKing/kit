@@ -9,7 +9,7 @@ use JustSteveKing\Toolbox\Deprecation\Attributes\Deprecation;
 use JustSteveKing\Toolbox\Deprecation\Attributes\Sunset;
 
 it('adds deprecation and sunset headers for endpoints that are still live', function (): void {
-    $path = '/v1/test/deprecated-'.Str::lower((string) Str::ulid());
+    $path = '/v1/test/deprecated-' . Str::lower((string) Str::ulid());
 
     Route::middleware('api')->get($path, DeprecatedEndpoint::class);
 
@@ -20,7 +20,7 @@ it('adds deprecation and sunset headers for endpoints that are still live', func
 });
 
 it('returns 410 gone once the sunset date has passed', function (): void {
-    $path = '/v1/test/retired-'.Str::lower((string) Str::ulid());
+    $path = '/v1/test/retired-' . Str::lower((string) Str::ulid());
 
     Route::middleware('api')->get($path, RetiredEndpoint::class);
 
@@ -32,7 +32,7 @@ it('returns 410 gone once the sunset date has passed', function (): void {
 });
 
 it('serves deprecated endpoints that have no sunset date', function (): void {
-    $path = '/v1/test/deprecated-only-'.Str::lower((string) Str::ulid());
+    $path = '/v1/test/deprecated-only-' . Str::lower((string) Str::ulid());
 
     Route::middleware('api')->get($path, DeprecatedWithoutSunsetEndpoint::class);
 

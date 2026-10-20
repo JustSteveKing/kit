@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Laravel\Sanctum\PersonalAccessToken;
 
-/**
- * @mixin PersonalAccessToken
- */
 final class PersonalAccessTokenResource extends JsonResource
 {
     /**
@@ -18,17 +15,20 @@ final class PersonalAccessTokenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $currentTokenId = $request->user()?->currentAccessToken()?->getKey();
+        /** @var PersonalAccessToken $token */
+        $token = $this->resource;
+
+        $currentToken = $request->user()?->currentAccessToken();
 
         return [
-            'id' => (string) $this->getKey(),
-            'name' => $this->name,
-            'abilities' => $this->abilities,
-            'last_used_at' => $this->last_used_at?->toAtomString(),
-            'expires_at' => $this->expires_at?->toAtomString(),
-            'created_at' => $this->created_at?->toAtomString(),
-            'updated_at' => $this->updated_at?->toAtomString(),
-            'is_current' => null !== $currentTokenId && (string) $currentTokenId === (string) $this->getKey(),
+            'id' => (string) $token->id,
+            'name' => $token->name,
+            'abilities' => $token->abilities,
+            'last_used_at' => $token->last_used_at?->toAtomString(),
+            'expires_at' => $token->expires_at?->toAtomString(),
+            'created_at' => $token->created_at?->toAtomString(),
+            'updated_at' => $token->updated_at?->toAtomString(),
+            'is_current' => $currentToken instanceof PersonalAccessToken && $currentToken->is($token),
         ];
     }
 }

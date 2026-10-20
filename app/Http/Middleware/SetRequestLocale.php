@@ -17,14 +17,14 @@ final class SetRequestLocale
     public function handle(Request $request, Closure $next): Response
     {
         $supportedLocales = array_values(array_filter(array_map(
-            static fn (mixed $locale): string => trim((string) $locale),
-            (array) config('app.supported_locales', [config('app.locale')]),
+            static fn(mixed $locale): string => is_string($locale) ? mb_trim($locale) : '',
+            config()->array('app.supported_locales', [config()->string('app.locale')]),
         )));
 
         $preferredLocale = $request->getPreferredLanguage($supportedLocales);
-        $resolvedLocale = is_string($preferredLocale) && $preferredLocale !== ''
+        $resolvedLocale = is_string($preferredLocale) && '' !== $preferredLocale
             ? $preferredLocale
-            : (string) config('app.fallback_locale', 'en');
+            : config()->string('app.fallback_locale', 'en');
 
         App::setLocale($resolvedLocale);
 

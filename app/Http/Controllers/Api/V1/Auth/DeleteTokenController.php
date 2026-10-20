@@ -30,13 +30,13 @@ final class DeleteTokenController
 {
     public function __invoke(DeleteTokenRequest $request, #[CurrentUser] User $user): Response
     {
-        $payload = DeleteTokenPayload::fromReqest($request);
+        $payload = DeleteTokenPayload::fromRequest($request);
 
         $token = $user->tokens()->whereKey($payload->tokenId)->first();
 
         if ( ! $token) {
             SecurityAudit::log('auth.tokens.revoke_failed', [
-                'user_id' => (string) $user->getKey(),
+                'user_id' => $user->id,
                 'token_id' => (string) $payload->tokenId,
                 'reason' => 'not_found',
             ]);
@@ -45,8 +45,8 @@ final class DeleteTokenController
         }
 
         SecurityAudit::log('auth.tokens.revoked', [
-            'user_id' => (string) $user->getKey(),
-            'token_id' => (string) $token->getKey(),
+            'user_id' => $user->id,
+            'token_id' => (string) $token->id,
         ]);
 
         $token->delete();

@@ -49,7 +49,7 @@ final class LoginController
 {
     public function __invoke(LoginRequest $request): JsonResponse
     {
-        $payload = LoginPayload::fromReqest($request);
+        $payload = LoginPayload::fromRequest($request);
 
         $user = User::query()->where('email', $payload->email)->first();
 
@@ -67,7 +67,7 @@ final class LoginController
         [$token, $expiresAt] = $this->issueToken($user, $payload->deviceName);
 
         SecurityAudit::log('auth.login.succeeded', [
-            'user_id' => (string) $user->getKey(),
+            'user_id' => $user->id,
             'email_hash' => SecurityAudit::hashEmail($payload->email),
             'device_name' => $payload->deviceName,
             'token_expires_at' => $expiresAt?->toAtomString(),
@@ -115,7 +115,7 @@ final class LoginController
         }
 
         return array_values(array_filter(
-            array_map(static fn(mixed $ability): string => mb_trim((string) $ability), $abilities),
+            array_map(static fn(mixed $ability): string => is_string($ability) ? mb_trim($ability) : '', $abilities),
             static fn(string $ability): bool => '' !== $ability,
         ));
     }
