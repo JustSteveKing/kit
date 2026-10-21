@@ -38,11 +38,11 @@ it('accepts the bare key form that common clients send', function (): void {
         'email' => 'bare-key@example.com',
     ]);
 
-    $first = $this->withHeaders(['Idempotency-Key' => 'bare-key-12345'])
+    $first = $this->withHeaders(['Idempotency-Key' => 'bare-retry-1'])
         ->postJson('/v1/auth/password/forgot', ['email' => $user->email])
         ->assertOk();
 
-    $this->withHeaders(['Idempotency-Key' => '"bare-key-12345"'])
+    $this->withHeaders(['Idempotency-Key' => '"bare-retry-1"'])
         ->postJson('/v1/auth/password/forgot', ['email' => $user->email])
         ->assertIdempotentReplay($first);
 
@@ -81,7 +81,7 @@ it('replays forgot-password requests when idempotency key is reused', function (
         'email' => 'forgot-idempotency@example.com',
     ]);
 
-    $headers = ['Idempotency-Key' => 'forgot-key-12345'];
+    $headers = ['Idempotency-Key' => 'forgot-retry-1'];
     $payload = ['email' => $user->email];
 
     $first = $this->withHeaders($headers)

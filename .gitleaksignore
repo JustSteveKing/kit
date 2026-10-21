@@ -1,3 +1,8 @@
+# False positives in Kit's own history, by commit. An application made from Kit has different
+# commits, so none of these apply there; .gitleaks.toml covers what it inherits.
 # Idempotency-Key fixtures in tests, not secrets.
 7659aa0276ef1b02f5fdb900f2353e64c59273b2:tests/Feature/IdempotencyKeyTest.php:generic-api-key:41
 7659aa0276ef1b02f5fdb900f2353e64c59273b2:tests/Feature/IdempotencyKeyTest.php:generic-api-key:45
+b82cd5f5910bc83fb2063b8347334fed3831cc6a:tests/Feature/IdempotencyKeyTest.php:generic-api-key:71
+# A package name in an early README.
+af563d83d2cb982cfc85cc0826e30c8271abb126:README.md:generic-api-key:25
