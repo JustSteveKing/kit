@@ -76,7 +76,18 @@ On every push and pull request:
 ### `security-gate.yml`
 
 On every push and pull request, `composer audit` fails the build on a high or critical advisory, and
-Gitleaks scans the repository for committed secrets.
+Gitleaks scans the repository for committed secrets. Gitleaks is downloaded at a pinned version
+and its checksum verified, like legible. It scans the commits a pull request or push adds, and all
+of history on a manual run or when there is no earlier commit to start from, such as your
+application's first push.
+
+`.gitleaks.toml` keeps every default rule and skips only generated files that cannot hold a
+secret: Scribe's `.scribe/.filehashes` and Laravel Boost's skills. Run `gitleaks git .` to scan
+locally with the same settings. When Gitleaks flags something that is not a secret, such as an
+example key in a test, make the example plainly not random (`"register-retry-1"`) rather than
+ignoring it: the rule that fires, `generic-api-key`, is looking for random-looking strings.
+`.gitleaksignore` lists false positives in Kit's own history by commit, so it does nothing in your
+application.
 
 ### `dependency-updates.yml`
 

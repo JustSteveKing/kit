@@ -1,0 +1,14 @@
+# Gitleaks reads this file in CI and locally (`gitleaks git .`). It keeps every default rule and
+# skips only files that are generated and cannot hold a secret. It is allowed by path, not by
+# commit, so it holds in an application made from Kit, whose history has different commits.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated files that are not secrets"
+paths = [
+    # Scribe's hashes of the files it has documented.
+    '''^\.scribe/\.filehashes$''',
+    # Laravel Boost's skills, written by boost:update, whose examples include placeholder keys.
+    '''^\.(agents|claude)/skills/''',
+]

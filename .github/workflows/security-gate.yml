@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   composer-audit:
@@ -50,7 +49,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      # The commits this push or pull request adds, or all of history when there is no earlier
+      # commit to start from: a new repository's first push, a new branch, a force push, or a
+      # manual run. gitleaks-action fails on a first push, where its range starts at the root
+      # commit's parent, which does not exist.
+      - name: Scan for secrets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_VERSION: 8.24.3
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl -fsSLO "${base}/${archive}"
+          curl -fsSL "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt" | grep " ${archive}\$" | sha256sum -c -
+          tar xzf "${archive}" gitleaks
+
+          range="${HEAD}"
+          if [ "${EVENT}" = "pull_request" ]; then
+            range="${BASE}..${HEAD}"
+          elif [ "${EVENT}" = "push" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            range="${BEFORE}..${HEAD}"
+          fi
+
+          echo "Scanning ${range}"
+          ./gitleaks git --redact --verbose --log-opts="--no-merges ${range}" .
