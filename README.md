@@ -52,6 +52,14 @@ curl -X POST http://127.0.0.1:8000/v1/auth/register \
 - [Laravel Vet](https://github.com/laravel/vet) auditing every dependency, and a weekly update PR
 - An [`AGENTS.md`](AGENTS.md) that tells coding agents how to build on Kit without undoing it
 
+## See it in an application
+
+[Flagpole](https://github.com/JustSteveKing/flagpole) is a feature flag service built on Kit, which
+applications evaluate with any OpenFeature SDK. Each Kit feature it uses is one a flag service
+needs: ETags for clients that poll, `If-Match` so two people cannot overwrite each other's rules,
+keys scoped tightly enough to put in a browser. Its first commit is Kit as the installer wrote it, and each commit after that adds one
+thing, so you can see what building on Kit involves.
+
 ## Documentation
 
 | Page | What it covers |
