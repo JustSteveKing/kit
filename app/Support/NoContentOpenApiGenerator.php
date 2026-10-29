@@ -8,13 +8,14 @@ use Knuckles\Camel\Output\OutputEndpointData;
 use Knuckles\Scribe\Writing\OpenApiSpecGenerators\OpenApiGenerator;
 
 /**
- * Documents 204 and 304 responses without content. Scribe gives every response a JSON body, even
- * one declared as content: null, but RFC 9110 sections 15.3.5 and 15.4.5 say these responses have
- * none.
+ * Documents 204, 303 and 304 responses without content. Scribe gives every response a JSON body,
+ * even one declared as content: null. RFC 9110 sections 15.3.5 and 15.4.5 say 204 and 304 have
+ * none. A 303's body, by section 15.4.4, is at most a short hypertext note pointing at the
+ * Location, which clients follow instead of reading; documenting it as JSON would be wrong.
  */
 final class NoContentOpenApiGenerator extends OpenApiGenerator
 {
-    private const array STATUSES = [204, 304];
+    private const array STATUSES = [204, 303, 304];
 
     /**
      * @param  array<string, mixed>  $pathItem
