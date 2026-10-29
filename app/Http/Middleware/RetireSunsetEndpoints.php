@@ -33,7 +33,8 @@ final readonly class RetireSunsetEndpoints
         if ($route instanceof Route) {
             $sunsetAt = $this->deprecations->forRoute($route)?->sunsetAt;
 
-            if ($sunsetAt instanceof DateTimeImmutable && $sunsetAt <= new DateTimeImmutable('now')) {
+            // Laravel's clock rather than the system's, so a test can travel past a sunset.
+            if ($sunsetAt instanceof DateTimeImmutable && $sunsetAt <= now()->toDateTimeImmutable()) {
                 abort(Response::HTTP_GONE, __('api.sunset.endpoint_unavailable'));
             }
         }
