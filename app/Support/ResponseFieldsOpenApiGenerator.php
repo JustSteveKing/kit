@@ -83,8 +83,10 @@ final class ResponseFieldsOpenApiGenerator extends OpenApiGenerator
     private function apply(array $schema, array $path, ResponseField $field): array
     {
         if ([] === $path) {
+            // Scribe writes an array field's type as "string[]" or "object[]", which is not an
+            // OpenAPI type; the items already carry their own.
             if ('' !== $field->type) {
-                $schema['type'] = $field->type;
+                $schema['type'] = str_ends_with($field->type, '[]') ? 'array' : $field->type;
             }
 
             if (true === $field->nullable) {
