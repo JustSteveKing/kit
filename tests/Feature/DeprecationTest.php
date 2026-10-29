@@ -31,6 +31,18 @@ it('returns 410 gone once the sunset date has passed', function (): void {
         ->assertSunset('2001-01-01T00:00:00Z');
 });
 
+it('retires an endpoint when the clock passes its sunset, the test clock included', function (): void {
+    $path = '/v1/test/deprecated-' . Str::lower((string) Str::ulid());
+
+    Route::middleware('api')->get($path, DeprecatedEndpoint::class);
+
+    $this->getJson($path)->assertOk();
+
+    $this->travelTo(new DateTimeImmutable('2099-01-01T00:00:01Z'));
+
+    $this->getJson($path)->assertProblemType('https://apiguide.dev/errors/gone', 410);
+});
+
 it('serves deprecated endpoints that have no sunset date', function (): void {
     $path = '/v1/test/deprecated-only-' . Str::lower((string) Str::ulid());
 
