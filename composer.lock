@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b814c4cf046e17e177a5ae998331468",
+    "content-hash": "aee1a1ef2a33027a8a78b7ff527e7b3e",
     "packages": [
         {
             "name": "brick/math",
@@ -1060,16 +1060,16 @@
         },
         {
             "name": "juststeveking/api-toolbox",
-            "version": "v0.3.2",
+            "version": "v0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JustSteveKing/api-toolbox.git",
-                "reference": "ed77856cc169af66260223e500e3822f852784c8"
+                "reference": "5f1978fa4d5d8e90806e3a9394524f3ae9ce5398"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JustSteveKing/api-toolbox/zipball/ed77856cc169af66260223e500e3822f852784c8",
-                "reference": "ed77856cc169af66260223e500e3822f852784c8",
+                "url": "https://api.github.com/repos/JustSteveKing/api-toolbox/zipball/5f1978fa4d5d8e90806e3a9394524f3ae9ce5398",
+                "reference": "5f1978fa4d5d8e90806e3a9394524f3ae9ce5398",
                 "shasum": ""
             },
             "require": {
@@ -1120,9 +1120,9 @@
             ],
             "support": {
                 "issues": "https://github.com/JustSteveKing/api-toolbox/issues",
-                "source": "https://github.com/JustSteveKing/api-toolbox/tree/v0.3.2"
+                "source": "https://github.com/JustSteveKing/api-toolbox/tree/v0.3.3"
             },
-            "time": "2026-10-20T19:55:31+00:00"
+            "time": "2026-10-29T13:27:48+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
