@@ -132,7 +132,7 @@ api-toolbox is configured in `config/api-toolbox.php`. Before hand-rolling any o
 | Cheap re-fetches of a resource | `conditional` middleware (ETag, `304`) |
 | Stop lost updates | the model implements `HasValidators` and is bound to the route, which adds `conditional` and `preconditions.required`: the first gives the `412`, the second only the `428` |
 | A `PATCH` | `merge-patch` and `consumes:application/merge-patch+json`, which replaces the group's `consumes:` |
-| Retire an endpoint | `#[Deprecation]` and `#[Sunset]` on the controller class; Kit answers `410` after the sunset date |
+| Retire an endpoint | `#[Deprecation]` and `#[Sunset]` on the controller class; Kit answers `410` (`endpoint-sunset`) after the sunset date |
 | Work that outlives the request | Async operations; switched off in the config, and turning it on adds a route to document |
 | Signed webhooks | Message signatures; keys go in the config, never in code |
 

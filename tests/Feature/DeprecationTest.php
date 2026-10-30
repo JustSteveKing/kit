@@ -25,8 +25,12 @@ it('returns 410 gone once the sunset date has passed', function (): void {
     Route::middleware('api')->get($path, RetiredEndpoint::class);
 
     $this->getJson($path)
-        ->assertProblemType('https://apiguide.dev/errors/gone', 410)
+        ->assertProblemType('https://apiguide.dev/errors/endpoint-sunset', 410)
+        ->assertJsonPath('title', 'Endpoint Sunset')
         ->assertJsonPath('detail', __('api.sunset.endpoint_unavailable'))
+        ->assertJsonPath('deprecatedAt', '2000-01-01T00:00:00+00:00')
+        ->assertJsonPath('sunsetAt', '2001-01-01T00:00:00+00:00')
+        ->assertJsonMissingPath('migrationGuide')
         ->assertDeprecated('2000-01-01T00:00:00Z')
         ->assertSunset('2001-01-01T00:00:00Z');
 });
@@ -40,7 +44,10 @@ it('retires an endpoint when the clock passes its sunset, the test clock include
 
     $this->travelTo(new DateTimeImmutable('2099-01-01T00:00:01Z'));
 
-    $this->getJson($path)->assertProblemType('https://apiguide.dev/errors/gone', 410);
+    // The sunset's link is where to go instead (apiguide.dev's endpoint-sunset asks for it).
+    $this->getJson($path)
+        ->assertProblemType('https://apiguide.dev/errors/endpoint-sunset', 410)
+        ->assertJsonPath('migrationGuide', 'https://docs.example.com/sunset-policy');
 });
 
 it('serves deprecated endpoints that have no sunset date', function (): void {
