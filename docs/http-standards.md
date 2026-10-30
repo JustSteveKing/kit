@@ -179,7 +179,11 @@ plus `Link` headers pointing at the pages you named. Client tooling can warn on 
 has to read your changelog to find out.
 
 When the sunset date passes, `RetireSunsetEndpoints` starts answering `410 Gone` as a problem,
-still carrying both headers. You do not have to remember to delete the route on the day.
+still carrying both headers. The problem's type is apiguide.dev's `endpoint-sunset` rather than
+plain `gone`, so a client can tell a retired interface (a fault in its code) from a deleted record,
+and the body says when and where to go instead: `deprecatedAt`, `sunsetAt`, and `migrationGuide`,
+which is the `#[Sunset]` link, or the `#[Deprecation]` one without it. You do not have to remember
+to delete the route on the day.
 
 The attributes go on the controller class or its `__invoke` method. Closure routes have nowhere to
 put them, so they cannot be deprecated this way.
